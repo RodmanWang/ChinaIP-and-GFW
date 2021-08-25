@@ -1,0 +1,84 @@
+name: Update China IP list and generate GeoIP2 database
+
+on:
+  push:
+    branches: [ RodmanWang-patch-1 ]
+  
+  workflow_dispatch:
+
+  schedule: 
+    - cron:  '0 2 */3 * *'
+
+jobs:
+  build:
+    name: Generate GeoIP2 database
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+    - name: Create dist folder
+      run: mkdir -p dist
+
+    - name: Compile GeoIP conversion bin (Golang)
+      run: ./build.sh
+
+    - name: Obtain CN IP lists
+      run: |
+        curl -LR -o dist/ipip_net.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
+        curl -LR -o dist/chunzhen.txt "https://raw.githubusercontent.com/metowolf/iplist/master/data/country/CN.txt"
+        curl -LR -o dist/china6.txt "https://raw.githubusercontent.com/ChanthMiao/China-IPv6-List/release/cn6.txt"
+
+    - name: Merge and IP lists and remove duplicates
+      run: |
+        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge.txt
+        awk '!seen[$0]++' dist/merge.txt > dist/CN-ip-cidr.txt
+
+    - name: Generate GeoIP2 database
+      run: |
+        CURRENT_DIR=$(pwd)
+        cd dist
+        ./ipip2mmdb -s ./CN-ip-cidr.txt -d Country.mmdb
+        cd $CURRENT_DIR
+
+    - name: Push artifacts to release branch
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        git fetch
+        git checkout release
+
+        git checkout --orphan release-orphan
+        git rm -rf .
+
+        cp -rf dist/CN-ip-cidr.txt ./
+        cp -rf dist/Country.mmdb ./
+
+        git add Country.mmdb
+        git add CN-ip-cidr.txt
+        git commit -am "Updated at $(date)"
+
+        git branch -D release
+        git branch -m release
+            
+    - name: GitHub Push
+      uses: ad-m/github-push-action@v0.6.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: release
+        force: true
