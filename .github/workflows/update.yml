@@ -35,7 +35,7 @@ jobs:
       run: mkdir -p dist
 
     - name: Compile GeoIP conversion bin (Golang)
-      run: ./build.sh
+      run: /bin/bash ./build.sh
 
     - name: Obtain CN IP lists
       run: |
