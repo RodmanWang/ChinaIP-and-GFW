@@ -58,8 +58,10 @@ jobs:
         git config --local user.name "GitHub Action"
         git fetch
         git checkout main
-        git checkout --orphan release-orphan
+        git checkout --orphan main-orphan
         git rm -rf dist/.
+        cp -rf dist/CN-ip-cidr.txt ./
+        cp -rf dist/Country.mmdb ./
         git add Country.mmdb
         git add CN-ip-cidr.txt
         git commit -am "Updated at $(date)"
