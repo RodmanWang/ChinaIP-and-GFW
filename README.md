@@ -1,7 +1,7 @@
 
 ## 🏅 声明
 
-综合以下仓库,感谢！
+感谢以下仓库大佬！
 
 https://github.com/JMVoid/ipip2mmdb
 
