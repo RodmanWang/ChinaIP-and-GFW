@@ -1,1 +1,0 @@
-# GeoIP2-CN-ip4-ip6
