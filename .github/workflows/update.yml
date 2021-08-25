@@ -56,9 +56,10 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        
         git fetch
-        git rm -rf dist
+        git checkout main
+        git checkout --orphan release-orphan
+        git rm -rf dist/.
         git add Country.mmdb
         git add CN-ip-cidr.txt
         git commit -am "Updated at $(date)"
@@ -69,4 +70,4 @@ jobs:
       uses: ad-m/github-push-action@v0.6.0
       with:
         github_token: ${{ secrets.PERSON_TOKEN }}
-        branch: main
+        branch: 'main'
