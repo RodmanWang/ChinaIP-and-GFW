@@ -74,12 +74,12 @@ jobs:
         git add CN-ip-cidr.txt
         git commit -am "Updated at $(date)"
 
-        git branch -D release
-        git branch -m release
+        git branch -D master
+        git branch -m master
             
     - name: GitHub Push
       uses: ad-m/github-push-action@v0.6.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: release
+        branch: master
         force: true
