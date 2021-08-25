@@ -47,7 +47,7 @@ jobs:
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
-        ipip2mmdb -s CN-ip-cidr.txt -d Country.mmdb
+        ./ipip2mmdb -s ./CN-ip-cidr.txt -d Country.mmdb
         cd $CURRENT_DIR
     - name: Push artifacts to release branch
       run: |
