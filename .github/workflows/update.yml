@@ -47,7 +47,7 @@ jobs:
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
-        ipip2mmdb -s ./CN-ip-cidr.txt -d Country.mmdb
+        ipip2mmdb -s CN-ip-cidr.txt -d Country.mmdb
         cd $CURRENT_DIR
     - name: Push artifacts to release branch
       run: |
@@ -59,8 +59,8 @@ jobs:
         git rm -rf ipip_net.txt
         git rm -rf merge.txt
         git rm -rf verify_ip
-        cp -rf CN-ip-cidr.txt ./
-        cp -rf Country.mmdb ./
+        cp -rf CN-ip-cidr.txt
+        cp -rf Country.mmdb
         git add Country.mmdb
         git add CN-ip-cidr.txt
         git commit -am "Updated at $(date)"
