@@ -31,42 +31,47 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
-        
+    - name: Create dist folder
+      run: mkdir -p dist
+
     - name: Compile GeoIP conversion bin (Golang)
       run: /bin/bash ./build.sh
 
     - name: Obtain CN IP lists
       run: |
-        curl -LR -o ipip_net.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
-        curl -LR -o chunzhen.txt "https://raw.githubusercontent.com/metowolf/iplist/master/data/country/CN.txt"
-        curl -LR -o china6.txt "https://raw.githubusercontent.com/ChanthMiao/China-IPv6-List/release/cn6.txt"
+        curl -LR -o dist/ipip_net.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
+        curl -LR -o dist/chunzhen.txt "https://raw.githubusercontent.com/metowolf/iplist/master/data/country/CN.txt"
+        curl -LR -o dist/china6.txt "https://raw.githubusercontent.com/ChanthMiao/China-IPv6-List/release/cn6.txt"
     - name: Merge and IP lists and remove duplicates
       run: |
-        awk 'FNR==1{print ""}{print}' *.txt > merge.txt
-        awk '!seen[$0]++' merge.txt > CN-ip-cidr.txt
+        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge.txt
+        awk '!seen[$0]++' dist/merge.txt > dist/CN-ip-cidr.txt
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
+        cd dist
         ./ipip2mmdb -s ./CN-ip-cidr.txt -d Country.mmdb
         cd $CURRENT_DIR
     - name: Push artifacts to release branch
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git rm -rf china6.txt
-        git rm -rf chunzhen.txt
-        git rm -rf ipip2mmdb
-        git rm -rf ipip_net.txt
-        git rm -rf merge.txt
-        git rm -rf verify_ip
-        cp -rf CN-ip-cidr.txt
-        cp -rf Country.mmdb
+        
+        git fetch
+        git checkout release
+        git checkout --orphan release-orphan
+        git rm -rf .
+        cp -rf dist/CN-ip-cidr.txt ./
+        cp -rf dist/Country.mmdb ./
         git add Country.mmdb
         git add CN-ip-cidr.txt
         git commit -am "Updated at $(date)"
+        git branch -D release
+        git branch -m release
             
     - name: GitHub Push
       uses: ad-m/github-push-action@v0.6.0
       with:
         github_token: ${{ secrets.PERSON_TOKEN }}
-        branch: 'main'
+        branch: release
+        force: true
