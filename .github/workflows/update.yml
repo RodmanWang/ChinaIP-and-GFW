@@ -57,17 +57,12 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         
-        git fetch
-        git checkout release
-        git checkout --orphan release-orphan
         git rm -rf .
         cp -rf dist/CN-ip-cidr.txt ./
         cp -rf dist/Country.mmdb ./
         git add Country.mmdb
         git add CN-ip-cidr.txt
         git commit -am "Updated at $(date)"
-        git branch -D release
-        git branch -m release
             
     - name: GitHub Push
       uses: ad-m/github-push-action@v0.6.0
