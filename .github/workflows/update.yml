@@ -44,14 +44,14 @@ jobs:
         curl -LR -o dist/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
         curl -LR -o dist/apple.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf"
         curl -LR -o dist/google.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf"
-        
     - name: Merge and IP lists and remove duplicates
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge.txt
         awk '!seen[$0]++' dist/merge.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
-        awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" | sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" > dist/domestic-domain.conf
+        awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
+        sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/domestic-domain.conf 2>/dev/null
         cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
        
     - name: Generate GeoIP2 database
