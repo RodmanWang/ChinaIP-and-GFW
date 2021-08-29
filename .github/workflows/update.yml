@@ -56,7 +56,7 @@ jobs:
       run: |
         awk 'FNR==1{print ""}{print}' dist/china+[1-9].txt > dist/v4.txt
         awk '!seen[$0]++' dist/v4.txt | sort -n > dist/china-v4.txt
-        awk 'FNR==1{print ""}{print}' dist/chinav[1-9].txt > dist/china.txt
+        awk 'FNR==1{print ""}{print}' dist/china-v[1-9].txt > dist/china.txt
         awk '!seen[$0]++' dist/china.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge2.txt
