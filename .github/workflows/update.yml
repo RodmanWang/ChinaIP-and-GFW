@@ -33,6 +33,7 @@ jobs:
         fi
     - name: Create dist folder
       run: mkdir -p dist
+           mkdir -p dist2
 
     - name: Compile GeoIP conversion bin (Golang)
       run: /bin/bash ./build.sh
