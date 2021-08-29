@@ -45,8 +45,7 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge.txt
-        awk '!seen[$0]++' dist/merge.txt | grep -v '^$|#' > dist/CN-ip-cidr.txt
-        cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
+        awk '!seen[$0]++' dist/merge.txt grep -v '^$|#' > dist/CN-ip-cidr.txt
         
     - name: Generate GeoIP2 database
       run: |
