@@ -57,9 +57,8 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
-        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n > dist2/ChinaIPv4.txt
-        awk 'FNR==1{print ""}{print}' dist2/*.txt > dist/China.txt
-        awk '!seen[$0]++' dist/China.txt | grep -Ev "^#|^$" > dist/China-IP.txt
+        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -Ev "^#|^$" > dist2/ChinaIPv4.txt
+        awk 'FNR==1{print ""}{print}' dist2/*.txt | grep -Ev "^#|^$"  > dist/China-IP.txt
         
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
         awk '!seen[$0]++' dist3/gfw0.txt | sed "s/^www\.//p" > dist3/gfw00.txt
