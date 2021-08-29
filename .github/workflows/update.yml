@@ -67,7 +67,7 @@ jobs:
         awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt  
 
         
-        awk '!seen[$0]++' dist//china.conf | sed "s/^/www\.///p" > dist/China0.conf
+        awk '!seen[$0]++' dist//china.conf | sed "s//!www\.//!/p" > dist/China0.conf
         awk '!seen[$0]++' dist/china0.conf | grep -Ev "^#|^$" > dist/China-domain.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
         
