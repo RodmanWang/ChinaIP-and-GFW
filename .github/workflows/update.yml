@@ -39,8 +39,6 @@ jobs:
 
     - name: Obtain CN IP lists
       run: |
-        curl -LR -o dist/ipip_net.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
-        curl -LR -o dist/chunzhen.txt "https://raw.githubusercontent.com/metowolf/iplist/master/data/country/CN.txt"
         curl -LR -o dist/china.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
         curl -LR -o dist/china6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
         
@@ -48,6 +46,7 @@ jobs:
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge.txt
         awk '!seen[$0]++' dist/merge.txt > dist/CN-ip-cidr.txt
+        cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
         
     - name: Generate GeoIP2 database
       run: |
@@ -69,9 +68,10 @@ jobs:
         
         cp -rf dist/CN-ip-cidr.txt ./
         cp -rf dist/Country.mmdb ./
-        
+        cp -rf dist/Whitelist-ip.conf ./
         git add Country.mmdb
         git add CN-ip-cidr.txt
+        git add Whitelist-ip.conf
         git commit -am "Updated at $(date)"
         
         git branch -D release
