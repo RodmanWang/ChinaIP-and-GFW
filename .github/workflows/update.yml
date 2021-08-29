@@ -44,8 +44,8 @@ jobs:
         curl -LR -o dist/china-v6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
         
         #GFW
-        curl -LR -o dist2/greatfire.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
-        curl -LR -o dist2/gfw0.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
+        curl -LR -o dist/gfw1.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
+        curl -LR -o dist/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
         
         #Domestic-Domain
         curl -LR -o dist/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
@@ -59,7 +59,7 @@ jobs:
         awk 'FNR==1{print ""}{print}' dist/china-v[1-9].txt > dist/china.txt
         awk '!seen[$0]++' dist/china.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
-        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge2.txt
+        awk 'FNR==1{print ""}{print}' dist/gfw*.txt > dist/merge2.txt
         awk '!seen[$0]++' dist/merge2.txt | sed "s/www.//p" > dist/gfw00.txt
         awk '!seen[$0]++' dist/gfw00.txt | grep -Ev "^#|^$" > dist/gfw.txt  
 
