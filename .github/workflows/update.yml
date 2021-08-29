@@ -89,12 +89,14 @@ jobs:
         cp -rf dist/Country.mmdb ./
         cp -rf dist/Whitelist-ip.conf ./
         cp -rf dist/domestic-domain.conf ./
+        cp -rf dist/gfw-domain.conf ./
         
         git add Country.mmdb
         git add CN-ip-cidr.txt
         git add gfw.txt
         git add Whitelist-ip.conf
         git add domestic-domain.conf
+        git add gfw-domain.conf
         
         git commit -am "Updated at $(date)"
         
