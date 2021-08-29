@@ -44,28 +44,28 @@ jobs:
         curl -LR -o dist/china6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
         
         #GFW
-        curl -LR -o dist/greatfire.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
-        curl -LR -o dist/gfw0.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
+        curl -LR -o dist2/greatfire.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
+        curl -LR -o dist2/gfw0.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
         
         #Domestic-Domain
-        curl -LR -o dist/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
-        curl -LR -o dist/apple.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf"
-        curl -LR -o dist/google.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf"
+        curl -LR -o dist3/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
+        curl -LR -o dist3/apple.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf"
+        curl -LR -o dist3/google.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf"
 
     - name: Merge and IP lists and remove duplicates
       run: |
-        awk 'FNR==1{print ""}{print}' dist/(china|china6).txt > dist/merge.txt
+        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge.txt
         awk '!seen[$0]++' dist/merge.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
-        awk 'FNR==1{print ""}{print}' dist/(gfw0|greatfire).txt > dist/merge2.txt
-        awk '!seen[$0]++' dist/merge2.txt | grep -Ev "^#|^$" > dist/gfw.txt
+        awk 'FNR==1{print ""}{print}' dist2/*.txt > dist2/merge.txt
+        awk '!seen[$0]++' dist2/merge.txt | grep -Ev "^#|^$" > dist2/gfw.txt
                 
-        awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
-        awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
-        sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/domestic-domain.conf
+        awk 'FNR==1{print ""}{print}' dist3/*.conf > dist3/merge.conf
+        awk '!seen[$0]++' dist3/merge.conf | grep -Ev "^#|^$" > dist3/domestic-domain.conf
+        sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist3/domestic-domain.conf
         
         cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/domestic/g;/^nameserver/!d" > dist/Whitelist-ip.conf
-        cat dist/gfw.txt | sed "s/^\(.*\)$/abroad/g;/^nameserver/!d" > dist/gfw-domain.conf
+        cat dist2/gfw.txt | sed "s/^\(.*\)$/abroad/g;/^nameserver/!d" > dist2/gfw-domain.conf
        
     - name: Generate GeoIP2 database
       run: |
