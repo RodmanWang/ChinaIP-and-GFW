@@ -54,10 +54,10 @@ jobs:
 
     - name: Merge and IP lists and remove duplicates
       run: |
-        awk 'FNR==1{print ""}{print}' dist/chi*.txt > dist/merge.txt
+        awk 'FNR==1{print ""}{print}' dist/"chi*".txt > dist/merge.txt
         awk '!seen[$0]++' dist/merge.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
-        awk 'FNR==1{print ""}{print}' dist/g*.txt > dist/merge2.txt
+        awk 'FNR==1{print ""}{print}' dist/"g*".txt > dist/merge2.txt
         awk '!seen[$0]++' dist/merge2.txt | grep -Ev "^#|^$" > dist/gfw.txt
                 
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
