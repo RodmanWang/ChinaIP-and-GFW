@@ -59,8 +59,7 @@ jobs:
         awk '!seen[$0]++' dist/merge.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
         awk 'FNR==1{print ""}{print}' dist2/*.txt > dist2/merge2.txt
-        dist2/merge2.txt | sed "s/www.//p"  > dist/gfw1.txt
-        awk '!seen[$0]++' dist2/gfw1.txt | grep -Ev "^#|^$" > dist/gfw.txt
+        awk '!seen[$0]++' sed "s/www.//p" | grep -Ev "^#|^$" | dist2/gfw1.txt> dist/gfw.txt
                 
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
         awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
