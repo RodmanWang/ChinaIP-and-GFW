@@ -49,8 +49,8 @@ jobs:
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge.txt
         awk '!seen[$0]++' dist/merge.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
-        awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge.conf
-        awk '!seen[$0]++' dist/merge.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
+        awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
+        awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
         
        cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
        
