@@ -62,7 +62,7 @@ jobs:
         awk 'FNR==1{print ""}{print}' dist2/*.txt > dist/china.txt
         awk '!seen[$0]++' dist/china.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
-        awk 'FNR==1{print ""}{print}' dist/gfw*.txt > dist3/merge2.txt
+        awk 'FNR==1{print ""}{print}' dist3/gfw*.txt > dist3/merge2.txt
         awk '!seen[$0]++' dist3/merge2.txt | sed "s/www.//p" > dist3/gfw00.txt
         awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/gfw.txt  
 
