@@ -41,13 +41,19 @@ jobs:
       run: |
         curl -LR -o dist/china.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
         curl -LR -o dist/china6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
-        
+        curl -LR -o dist/accelerated-domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
+        curl -LR -o dist/apple.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf"
+        curl -LR -o dist/google.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf"
     - name: Merge and IP lists and remove duplicates
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/merge.txt
         awk '!seen[$0]++' dist/merge.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
-        cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
         
+        awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge.conf
+        awk '!seen[$0]++' dist/merge.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
+        
+       cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
+       
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
@@ -69,10 +75,13 @@ jobs:
         cp -rf dist/CN-ip-cidr.txt ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/Whitelist-ip.conf ./
+        cp -rf dist/domestic-domain.conf ./
         
         git add Country.mmdb
         git add CN-ip-cidr.txt
         git add Whitelist-ip.conf
+        git add domestic-domain.conf
+        
         git commit -am "Updated at $(date)"
         
         git branch -D release
