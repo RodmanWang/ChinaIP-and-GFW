@@ -75,7 +75,7 @@ jobs:
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
-        cd dist2
+        cd dist
         ./ipip2mmdb -s ./ChinaIP-All.txt -d Country.mmdb
         cd $CURRENT_DIR
         
