@@ -86,11 +86,11 @@ jobs:
         git rm -rf .
         
         cp -rf dist/CN-ip-cidr.txt ./
-        cp -rf dist/gfw.txt ./
-        cp -rf dist/gfw-domain.conf ./
+        cp -rf dist2/gfw.txt ./
+        cp -rf dist2/gfw-domain.conf ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/Whitelist-ip.conf ./
-        cp -rf dist/domestic-domain.conf ./
+        cp -rf dist3/domestic-domain.conf ./
         
         git add Country.mmdb
         git add CN-ip-cidr.txt
