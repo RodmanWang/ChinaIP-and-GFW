@@ -44,8 +44,8 @@ jobs:
         curl -LR -o dist/china6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
         
         #GFW
-        curl -LR -o dist/greatfire.txt https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
-        curl -LR -o dist/gfw0.txt https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
+        curl -LR -o dist/greatfire.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
+        curl -LR -o dist/gfw0.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
         
         #Domestic-Domain
         curl -LR -o dist/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
