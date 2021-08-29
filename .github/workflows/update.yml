@@ -59,13 +59,13 @@ jobs:
         
         awk 'FNR==1{print ""}{print}' dist/g*.txt > dist/merge2.txt
         awk '!seen[$0]++' dist/merge2.txt | grep -Ev "^#|^$" > dist/gfw.txt
-        sed -i "s/^www.!d" dist/gfw.txt
                 
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
         awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/domestic-domain.conf
         
-        cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
+        cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/domestic/g;/^nameserver/!d" > dist/Whitelist-ip.conf
+        cat dist/gfw.txt | sed "s/^\(.*\)$/abroad/g;/^nameserver/!d" > dist/gfw-domain.conf
        
     - name: Generate GeoIP2 database
       run: |
@@ -87,6 +87,7 @@ jobs:
         
         cp -rf dist/CN-ip-cidr.txt ./
         cp -rf dist/gfw.txt ./
+        cp -rf dist/gfw-domain.conf ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/Whitelist-ip.conf ./
         cp -rf dist/domestic-domain.conf ./
@@ -94,6 +95,7 @@ jobs:
         git add Country.mmdb
         git add CN-ip-cidr.txt
         git add gfw.txt
+        git add gfw-domain.conf
         git add Whitelist-ip.conf
         git add domestic-domain.conf
         
