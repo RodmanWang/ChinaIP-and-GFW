@@ -1,4 +1,4 @@
-name: Update China IP list and generate GeoIP2 database
+name: Update ChinaIP-and-GFW database
 
 on:
   push:
@@ -42,9 +42,9 @@ jobs:
     - name: Obtain CN IP lists
       run: |
         #chinaIP
-        curl -LR -o dist/china1.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
-        curl -LR -o dist/china2.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
-        curl -LR -o dist2/v6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+        curl -LR -o dist/ChinaIPv4-1.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
+        curl -LR -o dist/ChinaIPv4-2.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
+        curl -LR -o dist2/ChinaIPv6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
         
         #GFW
         curl -LR -o dist3/gfw1.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
@@ -57,27 +57,27 @@ jobs:
 
     - name: Merge and IP lists and remove duplicates
       run: |
-        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/v4.txt
-        awk '!seen[$0]++' dist/v4.txt | sort -n > dist2/v4.txt
-        awk 'FNR==1{print ""}{print}' dist2/*.txt > dist/china.txt
-        awk '!seen[$0]++' dist/china.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
+        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
+        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n > dist2/ChinaIPv4.txt
+        awk 'FNR==1{print ""}{print}' dist2/*.txt > dist/China.txt
+        awk '!seen[$0]++' dist/China.txt | grep -Ev "^#|^$" > dist/China-IP.txt
         
-        awk 'FNR==1{print ""}{print}' dist3/gfw*.txt > dist3/merge2.txt
-        awk '!seen[$0]++' dist3/merge2.txt | sed "s/www.//p" > dist3/gfw00.txt
-        awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/gfw.txt  
+        awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
+        awk '!seen[$0]++' dist3/gfw0.txt | sed "s/www.//p" > dist3/gfw00.txt
+        awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt  
 
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
-        awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
-        sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/domestic-domain.conf
+        awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/China-domain.conf
+        sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
         
         cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
-        cat dist/gfw.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/gfw-domain.conf
+        cat dist/gfw.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
         cd dist
-        ./ipip2mmdb -s ./CN-ip-cidr.txt -d Country.mmdb
+        ./ipip2mmdb -s ./China-IP.txt -d Country.mmdb
         cd $CURRENT_DIR
         
     - name: Push artifacts to release branch
@@ -91,12 +91,12 @@ jobs:
         git checkout --orphan release-orphan
         git rm -rf .
         
-        cp -rf dist/CN-ip-cidr.txt ./
-        cp -rf dist/gfw.txt ./
+        cp -rf dist/China-IP.txt ./
+        cp -rf dist/GFW.txt ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/Whitelist-ip.conf ./
-        cp -rf dist/domestic-domain.conf ./
-        cp -rf dist/gfw-domain.conf ./
+        cp -rf dist/China-domain.conf ./
+        cp -rf dist/GFW.conf ./
         
         git add Country.mmdb
         git add CN-ip-cidr.txt
