@@ -32,7 +32,10 @@ jobs:
             dep ensure
         fi
     - name: Create dist folder
-      run: mkdir -p dist
+      run: mkdir -p dist1
+           mkdir -p dist2
+           mkdir -p dist3
+      
     - name: Compile GeoIP conversion bin (Golang)
       run: /bin/bash ./build.sh
 
@@ -41,11 +44,11 @@ jobs:
         #chinaIP
         curl -LR -o dist/china1.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
         curl -LR -o dist/china2.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
-        curl -LR -o dist/china-v6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+        curl -LR -o dist2/v6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
         
         #GFW
-        curl -LR -o dist/gfw1.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
-        curl -LR -o dist/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
+        curl -LR -o dist3/gfw1.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
+        curl -LR -o dist3/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
         
         #Domestic-Domain
         curl -LR -o dist/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
@@ -54,14 +57,14 @@ jobs:
 
     - name: Merge and IP lists and remove duplicates
       run: |
-        awk 'FNR==1{print ""}{print}' dist/china+[1-9].txt > dist/v4.txt
-        awk '!seen[$0]++' dist/v4.txt | sort -n > dist/china-v4.txt
-        awk 'FNR==1{print ""}{print}' dist/china-v[1-9].txt > dist/china.txt
+        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/v4.txt
+        awk '!seen[$0]++' dist/v4.txt | sort -n > dist2/v4.txt
+        awk 'FNR==1{print ""}{print}' dist2/*.txt > dist/china.txt
         awk '!seen[$0]++' dist/china.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
-        awk 'FNR==1{print ""}{print}' dist/gfw*.txt > dist/merge2.txt
-        awk '!seen[$0]++' dist/merge2.txt | sed "s/www.//p" > dist/gfw00.txt
-        awk '!seen[$0]++' dist/gfw00.txt | grep -Ev "^#|^$" > dist/gfw.txt  
+        awk 'FNR==1{print ""}{print}' dist/gfw*.txt > dist3/merge2.txt
+        awk '!seen[$0]++' dist3/merge2.txt | sed "s/www.//p" > dist3/gfw00.txt
+        awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/gfw.txt  
 
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
@@ -69,7 +72,7 @@ jobs:
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/domestic-domain.conf
         
         cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
-        cat dist/gfw.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/gfw-domain.conf
+        cat dist3/gfw.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/gfw-domain.conf
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
