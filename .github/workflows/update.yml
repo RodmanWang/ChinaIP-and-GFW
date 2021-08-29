@@ -60,14 +60,13 @@ jobs:
         
         awk 'FNR==1{print ""}{print}' dist2/*.txt > dist2/merge2.txt
         awk '!seen[$0]++' dist2/merge2.txt | grep -Ev "^#|^$" > dist/gfw.txt
-        sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/abroad/g;/^nameserver/!d" dist/gfw-domain.conf      
-        
+                
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
         awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/domestic-domain.conf
         
         cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
-        cat dist/gfw.txt | sed "s/^\(.*\)$/nameserver \1\/abroad/g" > dist/gfw-domain.conf
+        cat dist/gfw.txt | sed "s/^\(.*\)$/nameserver \/1\/abroad/g" > dist/gfw-domain.conf
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
