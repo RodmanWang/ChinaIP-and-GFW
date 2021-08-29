@@ -89,8 +89,8 @@ jobs:
         git checkout --orphan release-orphan
         git rm -rf .
         
-        cp -rf dist2/ChinaIPv4 ./
-        cp -rf dist2/ChinaIPv6 ./
+        cp -rf dist2/ChinaIPv4.txt ./
+        cp -rf dist2/ChinaIPv6.txt ./
         cp -rf dist/GFW.txt ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/China-domain.conf ./
