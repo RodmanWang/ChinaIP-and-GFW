@@ -60,7 +60,7 @@ jobs:
         
         awk 'FNR==1{print ""}{print}' dist2/*.txt > dist2/merge2.txt
         #awk '!seen[$0]++' dist2/merge2.txt | sed "s/www.//p" > dist2/gfw00.txt
-        awk '!seen[$0]++' dist2/merge2.txt | grep -Ev "^#|^$" | \ > sed "s/www.//p" > dist2/gfw.txt
+        awk '!seen[$0]++' dist2/merge2.txt | grep -Ev "^#|^$" | sed "s/www.//p" > dist/gfw.txt
         #awk '!seen[$0]++' dist2/gfw00.txt | grep -Ev "^#|^$" > dist/gfw.txt  
 
         
