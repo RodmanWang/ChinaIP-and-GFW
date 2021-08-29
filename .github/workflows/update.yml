@@ -68,11 +68,9 @@ jobs:
 
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
-        cat dist/china1.conf | sed "s/^\(.*\)$/\1/g" dist/china2.conf
-        awk '!seen[$0]++' dist/china2.conf | sed "s/^www\.//p" > dist/china3.conf
-        awk '!seen[$0]++' dist/china3.conf | grep -Ev "^#|^$" > dist/China-domain.conf
-        cat dist/China-domain.conf | sed "s/^\(.*\)$/nameserver \/\1\/domestic/g" > dist/China-domain.conf
-        #sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
+        awk '!seen[$0]++' dist/china1.conf | sed "s/www\.///p" > dist/china2.conf
+        awk '!seen[$0]++' dist/china2.conf | grep -Ev "^#|^$" > dist/China-domain.conf
+        sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
         
         cat dist/China-IP.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
         cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
