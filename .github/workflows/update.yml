@@ -67,12 +67,12 @@ jobs:
         awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt  
 
         
-        awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
-        awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/China-domain.conf
+        awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china.conf
+        awk '!seen[$0]++' dist/china.conf | grep -Ev "^#|^$" > dist/China-domain.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
         
-        cat dist/CN-ip-cidr.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
-        cat dist/gfw.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
+        cat dist/China-IP.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
+        cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
@@ -99,11 +99,11 @@ jobs:
         cp -rf dist/GFW.conf ./
         
         git add Country.mmdb
-        git add CN-ip-cidr.txt
-        git add gfw.txt
+        git add China-IP.txt
+        git add GFW.txt
         git add Whitelist-ip.conf
-        git add domestic-domain.conf
-        git add gfw-domain.conf
+        git add China-domain.conf
+        git add GFW.conf
         
         git commit -am "Updated at $(date)"
         
