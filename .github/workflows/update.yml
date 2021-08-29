@@ -59,8 +59,9 @@ jobs:
         awk '!seen[$0]++' dist/merge.txt | grep -Ev "^#|^$" > dist/CN-ip-cidr.txt
         
         awk 'FNR==1{print ""}{print}' dist2/*.txt > dist2/merge2.txt
-        awk '!seen[$0]++' dist2/merge2.txt | sed "s/www.//p" | grep -Ev "^#|^$" > dist/gfw.txt
-                
+        dist2/merge2.txt sed "s/www.//p" | grep -Ev "^#|^$" > dist2/gfw00.txt
+        awk '!seen[$0]++' dist2/gfw00.txt > dist2/gfw.txt  
+        
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/merge2.conf
         awk '!seen[$0]++' dist/merge2.conf | grep -Ev "^#|^$" > dist/domestic-domain.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/domestic-domain.conf
@@ -86,11 +87,11 @@ jobs:
         git rm -rf .
         
         cp -rf dist/CN-ip-cidr.txt ./
-        cp -rf dist/gfw.txt ./
+        cp -rf dist2/gfw.txt ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/Whitelist-ip.conf ./
         cp -rf dist/domestic-domain.conf ./
-        cp -rf dist/gfw-domain.conf ./
+        cp -rf dist2/gfw-domain.conf ./
         
         git add Country.mmdb
         git add CN-ip-cidr.txt
