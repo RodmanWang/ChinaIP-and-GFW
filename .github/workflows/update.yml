@@ -61,8 +61,8 @@ jobs:
         awk 'FNR==1{print ""}{print}' dist/.*[123].txt > dist/ChinaIPv2.txt
         awk '!seen[$0]++' dist/ChinaIPv1.txt | sort -n | grep -Ev "^#|^$" > dist2/ChinaIPv4v1.txt
         awk '!seen[$0]++' dist/ChinaIPv2.txt | sort -n | grep -Ev "^#|^$" > dist2/ChinaIPv4v2.txt
-        awk 'FNR==1{print ""}{print}' dist2/.*(v[46]|v[12]).txt | grep -Ev "^#|^$"  > dist/China-IPv1.txt
-        awk 'FNR==1{print ""}{print}' dist2/.*(v[46]|v[123]).txt | grep -Ev "^#|^$"  > dist/China-IPv2.txt
+        awk 'FNR==1{print ""}{print}' dist2/.*([46]|v[12]).txt | grep -Ev "^#|^$"  > dist/China-IPv1.txt
+        awk 'FNR==1{print ""}{print}' dist2/.*([46]|v[123]).txt | grep -Ev "^#|^$"  > dist/China-IPv2.txt
         
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
         awk '!seen[$0]++' dist3/gfw0.txt | sed "s/^www\.//p" > dist3/gfw00.txt
@@ -94,7 +94,7 @@ jobs:
         git rm -rf .
         
         cp -rf dist2/ChinaIPv4v1.txt ./
-        cp -rf dist2/ChinaIPv4v2.txt
+        cp -rf dist2/ChinaIPv4v2.txt ./
         cp -rf dist2/ChinaIPv6.txt ./
         cp -rf dist/GFW.txt ./
         cp -rf dist/Country.mmdb ./
