@@ -59,13 +59,11 @@ jobs:
         
     - name: Merge and IP lists and remove duplicates
       run: |
-      
-        mv -f dist/ChinaIPv4-1.txt  dist4/ChinaIPv4-1.txt
-        mv -f dist/ChinaIPv4-2.txt  dist4/ChinaIPv4-2.txt
-        
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
         awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -Ev "^#|^$" > dist/ChinaIPv4v1.txt
         
+        mv -f dist/ChinaIPv4-1.txt  dist4/ChinaIPv4-1.txt
+        mv -f dist/ChinaIPv4-2.txt  dist4/ChinaIPv4-2.txt
         awk 'FNR==1{print ""}{print}' dist4/*.txt > dist4/ChinaIPv2.txt
         awk '!seen[$0]++' dist4/ChinaIPv2.txt | sort -n | grep -Ev "^#|^$" > dist2/ChinaIPv4v2.txt
         
