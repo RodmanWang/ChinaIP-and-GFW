@@ -99,7 +99,7 @@ jobs:
         git checkout --orphan release-orphan
         git rm -rf .
         
-        cp -rf dist2/ChinaIPv4v1.txt ./
+        cp -rf dist/ChinaIPv4v1.txt ./
         cp -rf dist2/ChinaIPv4v2.txt ./
         cp -rf dist2/ChinaIPv6.txt ./
         cp -rf dist/GFW.txt ./
