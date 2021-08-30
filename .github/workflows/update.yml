@@ -31,11 +31,12 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
+        
     - name: Create dist folder
       run: mkdir -p dist1
            mkdir -p dist2
            mkdir -p dist3
-      
+           mkdir -p dist4
     - name: Compile GeoIP conversion bin (Golang)
       run: /bin/bash ./build.sh
 
@@ -44,7 +45,7 @@ jobs:
         #chinaIP
         curl -LR -o dist/ChinaIPv4-1.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
         curl -LR -o dist/ChinaIPv4-2.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
-        curl -LR -o dist/ChinaIPv4-3.txt "https://raw.githubusercontent.com/metowolf/iplist/master/data/country/CN.txt"
+        curl -LR -o dist/ChinaIPv4v3.txt "https://raw.githubusercontent.com/metowolf/iplist/master/data/country/CN.txt"
         curl -LR -o dist2/ChinaIPv6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
         
         #GFW
@@ -58,30 +59,32 @@ jobs:
         
     - name: Merge and IP lists and remove duplicates
       run: |
-        awk 'FNR==1{print ""}{print}' dist/.*\-[12].txt > dist/ChinaIPv1.txt
-        awk 'FNR==1{print ""}{print}' dist/.*\-[123].txt > dist/ChinaIPv2.txt
-        awk '!seen[$0]++' dist/ChinaIPv1.txt | sort -n | grep -Ev "^#|^$" > dist2/ChinaIPv4v1.txt
-        awk '!seen[$0]++' dist/ChinaIPv2.txt | sort -n | grep -Ev "^#|^$" > dist2/ChinaIPv4v2.txt
-        awk 'FNR==1{print ""}{print}' dist2/.*v[16].txt | grep -Ev "^#|^$"  > dist/China-IPv1.txt
-        awk 'FNR==1{print ""}{print}' dist2/.*v[26].txt | grep -Ev "^#|^$"  > dist/China-IPv2.txt
+        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
+        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -Ev "^#|^$" > dist2/ChinaIPv4v1.txt
+        
+        mv -f dist/ChinaIP.txt  dist4/ChinaIP.txt
+        awk 'FNR==1{print ""}{print}' dist4/*.txt > dist4/ChinaIPv2.txt
+        awk '!seen[$0]++' dist4/ChinaIPv2.txt | sort -n | grep -Ev "^#|^$" > dist2/ChinaIPv4v2.txt
+        
+        awk 'FNR==1{print ""}{print}' dist2/*.txt | grep -Ev "^#|^$"  > dist/China-IP.txt
         
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
         awk '!seen[$0]++' dist3/gfw0.txt | sed "s/^www\.//p" > dist3/gfw00.txt
         awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt  
-
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
         awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
         
         #cat dist/China-IP.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
+        
         cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
         
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
         cd dist
-        ./ipip2mmdb -s ./China-IPv2.txt -d Country.mmdb
+        ./ipip2mmdb -s ./China-IP.txt -d Country.mmdb
         cd $CURRENT_DIR
         
     - name: Push artifacts to release branch
@@ -96,7 +99,7 @@ jobs:
         git rm -rf .
         
         cp -rf dist2/ChinaIPv4v1.txt ./
-        cp -rf dist2/ChinaIPv4v2.txt ./
+        cp -rf dist4/ChinaIPv4v2.txt ./
         cp -rf dist2/ChinaIPv6.txt ./
         cp -rf dist/GFW.txt ./
         cp -rf dist/Country.mmdb ./
@@ -104,7 +107,8 @@ jobs:
         cp -rf dist/GFW.conf ./
         
         git add Country.mmdb
-        git add ChinaIPv4.txt
+        git add ChinaIPv4v1.txt
+        git add ChinaIPv4v2.txt
         git add ChinaIPv6.txt
         git add GFW.txt
         #git add Whitelist-ip.conf
