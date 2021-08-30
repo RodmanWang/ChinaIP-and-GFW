@@ -66,9 +66,12 @@ jobs:
         mv -f dist/ChinaIPv4-2.txt  dist4/ChinaIPv4-2.txt
         awk 'FNR==1{print ""}{print}' dist4/*.txt > dist4/ChinaIPv2.txt
         awk '!seen[$0]++' dist4/ChinaIPv2.txt | sort -n | grep -Ev "^#|^$" > dist2/ChinaIPv4v2.txt
-        
-        awk 'FNR==1{print ""}{print}' dist2/*.txt | grep -Ev "^#|^$"  > dist/China-IP.txt
-        
+
+        mv -f dist/ChinaIPv4v1.txt  dist3/ChinaIPv4-1.txt
+        mv -f dist2/ChinaIPv6.txt  dist3/ChinaIPv6.txt
+        awk 'FNR==1{print ""}{print}' dist3/*.txt | grep -Ev "^#|^$"  > dist/China-IPv1.txt
+        awk 'FNR==1{print ""}{print}' dist2/*.txt | grep -Ev "^#|^$"  > dist/China-IPv2.txt
+                
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
         awk '!seen[$0]++' dist3/gfw0.txt | sed "s/^www\.//p" > dist3/gfw00.txt
         awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt  
@@ -77,8 +80,8 @@ jobs:
         awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
         
-        #cat dist/China-IP.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ip.conf
-        
+        cat dist/China-IPv1.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv1.conf
+        cat dist/China-IPv2.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv2.conf
         cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
         
     - name: Generate GeoIP2 database
@@ -105,6 +108,8 @@ jobs:
         cp -rf dist/GFW.txt ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/China-domain.conf ./
+        cp -rf dist/Whitelist-ipv1.conf  ./
+        cp -rf dist/Whitelist-ipv2.conf ./
         cp -rf dist/GFW.conf ./
         
         git add Country.mmdb
@@ -112,7 +117,8 @@ jobs:
         git add ChinaIPv4v2.txt
         git add ChinaIPv6.txt
         git add GFW.txt
-        #git add Whitelist-ip.conf
+        git add Whitelist-ipv1.conf
+        git add Whitelist-ipv2.conf
         git add China-domain.conf
         git add GFW.conf
         
