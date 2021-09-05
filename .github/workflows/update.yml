@@ -101,8 +101,7 @@ jobs:
         git checkout release
         
         git checkout --orphan release-orphan
-        #git rm -rf .
-        git rm -rf !(README.md)
+        git rm -rf .
         
         cp -rf dist/ChinaIPv4v1.txt ./
         cp -rf dist2/ChinaIPv4v2.txt ./
