@@ -123,7 +123,7 @@ jobs:
         git add China-domain.conf
         git add GFW.conf
         
-        git commit -m "update : $(date +%Y-%m-%d  %h:%m:%s)"
+        git commit -m "update : $(date +%Y-%m-%d  %H:%M:%S)"
         git branch -D release
         git branch -m release
             
