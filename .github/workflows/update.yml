@@ -53,11 +53,13 @@ jobs:
         #GFW
         curl -LR -o dist3/gfw1.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
         curl -LR -o dist3/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
+        curl -LR -o dist3/gfw3.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-custom.txt"
         
         #Domestic-Domain
         curl -LR -o dist/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
         curl -LR -o dist/apple.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf"
         curl -LR -o dist/google.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf"
+        curl -LR -o dist/domestic--custom.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic--custom.conf"
         
     - name: Merge and IP lists and remove duplicates
       run: |
