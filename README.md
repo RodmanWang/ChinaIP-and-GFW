@@ -17,3 +17,6 @@ https://github.com/ChanthMiao/China-IPv6-List
 
 https://github.com/gaoyifan/china-operator-ip
 
+https://github.com/felixonmars/dnsmasq-china-list
+
+https://github.com/Loyalsoldier/v2ray-rules-dat
