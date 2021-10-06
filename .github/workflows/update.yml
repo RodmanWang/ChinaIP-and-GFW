@@ -60,7 +60,7 @@ jobs:
         ##curl -LR -o dist/apple.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf"
         ##curl -LR -o dist/google.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf"
         curl -LR -o dist/domestic-custom.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-custom.conf"
-        curl -LR -o dist2/bogus-nxdomain.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
+        curl -LR -o dist2/bogus-nxdomain1.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
         
     - name: Merge and IP lists and remove duplicates
       run: |
@@ -85,8 +85,8 @@ jobs:
         awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
 
-        awk '!seen[$0]++' dist2/bogus-nxdomain.conf | grep -Ev "^#|^$" > dist/bogus-nxdomain.conf
-        sed -i "s/=/ /;s/$//32/" dist/bogus-nxdomain.conf
+        awk '!seen[$0]++' dist2/bogus-nxdomain1.conf | grep -Ev "^#|^$" > dist/bogus-nxdomain.conf
+        sed -i "s/=/ /;/$//32/" dist/bogus-nxdomain.conf
         
         cat dist/China-IPv1.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv1.conf
         cat dist/China-IPv2.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv2.conf
