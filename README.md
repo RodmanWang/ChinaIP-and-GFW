@@ -26,13 +26,15 @@ https://github.com/Loyalsoldier/v2ray-rules-dat
 China-domain.conf     国内域名
 
 ChinaIPv4v1.txt   国内ip小体积版
+
 ChinaIPv4v2.txt   国内ip大体积版
 
 ChinaIPv6.txt     国内ipv6版
 
 Country.mmdb   国内ip大体积版&ipv6（GEOIP数据库，仅中国）
 
-GFW.txt   被墙名单
+GFW.txt   被墙名单，仅域名，适用多种墙软件
+
 GFW.conf  被墙名单，适用smartdns，国外dns组解析
 
 China-domain.conf  国内域名名单，适用smartdns，国内dns组解析
