@@ -39,7 +39,8 @@ GFW.conf  被墙名单，适用smartdns，国外dns组解析
 
 China-domain.conf  国内域名名单，适用smartdns，国内dns组解析
 
-Whitelist-ipv1.conf   国内ip小体积版，适用适用smartdns，国内dns组指定解析慎用
+Whitelist-ipv1.conf   国内ip小体积版，适用smartdns，国内dns组指定解析，慎用
+
 Whitelist-ipv2.conf   国内ip大体积版，适用smartdns，国内dns组解指定解析，慎用
 
 bogus-nxdomain.conf  虚假ip过滤，适用smartdns
