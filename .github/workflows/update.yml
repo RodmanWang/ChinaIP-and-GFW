@@ -64,8 +64,8 @@ jobs:
         #bogus-nxdomain   
         curl -LR -o dist2/bogus-nxdomain1.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
         curl -LR -o dist2/bogus-nxdomain2.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/bogus-nxdomain-custom.conf"
-   
-   - name: Merge and IP lists and remove duplicates
+ 
+    - name: Merge and IP lists and remove duplicates
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
         awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -Ev "^#|^$" > dist/ChinaIPv4v1.txt
