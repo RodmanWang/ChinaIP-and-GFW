@@ -81,8 +81,8 @@ jobs:
         awk 'FNR==1{print ""}{print}' dist2/*.txt | grep -Ev "^#|^$"  > dist/China-IPv2.txt
                 
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
-        awk '!seen[$0]++' dist3/gfw0.txt | sed "s/^www\.//p" > dist3/gfw00.txt
-        awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt  
+        awk '!seen[$0]++' dist3/gfw0.txt | sed "s/^www\.//p" | grep -Ev "^#|^$" > dist/GFW.txt
+        #awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt  
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
         awk '!seen[$0]++' dist/china1.conf | sort -n | grep -Ev "^#|^$" > dist/China-domain.conf
