@@ -89,7 +89,7 @@ jobs:
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
 
         awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/bogus-nxdomain3.conf
-        awk '!seen[$0]++' dist2/bogus-nxdomain3.conf | sort -g | grep -Ev "^#|^$" > dist/bogus-nxdomain.conf
+        awk '!seen[$0]++' dist2/bogus-nxdomain3.conf | sort -nk2 | grep -Ev "^#|^$" > dist/bogus-nxdomain.conf
         sed -i "s/=/ /;s/$/\/32/" dist/bogus-nxdomain.conf
         
         cat dist/China-IPv1.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv1.conf
