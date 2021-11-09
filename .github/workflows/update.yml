@@ -85,11 +85,11 @@ jobs:
         awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt  
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
-        awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
+        awk '!seen[$0]++' dist/china1.conf | sort -n | grep -Ev "^#|^$" > dist/China-domain.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
 
         awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/bogus-nxdomain3.conf
-        awk '!seen[$0]++' dist2/bogus-nxdomain3.conf | grep -Ev "^#|^$" > dist/bogus-nxdomain.conf
+        awk '!seen[$0]++' dist2/bogus-nxdomain3.conf | sort -n | grep -Ev "^#|^$" > dist/bogus-nxdomain.conf
         sed -i "s/=/ /;s/$/\/32/" dist/bogus-nxdomain.conf
         
         cat dist/China-IPv1.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv1.conf
