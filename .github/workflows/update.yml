@@ -87,7 +87,7 @@ jobs:
         ##awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/GFW.txt  
         
         cp -f dist/GFW.txt  dist/AutoGFW.txt
-        ##sed -i "s/^/\|\|/g" > dist/AutoGFW.txt
+        sed -i "s/^/\|\|&/g" > dist/AutoGFW.txt
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
         awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
