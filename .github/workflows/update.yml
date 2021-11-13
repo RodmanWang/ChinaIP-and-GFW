@@ -82,9 +82,8 @@ jobs:
                 
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
         awk '!seen[$0]++' dist3/gfw0.txt | sed "s/^www\.//p" > dist3/gfw00.txt
-        awk '!seen[$0]++' dist3/gfw00.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/GFW.txt
-        cp -f dist/GFW.txt  dist/AutoGFW.txt
-        sed -i "s/^\(.*\)$/||/\1\/abroad/g" > dist/AutoGFW.txt
+        awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt
+        ##awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/GFW.txt  
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
         awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
@@ -98,7 +97,6 @@ jobs:
         cat dist/China-IPv1.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv1.conf
         cat dist/China-IPv2.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv2.conf
         cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
-        
         
     - name: Generate GeoIP2 database
       run: |
@@ -122,7 +120,6 @@ jobs:
         cp -rf dist2/ChinaIPv4v2.txt ./
         cp -rf dist2/ChinaIPv6.txt ./
         cp -rf dist/GFW.txt ./
-        cp -rf dist/AutoGFW.txt ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/China-domain.conf ./
         cp -rf dist/Whitelist-ipv1.conf  ./
@@ -135,7 +132,6 @@ jobs:
         git add ChinaIPv4v2.txt
         git add ChinaIPv6.txt
         git add GFW.txt
-        git add AutoGFW.txt
         git add Whitelist-ipv1.conf
         git add Whitelist-ipv2.conf
         git add China-domain.conf
