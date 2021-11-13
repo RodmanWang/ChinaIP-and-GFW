@@ -87,7 +87,7 @@ jobs:
         ##awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/GFW.txt  
         
         cp -f dist/GFW.txt  dist/AutoGFW.txt
-        cat dist/AutoGFW.txt | sed "s/^\(.*\)$\||/\1\/g" > dist/AutoGFW.txt
+        cat dist/AutoGFW.txt | sed "s/^\(.*\)$\||/\1\" > dist/AutoGFW.txt
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
         awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
@@ -101,6 +101,7 @@ jobs:
         cat dist/China-IPv1.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv1.conf
         cat dist/China-IPv2.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv2.conf
         cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
+                      
         
     - name: Generate GeoIP2 database
       run: |
