@@ -146,7 +146,7 @@ jobs:
         git add GFW.conf
         git add bogus-nxdomain.conf
         
-        git commit -m "update : $(TZ=UTC+8 date "+%Y-%m-%d %H:%M:%S")"
+        git commit -m "update : $(date "+%Y-%m-%d %H:%M:%S")"
         git branch -D release
         git branch -m release
             
