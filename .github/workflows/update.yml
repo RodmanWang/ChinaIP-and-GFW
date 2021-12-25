@@ -3,7 +3,7 @@ name: Update ChinaIP-and-GFW database
 on:
   workflow_dispatch:
   schedule: 
-    - cron:  '30 0/12 * * *'
+    - cron:  '30 8/20 * * *'
   push:
     branches:
       - main
