@@ -13,3 +13,5 @@ btbtt.biz
 btbtt.net
 8btbtt.com
 92btbtt.com
+workers.dev
+pages.dev
