@@ -1,6 +1,4 @@
 
-## 🏅 声明
-
 个人自用，感谢以下仓库大佬！
 
 https://github.com/JMVoid/ipip2mmdb
@@ -20,3 +18,6 @@ https://github.com/gaoyifan/china-operator-ip
 https://github.com/felixonmars/dnsmasq-china-list
 
 https://github.com/Loyalsoldier/v2ray-rules-dat
+
+https://github.com/misakaio/chnroutes2
+
