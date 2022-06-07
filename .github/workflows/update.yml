@@ -101,8 +101,8 @@ jobs:
         sed -i "s/=/ /;s/$/\/32/" dist2/bogus-nxdomain4.conf
         awk '!seen[$0]++' dist2/bogus-nxdomain4.conf | sort -n -k2 > dist/bogus-nxdomain.conf
         
-        cat dist/China-IPv1.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv1.conf
-        cat dist/China-IPv2.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/Whitelist-ipv2.conf
+        cat dist/China-IPv1.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/blacklist-ipv1.conf
+        cat dist/China-IPv2.txt | sed "s/^\(.*\)$/Whitelist-ip \1/g" > dist/blacklist-ipv2.conf
         cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
                       
         
@@ -142,8 +142,8 @@ jobs:
         git add ChinaIPv6.txt
         git add GFW.txt
         git add AutoGFW.txt
-        git add Whitelist-ipv1.conf
-        git add Whitelist-ipv2.conf
+        git add blacklist-ipv1.conf
+        git add blacklist-ipv2.conf
         git add China-domain.conf
         git add GFW.conf
         git add bogus-nxdomain.conf
