@@ -131,8 +131,8 @@ jobs:
         cp -rf dist/AutoGFW.txt ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/China-domain.conf ./
-        cp -rf dist/Whitelist-ipv1.conf  ./
-        cp -rf dist/Whitelist-ipv2.conf ./
+        cp -rf dist/blacklist-ipv1.conf  ./
+        cp -rf dist/blacklist-ipv2.conf ./
         cp -rf dist/GFW.conf ./
         cp -rf dist/bogus-nxdomain.conf ./
                 
