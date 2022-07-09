@@ -17,3 +17,5 @@ workers.dev
 pages.dev
 msftconnecttest.com
 msftncsi.com
+zmk.pw
+zmk.org
