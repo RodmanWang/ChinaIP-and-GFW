@@ -15,7 +15,5 @@ btbtt.net
 92btbtt.com
 workers.dev
 pages.dev
-msftconnecttest.com
-msftncsi.com
 zmk.pw
 zmk.org
