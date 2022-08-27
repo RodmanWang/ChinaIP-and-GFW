@@ -50,3 +50,6 @@ wbagora.com
 event.wbinsights.com
 rtcp.on.epicgames.com
 epicgames.dev
+np.community.playstation.net
+np.communication.playstation.net
+smetrics.aem.playstation.com
