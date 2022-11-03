@@ -94,6 +94,7 @@ jobs:
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
         awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
+        cp -f dist/China-domain.conf dist/China-domain2.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/China-domain.conf
 
         awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/bogus-nxdomain3.conf
@@ -131,6 +132,7 @@ jobs:
         cp -rf dist/AutoGFW.txt ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/China-domain.conf ./
+        cp -rf dist/China-domain2.conf ./
         cp -rf dist/blacklist-ipv1.conf  ./
         cp -rf dist/blacklist-ipv2.conf ./
         cp -rf dist/GFW.conf ./
@@ -145,6 +147,7 @@ jobs:
         git add blacklist-ipv1.conf
         git add blacklist-ipv2.conf
         git add China-domain.conf
+        git add China-domain2.conf
         git add GFW.conf
         git add bogus-nxdomain.conf
         
