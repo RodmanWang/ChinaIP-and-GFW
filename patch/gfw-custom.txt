@@ -177,3 +177,8 @@ dns.iij.jp
 dns.sb
 doh.sb
 one.one.one.one
+sms-activate.org
+openai.com
+gitpod.io
+alpinelinux.org
+mozgcp.net
