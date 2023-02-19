@@ -173,9 +173,6 @@ aapks.com
 opendns.com
 quad9.net
 dns.google
-dns.iij.jp
-dns.sb
-doh.sb
 one.one.one.one
 sms-activate.org
 openai.com
