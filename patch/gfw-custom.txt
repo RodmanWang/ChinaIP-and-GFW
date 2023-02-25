@@ -80,8 +80,8 @@ np.community.playstation.net
 np.communication.playstation.net
 smetrics.aem.playstation.com
 dns.quad9.net
-doh.dns.sb
-public.dns.iij.jp
+dns.sb
+dns.iij.jp
 doh.opendns.com
 one.one.one.one
 1dot1dot1dot1.cloudflare-dns.com
