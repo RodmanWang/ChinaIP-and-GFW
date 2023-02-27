@@ -69,7 +69,7 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
-        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -Ev "^#|^$|203.208.32.0/19" > dist/ChinaIPv4v1.txt
+        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -Ev "^#|^$|203.208.32.0/19" > dist/China-IPv4.txt
         
         cp -f dist/ChinaIPv4-1.txt  dist4/ChinaIPv4-1.txt
         cp -f dist/ChinaIPv4-2.txt  dist4/ChinaIPv4-2.txt
@@ -77,8 +77,8 @@ jobs:
         awk 'FNR==1{print ""}{print}' dist4/*.txt > dist4/ChinaIPv2.txt
         awk '!seen[$0]++' dist4/ChinaIPv2.txt | sort -n | grep -Ev "^#|^$|203.208.32.0/19" > dist2/ChinaIPv4v2.txt
         
-        cp -f dist/ChinaIPv4v1.txt  dist5/ChinaIPv4-1.txt
-        cp -f dist2/ChinaIPv6.txt  dist5/ChinaIPv6.txt
+        cp -f dist/China-IPv4.txt  dist5/ChinaIPv4-1.txt
+        cp -f dist2/ChinaIPv6.txt  dist5/China-IPv6.txt
         awk 'FNR==1{print ""}{print}' dist5/*.txt | grep -Ev "^#|^$"  > dist/China-IPv1.txt
         awk 'FNR==1{print ""}{print}' dist2/*.txt | grep -Ev "^#|^$"  > dist/China-IPv2.txt
         cp -f dist/China-IPv1.txt  dist/China-IPv3.txt
@@ -126,8 +126,8 @@ jobs:
         git checkout --orphan release-orphan
         git rm -rf .
         
-        cp -rf dist/ChinaIPv4v1.txt ./
-        cp -rf dist2/ChinaIPv6.txt ./
+        cp -rf dist/China-IPv4.txt ./
+        cp -rf dist2/China-IPv6.txt ./
         cp -rf dist/GFW.txt ./
         cp -rf dist/AutoGFW.txt ./
         cp -rf dist/Country.mmdb ./
@@ -139,8 +139,8 @@ jobs:
         cp -rf dist/Bogus-nxdomain.conf ./
                 
         git add Country.mmdb         
-        git add ChinaIPv4v1.txt      #小体积
-        git add ChinaIPv6.txt
+        git add China-IPv4.txt      #小体积
+        git add China-IPv6.txt
         git add GFW.txt              #纯域名
         git add AutoGFW.txt          #Switchy 格式
         git add Blacklist-ip.conf    #SmartDNS格式
