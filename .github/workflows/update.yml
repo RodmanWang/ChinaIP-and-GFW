@@ -89,9 +89,6 @@ jobs:
         ##awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt
         ##awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/GFW.txt  
         
-        cp -f dist/GFW.txt dist/GFW1111.txt
-        awk '!seen[$0]++' dist/GFW1111.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/AutoGFW.txt
-        
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
         awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
         cp -f dist/China-domain.conf dist/China-domain2.conf
@@ -128,7 +125,6 @@ jobs:
         cp -rf dist/China-IPv4.txt ./
         cp -rf dist2/China-IPv6.txt ./
         cp -rf dist/GFW.txt ./
-        cp -rf dist/AutoGFW.txt ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist/China-domain.conf ./
         cp -rf dist/China-domain2.conf ./
@@ -141,7 +137,6 @@ jobs:
         git add China-IPv4.txt      #小体积
         git add China-IPv6.txt
         git add GFW.txt              #纯域名
-        git add AutoGFW.txt          #Switchy 格式
         git add Blacklist-ip.conf    #SmartDNS格式
         git add Whitelist-ip.conf    #SmartDNS格式
         git add China-domain.conf    #SmartDNS格式
