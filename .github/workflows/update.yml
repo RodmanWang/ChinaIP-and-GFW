@@ -69,7 +69,7 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
-        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -Ev "^#|^$|203.208.32.0/19" > dist/China-IPv4.txt
+        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -Ev "^#|^$|203.208.32.0/19" > dist/ChinaIPv4.txt
         
         cp -f dist/ChinaIPv4-1.txt  dist4/ChinaIPv4-1.txt
         cp -f dist/ChinaIPv4-2.txt  dist4/ChinaIPv4-2.txt
@@ -77,7 +77,7 @@ jobs:
         awk 'FNR==1{print ""}{print}' dist4/*.txt > dist4/ChinaIPv2.txt
         awk '!seen[$0]++' dist4/ChinaIPv2.txt | sort -n | grep -Ev "^#|^$|203.208.32.0/19" > dist2/ChinaIPv4v2.txt
         
-        cp -f dist/China-IPv4.txt  dist5/ChinaIPv4-1.txt
+        cp -f dist/ChinaIPv4.txt  dist5/ChinaIPv4-1.txt
         cp -f dist2/ChinaIPv6.txt  dist5/ChinaIPv6.txt 
         awk 'FNR==1{print ""}{print}' dist5/*.txt | grep -Ev "^#|^$"  > dist/China-IPv1.txt
         awk 'FNR==1{print ""}{print}' dist2/*.txt | grep -Ev "^#|^$"  > dist/China-IPv2.txt
@@ -94,8 +94,8 @@ jobs:
         awk '!seen[$0]++' dist/GFW1112.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/AutoGFW.txt
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
-        awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/China-domain.conf
-        cp -f dist/China-domain.conf dist/ChinaDomain2.conf
+        awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/ChinaDomain.conf
+        cp -f dist/ChinaDomain.conf dist/ChinaDomain2.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/ChinaDomain.conf
 
         awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/bogus-nxdomain3.conf
@@ -133,8 +133,8 @@ jobs:
         cp -rf dist/Country.mmdb ./
         cp -rf dist/ChinaDomain.conf ./
         cp -rf dist/ChinaDomain2.conf ./
-        cp -rf dist/BlackListIP.conf  ./
-        cp -rf dist/WhiteListIP.conf ./
+        cp -rf dist/BlacklistIP.conf  ./
+        cp -rf dist/WhitelistIP.conf ./
         cp -rf dist/GFW.conf ./
         cp -rf dist/BogusNxdomain.conf ./
                 
@@ -143,8 +143,8 @@ jobs:
         git add ChinaIPv6.txt
         git add GFW.txt              #纯域名
         git add AutoGFW.txt          #Switchy 格式
-        git add BlackListIP.conf    #SmartDNS格式
-        git add WhiteListIP.conf    #SmartDNS格式
+        git add BlacklistIP.conf    #SmartDNS格式
+        git add WhitelistIP.conf    #SmartDNS格式
         git add ChinaDomain.conf    #SmartDNS格式
         git add ChinaDomain2.conf   #代理软件使用格式,国内域名
         git add GFW.conf             #SmartDNS格式
