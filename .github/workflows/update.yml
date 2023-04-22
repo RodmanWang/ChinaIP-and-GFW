@@ -44,6 +44,7 @@ jobs:
       run: |
         #chinaIP
         curl -LR -o dist/ChinaIPv4v6.txt "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
+        curl -LR -o dist/googleCN.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
         
         #GFW
         curl -LR -o dist3/gfw1.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
@@ -62,6 +63,9 @@ jobs:
       run: |
 
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\:.*" > dist/ChinaIPv4.txt
+        awk '{print NR, $0}' dist/ChinaIPv4.txt dist/googleCN.txt |uniq -u -f 1|awk '{print $2}'
+        
+        
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\..*" > dist/ChinaIPv6.txt  
 
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
