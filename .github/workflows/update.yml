@@ -47,9 +47,8 @@ jobs:
         #chinaIP
         curl -LR -o dist/ChinaIPv4-1.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
         curl -LR -o dist/ChinaIPv4-2.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
-        curl -LR -o dist4/ChinaIPv4-3.txt "https://raw.githubusercontent.com/metowolf/iplist/master/data/country/CN.txt"
-        curl -LR -o dist/ChinaIPv4-4.txt "https://raw.githubusercontent.com/misakaio/chnroutes2/master/chnroutes.txt"
-        curl -LR -o dist2/ChinaIPv6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+        curl -LR -o dist4/googleCN.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
+        curl -LR -o dist2/China-IPv4IPv6.txt "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
         
         #GFW
         curl -LR -o dist3/gfw1.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/greatfire.txt"
@@ -69,19 +68,19 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
-        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -Ev "^#|^$|203.208.32.0/19" > dist/ChinaIPv4.txt
+        cp -f dist4/googleCN.txt  dist/googleCN.txt
+        awk '{print $0}' dist/googleCN.txt dist/ChinaIP.txt |sort|uniq -u > dist/ChinaIPv4.txt
         
-        cp -f dist/ChinaIPv4-1.txt  dist4/ChinaIPv4-1.txt
-        cp -f dist/ChinaIPv4-2.txt  dist4/ChinaIPv4-2.txt
-        cp -f dist/ChinaIPv4-4.txt  dist4/ChinaIPv4-4.txt
-        awk 'FNR==1{print ""}{print}' dist4/*.txt > dist4/ChinaIPv2.txt
-        awk '!seen[$0]++' dist4/ChinaIPv2.txt | sort -n | grep -Ev "^#|^$|203.208.32.0/19" > dist2/ChinaIPv4v2.txt
+        cp -f dist/ChinaIP.txt  dist2/ChinaIP.txt
+        cp -f dist/ChinaIPv4.txt  dist2/ChinaIPv4.txt 
+        awk '{print $0}' dist2/ChinaIP.txt dist2/China-IPv4IPv6.txt |sort|uniq -u > dist2/ChinaIPv6.txt
+
+        cp -f dist/ChinaIPv4.txt  dist5/ChinaIPv4.txt
+        cp -f dist2/ChinaIPv6.txt  dist5/ChinaIPv6.txt
+        awk 'FNR==1{print ""}{print}' dist5/*.txt | grep -Ev "^#|^$"  > dist/ChinaIP.txt
         
-        cp -f dist/ChinaIPv4.txt  dist5/ChinaIPv4-1.txt
-        cp -f dist2/ChinaIPv6.txt  dist5/ChinaIPv6.txt 
-        awk 'FNR==1{print ""}{print}' dist5/*.txt | grep -Ev "^#|^$"  > dist/China-IPv1.txt
-        awk 'FNR==1{print ""}{print}' dist2/*.txt | grep -Ev "^#|^$"  > dist/China-IPv2.txt
-        cp -f dist/China-IPv1.txt  dist/China-IPv3.txt
+        cp -f dist/ChinaIPv4.txt  dist/China-IPv1.txt
+        cp -f dist/ChinaIPv4.txt  dist/China-IPv3.txt
         
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
         #awk '!seen[$0]++' dist3/gfw0.txt | sed "s/^www\.//p" > dist3/gfw00.txt
@@ -112,7 +111,7 @@ jobs:
       run: |
         CURRENT_DIR=$(pwd)
         cd dist
-        ./ipip2mmdb -s ./China-IPv2.txt -d Country.mmdb
+        ./ipip2mmdb -s ./ChinaIP.txt -d Country.mmdb
         cd $CURRENT_DIR
         
     - name: Push artifacts to release branch
