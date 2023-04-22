@@ -65,7 +65,7 @@ jobs:
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\:.*" > dist/ChinaIPv41.txt
         #awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\:.*|203.208.32.0/19|103.104.152.0/22|113.197.104.0/22" > dist/ChinaIPv4.txt
         #awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\:.*" > dist/ChinaIPv4.txt
-        awk '!seen[$0]++' grep -v -f dist/googleCN.txt dist/ChinaIPv41.txt > dist/ChinaIPv4.txt
+        awk '!seen[$0]++' | grep -v -f dist/googleCN.txt dist/ChinaIPv41.txt > dist/ChinaIPv4.txt
         
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\..*" > dist/ChinaIPv6.txt  
 
