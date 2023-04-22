@@ -69,8 +69,7 @@ jobs:
       run: |
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
         cp -f dist4/googleCN.txt  dist/googleCN.txt
-        awk '{print NR, $0}' dist/googleCN.txt dist/ChinaIP.txt |sort -k2|uniq -u -f 1|sort -k1|awk '{print $2}'  > dist/ChinaIPv4.txt
-
+        awk '!seen[$0]++' dist/ChinaIP.txt | sort -n | grep -v -f dist/googleCN.txt > dist/ChinaIPv4.txt
 
         cp -f dist/ChinaIP.txt  dist2/ChinaIP.txt
         cp -f dist/ChinaIPv4.txt  dist2/ChinaIPv4.txt 
