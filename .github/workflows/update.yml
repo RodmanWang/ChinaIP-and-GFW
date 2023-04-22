@@ -54,8 +54,6 @@ jobs:
         
         #Domestic-Domain
         curl -LR -o dist/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
-        ##curl -LR -o dist/apple.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf"
-        ##curl -LR -o dist/google.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf"
         curl -LR -o dist/domestic-custom.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-custom.conf"
         
         #bogus-nxdomain   
@@ -64,18 +62,12 @@ jobs:
    
     - name: Merge and IP lists and remove duplicates
       run: |
-        #awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIP.txt
-        #awk '!seen[$0]++' dist/ChinaIPv4v6.txt | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^#|^$|203.208.32.0/19" > dist/ChinaIPv4.txt
+
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^#|^$|.*::.*" > dist/ChinaIPv4.txt
-        
-        cp -f dist/ChinaIPv4v6.txt.txt  dist2/ChinaIPv4v6.txt.txt 
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^#|^$|.*" > dist/ChinaIPv6.txt  
 
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
-        #awk '!seen[$0]++' dist3/gfw0.txt | sed "s/^www\.//p" > dist3/gfw00.txt
-        awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/GFW.txt
-        ##awk '!seen[$0]++' dist3/gfw00.txt | grep -Ev "^#|^$" > dist/GFW.txt
-        ##awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/GFW.txt  
+        awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^#|^$" > dist/GFW.txt 
         
         cp -f dist/GFW.txt dist/GFW1111.txt
         awk '!seen[$0]++' dist/GFW1111.txt | sed "s/^/\|\|&/p" > dist/GFW1112.txt
@@ -115,7 +107,7 @@ jobs:
         git rm -rf .
         
         cp -rf dist/ChinaIPv4.txt ./
-        cp -rf dist2/ChinaIPv6.txt ./
+        cp -rf dist/ChinaIPv6.txt ./
         cp -rf dist/GFW.txt ./
         cp -rf dist/AutoGFW.txt ./
         cp -rf dist/Country.mmdb ./
