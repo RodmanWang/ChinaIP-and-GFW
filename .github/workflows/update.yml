@@ -37,8 +37,6 @@ jobs:
       run: mkdir -p dist1
            mkdir -p dist2
            mkdir -p dist3
-           mkdir -p dist4
-           mkdir -p dist5
     - name: Compile GeoIP conversion bin (Golang)
       run: /bin/bash ./build.sh
 
@@ -63,7 +61,7 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
 
-        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^#|^$|.*\:.*" > dist/ChinaIPv4.txt
+        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\:.*" > dist/ChinaIPv4.txt
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\..*" > dist/ChinaIPv6.txt  
 
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
