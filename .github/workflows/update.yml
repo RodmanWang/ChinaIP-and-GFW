@@ -61,7 +61,9 @@ jobs:
    
     - name: Merge and IP lists and remove duplicates
       run: |
-        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\:.*|203.208.32.0/19|103.104.152.0/22|113.197.104.0/22" > dist/ChinaIPv4.txt
+        #awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\:.*|203.208.32.0/19|103.104.152.0/22|113.197.104.0/22" > dist/ChinaIPv4.txt
+        pattern=$(cat dist/googleCN.txt | sed 's/[]\[^$.*/]/\\&/g' | sed 's/$/|/' | tr -d '\n' | sed 's/|$//')
+        grep -E "$pattern" dist/ChinaIPv4v6.txt | sed "s/$pattern//g" > dist/ChinaIPv4.txt
         
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\..*" > dist/ChinaIPv6.txt  
 
