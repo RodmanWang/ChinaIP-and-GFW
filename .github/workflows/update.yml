@@ -77,12 +77,14 @@ jobs:
         cp -f dist/GFW.txt dist/GFW1111.txt
         awk '!seen[$0]++' dist/GFW1111.txt | sed "s/^/\|\|&/p" > dist/GFW1112.txt
         awk '!seen[$0]++' dist/GFW1112.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist/AutoGFW.txt
-        
+
+        cat dist/domestic-custom.conf | sed "s/^\(.*\)$/server=\/\1\/114.114.114.114/g" > dist/domestic-custom.conf
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
         awk '!seen[$0]++' dist/china1.conf | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist/ChinaDomain.conf
         cp -f dist/ChinaDomain.conf dist/ChinaDomain2.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/ChinaDomain.conf
 
+        cat dist/bogus-nxdomain2.conf | sed "s/^\(.*\)$/bogus-nxdomain \/\1/g" > dist/bogus-nxdomain2.conf
         awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/bogus-nxdomain3.conf
         awk '!seen[$0]++' dist2/bogus-nxdomain3.conf | grep -Ev "^$|^\s*#" > dist2/bogus-nxdomain4.conf
         sed -i "s/=/ /;s/$/\/32/" dist2/bogus-nxdomain4.conf
