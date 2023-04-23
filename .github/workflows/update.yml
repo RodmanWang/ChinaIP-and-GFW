@@ -84,7 +84,7 @@ jobs:
         cp -f dist/ChinaDomain.conf dist/ChinaDomain2.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/ChinaDomain.conf
 
-        cat dist/bogus-nxdomain2.conf | sed "s/^\(.*\)$/bogus-nxdomain \/\1/g" > dist/bogus-nxdomain2.conf
+        cat dist2/bogus-nxdomain2.conf | sed "s/^\(.*\)$/bogus-nxdomain \/\1/g" > dist2/bogus-nxdomain2.conf
         awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/bogus-nxdomain3.conf
         awk '!seen[$0]++' dist2/bogus-nxdomain3.conf | grep -Ev "^$|^\s*#" > dist2/bogus-nxdomain4.conf
         sed -i "s/=/ /;s/$/\/32/" dist2/bogus-nxdomain4.conf
