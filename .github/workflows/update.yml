@@ -65,7 +65,7 @@ jobs:
         #生成不包含googleCN.txt的ChinaIP地址（ipv4&ipv6）
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
 
-        #生成不包含googleCN.txtip的IPV4地址
+        #生成不包含googleCN.txt的ChinaIPV4地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
 
         #删除ipv4地址，生成IPV6地址
@@ -90,7 +90,7 @@ jobs:
       run: |
         CURRENT_DIR=$(pwd)
         cd dist
-        ./ipip2mmdb -s ./ChinaIPv4v6.txt -d Country.mmdb
+        ./ipip2mmdb -s ./ChinaIP.txt -d Country.mmdb
         cd $CURRENT_DIR
         
     - name: Push artifacts to release branch
