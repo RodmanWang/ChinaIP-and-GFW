@@ -83,12 +83,11 @@ jobs:
         awk '!seen[$0]++' dist/china1.conf | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist/ChinaDomain.conf
         cp -f dist/ChinaDomain.conf dist/ChinaDomain2.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/ChinaDomain.conf
-
-        cat dist2/bogus-nxdomain2.conf | sed "s/^\(.*\)$/bogus-nxdomain \/\1/g" > dist2/bogus-nxdomain2.conf
-        awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/bogus-nxdomain3.conf
-        awk '!seen[$0]++' dist2/bogus-nxdomain3.conf | grep -Ev "^$|^\s*#" > dist2/bogus-nxdomain4.conf
-        sed -i "s/=/ /;s/$/\/32/" dist2/bogus-nxdomain4.conf
-        awk '!seen[$0]++' dist2/bogus-nxdomain4.conf | sort -t. -k1 > dist/BogusNxdomain.conf
+        
+        awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/bogus-nxdomain1.conf
+        sed -i "s/^bogus-nxdomain=\/\(.*\)\/[^\/]*$//\1\/g" dist2/bogus-nxdomain2.conf
+        awk '!seen[$0]++' dist2/bogus-nxdomain2.conf | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^$|^\s*#" > dist2/bogus-nxdomain3.conf
+        cat dist2/bogus-nxdomain3.conf | sed "s/^\(.*\)$/bogus-nxdomain \/\1/32/g" > dist2/bogus-nxdomain.conf
         
         cat dist/ChinaIP.txt | sed "s/^\(.*\)$/blacklist-ip \1/g" > dist/BlacklistIP.conf
         cat dist/ChinaIP.txt | sed "s/^\(.*\)$/whitelist-ip \1/g" > dist/WhitelistIP.conf
