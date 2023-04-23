@@ -61,14 +61,14 @@ jobs:
    
     - name: Merge and IP lists and remove duplicates
       run: |
-
-        #生成不包含googleCN.txt的ChinaIP地址（ipv4&ipv6）
+      
+        # 生成不包含googleCN.txt的ChinaIP地址（ipv4&ipv6）
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
         
-        #生成不包含googleCN.txt的ChinaIPV4地址
+        # 生成不包含googleCN.txt的ChinaIPV4地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
         
-        #删除ipv4地址，生成IPV6地址
+        # 删除ipv4地址，生成IPV6地址
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt
         
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
