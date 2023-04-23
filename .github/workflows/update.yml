@@ -86,9 +86,9 @@ jobs:
         
         
         awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/nxdomain1.conf
-        sed -i "s/^bogus-nxdomain=\/\(.*\)\/[^\/]*$/\1/g" dist2/nxdomain1.conf
-        awk '!seen[$0]++' dist2/nxdomain1.conf | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^$|^\s*#" > dist2/nxdomain2.conf
-        cat dist2/nxdomain2.conf | sed "s/^\(.*\)$/bogus-nxdomain \1\/32/g" > dist/BogusNxdomain.conf
+        sed -i "s/^bogus-nxdomain=\/\(.*\)\/[^\/]*$/ \1/g" dist2/nxdomain1.conf
+        #awk '!seen[$0]++' dist2/nxdomain1.conf | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^$|^\s*#" > dist2/nxdomain2.conf
+        #cat dist2/nxdomain2.conf | sed "s/^\(.*\)$/bogus-nxdomain \1\/32/g" > dist/BogusNxdomain.conf
         
         cat dist/ChinaIP.txt | sed "s/^\(.*\)$/blacklist-ip \1/g" > dist/BlacklistIP.conf
         cat dist/ChinaIP.txt | sed "s/^\(.*\)$/whitelist-ip \1/g" > dist/WhitelistIP.conf
