@@ -61,10 +61,14 @@ jobs:
    
     - name: Merge and IP lists and remove duplicates
       run: |
-      
-        #awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*|203.208.32.0/19|103.104.152.0/22|113.197.104.0/22" > dist/ChinaIPv4.txt
+
+        #生成不包含googleCN.txt的ChinaIP地址（ipv4&ipv6）
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
+
+        #生成不包含googleCN.txtip的IPV4地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
 
+        #删除ipv4地址，生成IPV6地址
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
 
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
@@ -84,8 +88,8 @@ jobs:
         sed -i "s/=/ /;s/$/\/32/" dist2/bogus-nxdomain4.conf
         awk '!seen[$0]++' dist2/bogus-nxdomain4.conf | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n > dist/BogusNxdomain.conf
         
-        cat dist/ChinaIPv4v6.txt | sed "s/^\(.*\)$/blacklist-ip \1/g" > dist/BlacklistIP.conf
-        cat dist/ChinaIPv4v6.txt | sed "s/^\(.*\)$/whitelist-ip \1/g" > dist/WhitelistIP.conf
+        cat dist/ChinaIP.txt | sed "s/^\(.*\)$/blacklist-ip \1/g" > dist/BlacklistIP.conf
+        cat dist/ChinaIP.txt | sed "s/^\(.*\)$/whitelist-ip \1/g" > dist/WhitelistIP.conf
         cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
                       
         
@@ -120,7 +124,7 @@ jobs:
         cp -rf dist/BogusNxdomain.conf ./
                 
         git add Country.mmdb         
-        git add ChinaIPv4.txt      #小体积
+        git add ChinaIPv4.txt     
         git add ChinaIPv6.txt
         git add GFW.txt              #纯域名
         git add AutoGFW.txt          #Switchy 格式
