@@ -61,23 +61,24 @@ jobs:
    
     - name: Merge and IP lists and remove duplicates
       run: |
-        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\:.*|203.208.32.0/19|103.104.152.0/22|113.197.104.0/22" > dist/ChinaIPv4.txt
-        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^#|^$|.*\..*" > dist/ChinaIPv6.txt  
+        #awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*|203.208.32.0/19|103.104.152.0/22|113.197.104.0/22" > dist/ChinaIPv4.txt
+        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Evf "^$|^\s*#|.*\:.*|dist/googleCN.txt" > dist/ChinaIPv4.txt
+        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
 
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
-        awk '!seen[$0]++' dist3/gfw0.txt | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^#|^$" > dist/GFW.txt 
+        awk '!seen[$0]++' dist3/gfw0.txt | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^$|^\s*#" > dist/GFW.txt 
         
         cp -f dist/GFW.txt dist/GFW1111.txt
         awk '!seen[$0]++' dist/GFW1111.txt | sed "s/^/\|\|&/p" > dist/GFW1112.txt
-        awk '!seen[$0]++' dist/GFW1112.txt | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^#|^$" > dist/AutoGFW.txt
+        awk '!seen[$0]++' dist/GFW1112.txt | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^$|^\s*#" > dist/AutoGFW.txt
         
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
-        awk '!seen[$0]++' dist/china1.conf | grep -Ev "^#|^$" > dist/ChinaDomain.conf
+        awk '!seen[$0]++' dist/china1.conf | grep -Ev "^$|^\s*#" > dist/ChinaDomain.conf
         cp -f dist/ChinaDomain.conf dist/ChinaDomain2.conf
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist/ChinaDomain.conf
 
         awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/bogus-nxdomain3.conf
-        awk '!seen[$0]++' dist2/bogus-nxdomain3.conf | grep -Ev "^#|^$" > dist2/bogus-nxdomain4.conf
+        awk '!seen[$0]++' dist2/bogus-nxdomain3.conf | grep -Ev "^$|^\s*#" > dist2/bogus-nxdomain4.conf
         sed -i "s/=/ /;s/$/\/32/" dist2/bogus-nxdomain4.conf
         awk '!seen[$0]++' dist2/bogus-nxdomain4.conf | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n > dist/BogusNxdomain.conf
         
