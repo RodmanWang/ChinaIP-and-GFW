@@ -93,7 +93,7 @@ jobs:
         cat dist2/nxdomain2.conf | sed "s/^\(.*\)$/bogus-nxdomain \1\/32/g" > dist2/BogusNxdomain.conf
         #
         #生成openclash使用的ip格式
-        sed -e '1i payload:' -e '1,$s/^/  - \x27/' -e '1,$s/$/\/32\x27/' -e '2i # >AD & BanIP' dist2/nxdomain2.conf > dist2/Ad·IP.yaml
+        sed -e '1i payload:' -e '1,$s/^/  - \x27/' -e '1,$s/$/\/32\x27/' -e '1a # >AD & BanIP' dist2/nxdomain2.conf > dist2/Ad·IP.yaml
         #
 
         #Domestic文件仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
