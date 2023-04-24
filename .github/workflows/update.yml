@@ -71,8 +71,8 @@ jobs:
         #删除ipv4地址，生成IPV6地址
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
 
+        sed -i '/^\(- DOMAIN-SUFFIX\|- DOMAIN\)/!d' dist3/gfw1.txt
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
-        sed -i '/^\(- DOMAIN-SUFFIX\|- DOMAIN\)/!d' dist3/gfw0.txt
         awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist/GFW.txt 
         
         cp -f dist/GFW.txt dist/GFW1111.txt
