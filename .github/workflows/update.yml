@@ -82,8 +82,8 @@ jobs:
         #仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
         grep '\(- DOMAIN-SUFFIX,\|- DOMAIN,\)' dist3/Proxy.yaml > dist3/gfw1.txt
         #
-        #新文件删除每行数据中的"- DOMAIN-SUFFIX,“或”- DOMAIN,“字符，方便汇总，便与后续排序
-        sed -i 's/- DOMAIN-SUFFIX,//g; s/- DOMAIN,//g' dist3/gfw1.txt
+        #新文件删除每行数据中的"- DOMAIN-SUFFIX,“或”- DOMAIN,“字符，并让每行顶格，方便汇总，便与后续排序
+        sed -i 's/^[- ]*DOMAIN[- ]*[-SUFFIX]*,//g' dist3/gfw1.txt
         #
         #汇总，字符格式排序，删除空行，注释行，重复行
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
@@ -99,8 +99,8 @@ jobs:
         #Domestic文件仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
         grep '\(- DOMAIN-SUFFIX,\|- DOMAIN,\)' dist/Domestic.yaml > dist/Domestic.conf
         #
-        #新文件删除每行数据中的"- DOMAIN-SUFFIX,“或”- DOMAIN,“字符，方便汇总，便与后续排序
-        sed -i 's/- DOMAIN-SUFFIX,//g; s/- DOMAIN,//g' dist/Domestic.conf
+        #新文件删除每行数据中的"- DOMAIN-SUFFIX,“或”- DOMAIN,“字符，并让每行顶格，方便汇总，便与后续排序
+        sed -i 's/^[- ]*DOMAIN[- ]*[-SUFFIX]*,//g' dist/Domestic.conf
         #
         #对补充的自定义国内域名文件，开头添加“server=/”字符，末尾添加”/114.114.114.114“字符，保证与后续其他域名格式一致
         cat dist/domestic-custom.conf dist/Domestic.conf | sed "s/^\(.*\)$/server=\/\1\/114.114.114.114/g" > dist/domestic-custom.conf
