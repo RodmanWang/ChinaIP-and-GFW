@@ -47,6 +47,7 @@ jobs:
         curl -LR -o dist/googleCN.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
         
         #GFW
+        curl -LR -o dist3/Proxy.yaml "https://raw.githubusercontent.com/RodmanWang/openclash-rule/main/rule-provider/Proxy.yaml"
         curl -LR -o dist3/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
         curl -LR -o dist3/gfw3.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-custom.txt"
         
@@ -68,8 +69,11 @@ jobs:
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
 
         #删除ipv4地址，生成IPV6地址
-        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
-
+        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt
+        
+        sed -i 's/bogus-nxdomain=//' dist3/Proxy.yaml
+        sed -i '/^\(- DOMAIN-SUFFIX\|- DOMAIN\)/!d; s/- DOMAIN-SUFFIX,//g; s/- DOMAIN,//g' dist3/Proxy.yaml
+        cat dist3/Proxy.yaml > dist3/gfw1.txt
         awk 'FNR==1{print ""}{print}' dist3/*.txt > dist3/gfw0.txt
         awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist/GFW.txt 
         
