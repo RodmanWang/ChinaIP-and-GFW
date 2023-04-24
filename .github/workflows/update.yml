@@ -91,7 +91,10 @@ jobs:
         #
         #每行数据开头添加“bogus-nxdomain ”，生成SmartDNS使用的忽略IP解析文件
         cat dist2/nxdomain2.conf | sed "s/^\(.*\)$/bogus-nxdomain \1\/32/g" > dist2/BogusNxdomain.conf
-        #      
+        #
+        #生成openclash使用的ip格式
+        cat dist2/nxdomain2.conf | sed -i -e '1i payload:' -e '1,$s/^/  - \x27/' -e '1,$s/$/\/32\x27/' > dist2/Ad·IP.yaml
+        #
 
         #Domestic文件仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
         grep '\(- DOMAIN-SUFFIX,\|- DOMAIN,\)' dist3/Domestic.yaml > dist3/Domestic1.yaml
@@ -154,6 +157,7 @@ jobs:
         cp -rf dist/WhitelistIP.conf ./
         cp -rf dist/Country.mmdb ./
         cp -rf dist2/BogusNxdomain.conf ./
+        cp -rf dist2/Ad·IP.yaml ./
         cp -rf dist3/ChinaDomain.conf ./
         cp -rf dist3/ChinaDomain2.conf ./
         cp -rf dist4/GFW.txt ./
@@ -172,6 +176,7 @@ jobs:
         git add ChinaDomain2.conf   #代理软件使用格式,国内域名
         git add GFW.conf             #SmartDNS格式
         git add BogusNxdomain.conf  #SmartDNS格式，忽略解析IP
+        git add Ad·IP.yaml  #openclash使用的ip格式P
         
         git commit -m "update : $(TZ=UTC-8 date "+%Y-%m-%d %H:%M:%S")"
         git branch -D release
