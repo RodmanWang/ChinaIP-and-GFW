@@ -54,6 +54,7 @@ jobs:
         #Domestic-Domain
         curl -LR -o dist/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
         curl -LR -o dist/domestic-custom.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-custom.conf"
+        curl -LR -o dist/Domestic.yaml "https://raw.githubusercontent.com/RodmanWang/openclash-rule/main/rule-provider/Domestic.yaml"
         
         #bogus-nxdomain   
         curl -LR -o dist2/bogus-nxdomain1.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
@@ -94,9 +95,15 @@ jobs:
         #每行数据开头添加“nameserver /”字符，末尾添加”/abroad“字符，生成SmartDNS使用的指定解析组的GFW文件
         cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
         #
-        
+
+        #Domestic文件仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
+        grep '\(- DOMAIN-SUFFIX,\|- DOMAIN,\)' dist/Domestic.yaml > dist/Domestic.conf
+        #
+        #新文件删除每行数据中的"- DOMAIN-SUFFIX,“或”- DOMAIN,“字符，方便汇总，便与后续排序
+        sed -i 's/- DOMAIN-SUFFIX,//g; s/- DOMAIN,//g' dist/Domestic.conf
+        #
         #对补充的自定义国内域名文件，开头添加“server=/”字符，末尾添加”/114.114.114.114“字符，保证与后续其他域名格式一致
-        cat dist/domestic-custom.conf | sed "s/^\(.*\)$/server=\/\1\/114.114.114.114/g" > dist/domestic-custom.conf
+        cat dist/domestic-custom.conf dist/Domestic.conf | sed "s/^\(.*\)$/server=\/\1\/114.114.114.114/g" > dist/domestic-custom.conf
         #
         #汇总，字符格式排序，删除空行，注释行，重复行
         awk 'FNR==1{print ""}{print}' dist/*.conf > dist/china1.conf
