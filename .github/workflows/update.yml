@@ -90,7 +90,7 @@ jobs:
         awk '!seen[$0]++' dist3/gfw0.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist/GFW.txt 
         #
         #每行数据开头添加“||”字符，生成代理使用的格式GFW 
-        awk '!seen[$0]++' dist/GFW1111.txt | sed "s/^/\|\|&/p" > dist/AutoGFW.txt
+        awk '!seen[$0]++' dist/GFW.txt | sed "s/^/\|\|&/p" > dist/AutoGFW.txt
         #
         #每行数据开头添加“nameserver /”字符，末尾添加”/abroad“字符，生成SmartDNS使用的指定解析组的GFW文件
         cat dist/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist/GFW.conf
