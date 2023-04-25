@@ -131,7 +131,7 @@ jobs:
         awk '!seen[$0]++' dist4/GFW.txt | sed "s/^/\|\|&/p" > dist4/AutoGFW.txt
         #
         #每行数据开头添加“nameserver /”字符，末尾添加”/abroad“字符，生成SmartDNS使用的指定解析组的GFW文件
-        cat dist4/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist4/GFW.conf
+        cat dist4/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" | uniq > dist4/GFW.conf
         #
         
     - name: Generate GeoIP2 database
