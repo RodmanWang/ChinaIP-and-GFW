@@ -57,7 +57,8 @@ jobs:
         
         #GFW
         curl -LR -o dist4/Proxy.yaml "https://raw.githubusercontent.com/RodmanWang/openclash-rule/main/rule-provider/Proxy.yaml"
-        curl -LR -o dist4/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"     
+        curl -LR -o dist4/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
+        curl -LR -o dist4/gfw3.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-custom.txt"
    
     - name: Merge and IP lists and remove duplicates
       run: |
