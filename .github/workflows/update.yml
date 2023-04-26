@@ -124,7 +124,7 @@ jobs:
         awk '{gsub(/server=\/|\/114.114.114.114/,""); gsub(/[[:space:]]*/,"")}1' dist3/china2.conf > dist3/china3.conf
         #
         #将生成的china3.conf文件，每行数据开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的Domestic国内域名文件
-        awk '{print "  - DOMAIN-SUFFIX," $0}' dist3/china3.conf > dist3/Domestic.yaml
+        awk '{print "  - DOMAIN-SUFFIX," $0}' dist3/china3.conf | awk 'BEGIN {print "payload:"} {print}' > dist3/Domestic.yaml
         #
         
         #
@@ -143,7 +143,7 @@ jobs:
         awk '!seen[$0]++' dist4/GFW.txt | sed "s/^/\|\|&/p" | uniq > dist4/AutoGFW.txt
         #
         #行数据开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的gfw域名文件
-        awk '!seen[$0]++' dist4/GFW.txt | sed "s/^/\  - DOMAIN-SUFFIX\,&/p" | uniq > dist4/Proxy.yaml
+        awk '{print "  - DOMAIN-SUFFIX," $0}' dist4/GFW.txt | awk 'BEGIN {print "payload:"} {print}' > dist4/Proxy.yaml   
         #
         #每行数据开头添加“nameserver /”字符，末尾添加”/abroad“字符，生成SmartDNS使用的指定解析组的GFW文件
         awk '{print "nameserver /" $0 "/abroad"}' dist4/GFW.txt > dist4/GFW.conf
