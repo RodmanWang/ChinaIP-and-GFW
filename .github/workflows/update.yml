@@ -95,7 +95,7 @@ jobs:
         #生成openclash使用的ip格式
         #sed -e '1i payload:' -e '1,$s/^/  - \x27/' -e '1,$s/$/\/32\x27/' dist2/nxdomain2.conf > dist2/Ad·IP.yaml
         #sed -i '2i # >AD & BanIP' dist2/Ad·IP.yaml
-        awk '{print " - \x27" $0 "/32\x27"}' dist2/nxdomain2.conf | awk 'BEGIN {print "payload:"} {print}' > dist2/Ad·IP.yaml
+        awk '{print "  - \x27" $0 "/32\x27"}' dist2/nxdomain2.conf | awk 'BEGIN {print "payload:"} {print}' > dist2/Ad·IP.yaml
         awk 'NR==2{print "# >AD & BanIP"} 1' dist2/Ad·IP.yaml > temp && mv temp dist2/Ad·IP.yaml
         #
 
