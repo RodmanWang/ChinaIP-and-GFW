@@ -118,7 +118,7 @@ jobs:
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist3/ChinaDomain.conf
         #
         #将原生成的ChinaDomain文件，每行数据开头添加“nameserver /”字符，末尾添加”domestic“字符，生成SmartDNS使用的指定解析组的国内域名文件
-        sed -i 's/server=///g; s//114.114.114.114//g; s/[[:space:]]*//g' dist3/ChinaDomain3.conf
+        sed -i 's/server=\///g; s/\/114.114.114.114//g; s/[[:space:]]*//g' dist3/ChinaDomain3.conf
         cat dist3/ChinaDomain3.conf > dist3/Domestic.yaml
         #     
         #仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
