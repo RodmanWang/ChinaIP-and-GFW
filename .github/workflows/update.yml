@@ -93,8 +93,8 @@ jobs:
         awk '{print "bogus-nxdomain " $0 "/32"}' dist2/nxdomain2.conf > dist2/BogusNxdomain.conf
         #
         #生成openclash使用的ip格式
-        awk '{print "  -'\''" $0 "/32'\''"}' dist2/nxdomain2.conf | awk 'NR==1{print "payload:"} {print}' > dist2/nxdomain3.conf
-        awk 'NR==2{print "# >AD & BanIP"} {print}' dist2/nxdomain3.conf > dist2/Ad-IP.yaml
+        sed -e '1i payload:' -e '1,$s/^/  - \x27/' -e '1,$s/$/\/32\x27/' dist2/nxdomain2.conf > dist2/Ad·IP.yaml
+        sed -i '2i # >AD & BanIP' dist2/Ad·IP.yaml
         #
 
 
