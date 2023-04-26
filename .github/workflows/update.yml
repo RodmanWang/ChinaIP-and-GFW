@@ -76,8 +76,8 @@ jobs:
         #每行数据开头添加“blacklist-ip ”字符，生成SmartDNS使用的黑名单IP
         awk '{print "blacklist-ip " $0}' dist/ChinaIP.txt > dist/BlacklistIP.conf
         #
-        #行数据开头添加“blacklist-ip ”字符，生成SmartDNS使用的白名单IP
-        awk '{print "blacklist-ip " $0}' dist/ChinaIP.txt > dist/WhitelistIP.conf
+        #行数据开头添加“whitelist-ip ”字符，生成SmartDNS使用的白名单IP
+        awk '{print "whitelist-ip " $0}' dist/ChinaIP.txt > dist/WhitelistIP.conf
         #
         
         
