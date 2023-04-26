@@ -112,11 +112,15 @@ jobs:
         #
         #复制一份生成的ChinaDomain并改名，用于一般代理软件使用
         cp -f dist3/ChinaDomain.conf dist3/ChinaDomain2.conf
+        cp -f dist3/ChinaDomain.conf dist3/ChinaDomain3.conf
         #
-        #将原生成的ChinaDomain文件，每行数据开头添加“nameserver /”字符，末尾添加”domestic“字符，生成SmartDNS使用的指定解析组的国内域名文件
+        #将原生成的ChinaDomain文件，每行数据开头添加“nameserver /”字符，末尾替换成”/domestic“字符，生成SmartDNS使用的指定解析组的国内域名文件
         sed -i "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist3/ChinaDomain.conf
         #
-        
+       #将原生成的ChinaDomain文件，每行数据开头添加“nameserver /”字符，末尾添加”domestic“字符，生成SmartDNS使用的指定解析组的国内域名文件
+        sed -i 's/server=///g; s//114.114.114.114//g; s/[[:space:]]*//g' dist3/ChinaDomain3.conf
+        cat dist3/ChinaDomain3.conf > dist3/Domestic.yaml
+        #     
         #仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
         grep '\(- DOMAIN-SUFFIX,\|- DOMAIN,\)' dist4/Proxy.yaml > dist4/gfw1.txt
         #
@@ -161,6 +165,7 @@ jobs:
         cp -rf dist2/Ad·IP.yaml ./
         cp -rf dist3/ChinaDomain.conf ./
         cp -rf dist3/ChinaDomain2.conf ./
+        cp -rf dist3/Domestic.yaml ./
         cp -rf dist4/GFW.txt ./
         cp -rf dist4/AutoGFW.txt ./
         cp -rf dist4/GFW.conf ./
@@ -175,6 +180,7 @@ jobs:
         git add WhitelistIP.conf    #SmartDNS格式
         git add ChinaDomain.conf    #SmartDNS格式
         git add ChinaDomain2.conf   #代理软件使用格式,国内域名
+        git add Domestic.yaml
         git add GFW.conf             #SmartDNS格式
         git add BogusNxdomain.conf  #SmartDNS格式，忽略解析IP
         git add Ad·IP.yaml  #openclash使用的ip格式P
