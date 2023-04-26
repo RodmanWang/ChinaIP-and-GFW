@@ -97,6 +97,7 @@ jobs:
         sed -i '2i # >AD & BanIP' dist2/Ad·IP.yaml
         #
 
+
         #Domestic文件仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
         grep '\(- DOMAIN-SUFFIX,\|- DOMAIN,\)' dist3/Domestic.yaml > dist3/Domestic1.yaml
         #
@@ -113,13 +114,17 @@ jobs:
         #复制一份生成的ChinaDomain并改名，用于一般代理软件使用
         cp -f dist3/china2.conf dist3/ChinaDomain2.conf
         #
-        #将原生成的ChinaDomain文件，每行数据开头添加“nameserver /”字符，末尾替换成”/domestic“字符，生成SmartDNS使用的指定解析组的国内域名文件
+        #将原生成的china2.conf文件，每行数据开头添加“nameserver /”字符，末尾替换成”/domestic“字符，生成SmartDNS使用的指定解析组的国内域名文件
         sed "s/^server=\/\(.*\)\/[^\/]*$/nameserver \/\1\/domestic/g;/^nameserver/!d" dist3/china2.conf > dist3/ChinaDomain.conf
         #
-        #将原生成的ChinaDomain文件，每行数据开头添加“nameserver /”字符，末尾添加”domestic“字符，生成SmartDNS使用的指定解析组的国内域名文件
+        #将原生成的china2.conf文件，每行删除包含“/114.114.114.114”和“server=\”的字符，生成china3.conf
         sed 's/server=\///g; s/\/114.114.114.114//g; s/[[:space:]]*//g' dist3/china2.conf > dist3/china3.conf
+        #
+        #将生成的china3.conf文件，每行数据开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的Domestic.yaml国内域名文件
         cat dist3/china3.conf | sed "s/^\(.*\)$/- DOMAIN-SUFFIX,\1/g" > dist3/Domestic.yaml
-        #     
+        #
+        
+        
         #仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
         grep '\(- DOMAIN-SUFFIX,\|- DOMAIN,\)' dist4/Proxy.yaml > dist4/gfw1.txt
         #
@@ -132,6 +137,10 @@ jobs:
         #
         #每行数据开头添加“||”字符，生成代理使用的格式GFW 
         awk '!seen[$0]++' dist4/GFW.txt | sed "s/^/\|\|&/p" | uniq > dist4/AutoGFW.txt
+        #
+        #
+        #每行数据开头添加“||”字符，生成代理使用的格式GFW 
+        awk '!seen[$0]++' dist4/GFW.txt | sed "s/^/\- DOMAIN-SUFFIX\,&/p" | uniq > dist4/Proxy.yaml
         #
         #每行数据开头添加“nameserver /”字符，末尾添加”/abroad“字符，生成SmartDNS使用的指定解析组的GFW文件
         cat dist4/GFW.txt | sed "s/^\(.*\)$/nameserver \/\1\/abroad/g" > dist4/GFW.conf
@@ -168,19 +177,20 @@ jobs:
         cp -rf dist4/GFW.txt ./
         cp -rf dist4/AutoGFW.txt ./
         cp -rf dist4/GFW.conf ./
-
+        cp -rf dist4/Proxy.yaml ./
                 
         git add Country.mmdb         
         git add ChinaIPv4.txt     
         git add ChinaIPv6.txt
         git add GFW.txt              #纯域名
         git add AutoGFW.txt          #Switchy 格式
+        git add GFW.conf            #SmartDNS格式
+        git add Proxy.yaml          #OpenClash使用
         git add BlacklistIP.conf    #SmartDNS格式
         git add WhitelistIP.conf    #SmartDNS格式
         git add ChinaDomain.conf    #SmartDNS格式
         git add ChinaDomain2.conf   #代理软件使用格式,国内域名
-        git add Domestic.yaml
-        git add GFW.conf             #SmartDNS格式
+        git add Domestic.yaml       #OpenClash使用
         git add BogusNxdomain.conf  #SmartDNS格式，忽略解析IP
         git add Ad·IP.yaml  #openclash使用的ip格式P
         
