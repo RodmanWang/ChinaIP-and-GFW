@@ -761,3 +761,4 @@ ziffstatic.com
 openaicom.imgix.net
 synologydownload.com
 pubsub.razersynapse.com
+cloudfront.net
