@@ -762,3 +762,4 @@ openaicom.imgix.net
 synologydownload.com
 pubsub.razersynapse.com
 cloudfront.net
+qqwry.api.skk.moe
