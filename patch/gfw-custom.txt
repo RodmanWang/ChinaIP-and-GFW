@@ -362,7 +362,6 @@ ebookservice.tw
 edditstatic.com
 edgekey.net
 edgesuite.net
-edu
 engadget.com
 entrust.net
 esoir.be
@@ -402,7 +401,6 @@ go.com
 go.jp
 godaddy.com
 gosetsuden.jp
-gov
 greasyfork.org
 gstatic.cn
 helpshift.com
@@ -473,7 +471,6 @@ mathjax.org
 maying.co
 megaupload.com
 microsofttranslator.com
-mil
 mindnode.com
 mixlr.com
 mlssoccer.com
