@@ -67,12 +67,6 @@ dandanzan.cc
 baobuzz.com
 bunediy.com
 88zy.site
-opendns.com
-quad9.net
-one.one.one.one
-dns.iij.jp
-dns.sb
-doh.sb
 apache.org
 docker.com
 elastic.co
@@ -102,8 +96,6 @@ githubapp.com
 githubusercontents.com
 vercel.com
 statuspage.io
-google
-goog
 googletagmanager.com
 gvt2.com
 dialogflow.com
