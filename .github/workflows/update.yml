@@ -57,7 +57,7 @@ jobs:
         #curl -LR -o dist3/domestic-custom.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-custom.txt"
         
         #GFW
-        curl -LR -o dist4/Proxy.yaml "https://raw.githubusercontent.com/RodmanWang/openclash-rule/main/rule-provider/Proxy.yaml"
+        curl -LR -o dist4/Proxy11.yaml "https://raw.githubusercontent.com/RodmanWang/openclash-rule/main/rule-provider/Proxy.yaml"
         curl -LR -o dist4/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
         #curl -LR -o dist4/gfw3.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-custom.txt"
 
@@ -130,7 +130,7 @@ jobs:
         
         #
         #仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
-        awk '/- DOMAIN-SUFFIX,|- DOMAIN,/' dist4/Proxy.yaml > dist4/gfw1.txt
+        awk '/- DOMAIN-SUFFIX,|- DOMAIN,/' dist4/Proxy.yaml11 > dist4/gfw1.txt
         #
         #新文件删除每行数据中的"- DOMAIN-SUFFIX,“或”- DOMAIN,“字符，并让每行顶格，方便汇总，便与后续排序
         awk '{gsub(/- DOMAIN-SUFFIX,|- DOMAIN,/, ""); gsub(/[[:space:]]*/, "")}1' dist4/gfw1.txt > tmpfile && mv tmpfile dist4/gfw1.txt
