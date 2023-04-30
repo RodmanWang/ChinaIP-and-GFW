@@ -65,10 +65,10 @@ jobs:
       
         #
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i == $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV4地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i == $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV6地址
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
@@ -124,7 +124,7 @@ jobs:
         awk 'FNR==1{print ""}{print}' dist4/*.txt > dist4/gfw1.txt
         #
         #生成不包含dns.conf中域名的gfw地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i == $0) next} 1' dist4/dns.conf dist4/gfw1.txt > dist4/gfw0.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist4/dns.conf dist4/gfw1.txt > dist4/gfw0.txt
         #
         #字符格式排序，删除空行，注释行，重复行
         awk '!seen[$0]++' dist4/gfw0.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist4/GFW.txt
