@@ -53,11 +53,11 @@ jobs:
         
         #Domestic-Domain
         curl -LR -o dist3/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
-        curl -LR -o dist3/Domestic11.yaml "https://raw.githubusercontent.com/RodmanWang/openclash-rule/main/rule-provider/Domestic.yaml"
+        curl -LR -o dist3/Domestic.yaml "https://raw.githubusercontent.com/RodmanWang/openclash-rule/main/rule-provider/Domestic.yaml"
         #curl -LR -o dist3/domestic-custom.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-custom.txt"
         
         #GFW
-        curl -LR -o dist4/Proxy11.yaml "https://raw.githubusercontent.com/RodmanWang/openclash-rule/main/rule-provider/Proxy.yaml"
+        curl -LR -o dist4/Proxy.yaml "https://raw.githubusercontent.com/RodmanWang/openclash-rule/main/rule-provider/Proxy.yaml"
         curl -LR -o dist4/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
         #curl -LR -o dist4/gfw3.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-custom.txt"
 
@@ -102,13 +102,12 @@ jobs:
 
         #
         #Domestic文件仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
-        grep '\(- DOMAIN-SUFFIX,\|- DOMAIN,\)' dist3/Domestic11.yaml > dist3/Domestic1.yaml
+        grep '\(- DOMAIN-SUFFIX,\|- DOMAIN,\)' dist3/Domestic.yaml > dist3/Domestic1.yaml
         #新文件删除每行数据中的"- DOMAIN-SUFFIX,“或”- DOMAIN,“字符，并让每行顶格，方便汇总，便与后续排序
         awk '{gsub(/- DOMAIN-SUFFIX,/,""); gsub(/- DOMAIN,/,""); gsub(/[[:space:]]*/,"")}1' dist3/Domestic1.yaml > tmpfile && mv tmpfile dist3/Domestic1.yaml
         #
         #
         #对补充的自定义国内域名文件，开头添加“server=/”字符，末尾添加”/114.114.114.114“字符，保证与后续其他域名格式一致
-        #awk '{print "server=/" $0 "/114.114.114.114"}' dist3/domestic-custom.txt > dist3/other.conf
         awk '{print "server=/" $0 "/114.114.114.114"}' dist3/Domestic1.yaml > dist3/other.conf
         #
         #汇总，字符格式排序，删除空行，注释行，重复行
@@ -130,7 +129,7 @@ jobs:
         
         #
         #仅保留"- DOMAIN-SUFFIX,“和”- DOMAIN,“字符的行数据，生成新文件
-        awk '/- DOMAIN-SUFFIX,|- DOMAIN,/' dist4/Proxy11.yaml > dist4/gfw1.txt
+        awk '/- DOMAIN-SUFFIX,|- DOMAIN,/' dist4/Proxy.yaml > dist4/gfw1.txt
         #
         #新文件删除每行数据中的"- DOMAIN-SUFFIX,“或”- DOMAIN,“字符，并让每行顶格，方便汇总，便与后续排序
         awk '{gsub(/- DOMAIN-SUFFIX,|- DOMAIN,/, ""); gsub(/[[:space:]]*/, "")}1' dist4/gfw1.txt > tmpfile && mv tmpfile dist4/gfw1.txt
