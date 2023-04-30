@@ -113,11 +113,11 @@ jobs:
         #
         #
         #每行开头添加“server=/”字符，末尾添加“/114.114.114.114”字符，用于一般代理软件使用
-        awk '{print "server=/" $0 "/114.114.114.114"}' dist3/china2.conf > ChinaDomain2.conf
+        awk '{print "server=/" $0 "/114.114.114.114"}' dist3/china2.conf > dist3/ChinaDomain2.conf
         #
         #
         #每行开头添加“nameserver /”字符，末尾添加“/domestic”字符，生成SmartDNS使用的、指定解析组的国内域名文件
-        awk '{print "nameserver /" $0 "/domestic"}' dist3/china2.conf > ChinaDomain.conf
+        awk '{print "nameserver /" $0 "/domestic"}' dist3/china2.conf > dist3/ChinaDomain.conf
         #
         #
         #每行开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的Domestic国内域名文件
