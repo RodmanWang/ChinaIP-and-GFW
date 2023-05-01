@@ -106,16 +106,16 @@ jobs:
         #
         #汇总，字符格式排序，删除空行，注释行，重复行
         awk 'FNR==1{print ""}{print}' dist3/*.conf > dist3/china1.conf
-        awk '!seen[$0]++' dist3/china1.conf | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist3/china2.conf
+        awk '!seen[$0]++' dist3/china1.conf | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist3/ChinaDomain3.conf
         #
         #每行开头添加“server=/”字符，末尾添加“/114.114.114.114”字符，用于一般代理软件使用
-        awk '{print "server=/" $0 "/114.114.114.114"}' dist3/china2.conf > dist3/ChinaDomain2.conf
+        awk '{print "server=/" $0 "/114.114.114.114"}' dist3/ChinaDomain3.conf > dist3/ChinaDomain2.conf
         #
         #每行开头添加“nameserver /”字符，末尾添加“/domestic”字符，生成SmartDNS使用的、指定解析组的国内域名文件
-        awk '{print "nameserver /" $0 "/domestic"}' dist3/china2.conf > dist3/ChinaDomain.conf
+        awk '{print "nameserver /" $0 "/domestic"}' dist3/ChinaDomain3.conf > dist3/ChinaDomain.conf
         #
         #每行开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的Domestic国内域名文件
-        awk '{print "  - DOMAIN-SUFFIX," $0}' dist3/china2.conf | awk 'BEGIN {print "payload:"} {print}' > dist3/Domestic.yaml
+        awk '{print "  - DOMAIN-SUFFIX," $0}' dist3/ChinaDomain3.conf | awk 'BEGIN {print "payload:"} {print}' > dist3/Domestic.yaml
         #
         #
         
@@ -168,6 +168,7 @@ jobs:
         cp -rf dist2/Ad·IP.yaml ./
         cp -rf dist3/ChinaDomain.conf ./
         cp -rf dist3/ChinaDomain2.conf ./
+        cp -rf dist3/ChinaDomain3.conf ./
         cp -rf dist3/Domestic.yaml ./
         cp -rf dist4/GFW.txt ./
         cp -rf dist4/AutoGFW.txt ./
@@ -177,14 +178,15 @@ jobs:
         git add Country.mmdb         
         git add ChinaIPv4.txt     
         git add ChinaIPv6.txt
-        git add GFW.txt              #纯域名
-        git add AutoGFW.txt          #Switchy 格式
+        git add GFW.txt             #纯域名
+        git add AutoGFW.txt         #Switchy 格式
         git add GFW.conf            #SmartDNS格式
         git add Proxy.yaml          #OpenClash使用
         git add BlacklistIP.conf    #SmartDNS格式
         git add WhitelistIP.conf    #SmartDNS格式
         git add ChinaDomain.conf    #SmartDNS格式
         git add ChinaDomain2.conf   #代理软件使用格式,国内域名
+        git add ChinaDomain3.conf   #纯域名
         git add Domestic.yaml       #OpenClash使用
         git add BogusNxdomain.conf  #SmartDNS格式，忽略解析IP
         git add Ad·IP.yaml  #openclash使用的ip格式P
