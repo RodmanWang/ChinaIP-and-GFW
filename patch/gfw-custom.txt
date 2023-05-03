@@ -856,3 +856,4 @@ nflximg.com
 nflximg.net
 nflxso.net
 nflxvideo.net
+pypi.org
