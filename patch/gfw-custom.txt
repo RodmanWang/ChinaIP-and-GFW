@@ -860,3 +860,4 @@ pypi.org
 83.ucp-ntfy.kaspersky-labs.com
 dc1-st.ksn.kaspersky-labs.com
 omdbapi.com
+featuregates.org
