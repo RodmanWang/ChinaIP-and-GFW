@@ -861,3 +861,4 @@ pypi.org
 dc1-st.ksn.kaspersky-labs.com
 omdbapi.com
 featuregates.org
+firecore.com
