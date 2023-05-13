@@ -867,4 +867,4 @@ dvblogic.com
 chronowerks.com
 brandfetch.io
 icon-icons.com
-cdn.icon-icons.com
+bugsnag.com
