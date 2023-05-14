@@ -871,3 +871,4 @@ bugsnag.com
 dzen.ru
 crl.digicert-cn.com
 api.nolanstore.top
+global.synologydownload.com
