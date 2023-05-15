@@ -45,7 +45,7 @@ jobs:
       run: |
         #chinaIP
         curl -LR -o dist/ChinaIPv4v6.txt "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
-        curl -LR -o dist/domestic-IP.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-IP.txt"
+        curl -LR -o dist/domestic-IP.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-IP.txt"
         curl -LR -o dist/googleCN.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
         
         #bogus-nxdomain   
