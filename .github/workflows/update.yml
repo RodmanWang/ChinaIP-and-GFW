@@ -54,6 +54,7 @@ jobs:
         #Domestic-Domain
         curl -LR -o dist3/domains.china.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
         curl -LR -o dist3/domestic-custom.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-custom.txt"
+        curl -LR -o dist3/no-domestic.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/no-domestic.txt"
         
         #GFW
         curl -LR -o dist4/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
@@ -106,7 +107,10 @@ jobs:
         #
         #汇总，字符格式排序，删除空行，注释行，重复行
         awk 'FNR==1{print ""}{print}' dist3/*.conf > dist3/china1.conf
-        awk '!seen[$0]++' dist3/china1.conf | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist3/ChinaDomain3.conf
+        awk '!seen[$0]++' dist3/china1.conf | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist3/China2.conf
+        #
+        #汇总，字符格式排序，删除空行，注释行，重复行
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist3/no-domestic.txt dist3/China2.conf > dist3/ChinaDomain3.conf
         #
         #每行开头添加“server=/”字符，末尾添加“/114.114.114.114”字符，用于一般代理软件使用
         awk '{print "server=/" $0 "/114.114.114.114"}' dist3/ChinaDomain3.conf > dist3/ChinaDomain2.conf
