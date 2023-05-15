@@ -45,7 +45,8 @@ jobs:
       run: |
         #chinaIP
         curl -LR -o dist/ChinaIPv4v6.txt "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
-        curl -LR -o dist/googleCN.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
+        curl -LR -o dist/domestic-IP.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-IP.txt"
+        curl -LR -o dist/googleCN.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
         
         #bogus-nxdomain   
         curl -LR -o dist2/bogus-nxdomain1.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
@@ -59,17 +60,19 @@ jobs:
         #GFW
         curl -LR -o dist4/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
         curl -LR -o dist4/gfw3.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-custom.txt"
-        curl -LR -o dist4/dns.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/dns.conf"
+        curl -LR -o dist4/dns.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/dns.txt"
         
     - name: Merge and IP lists and remove duplicates
       run: | 
       
         #
+        #汇总数据
+        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/China.txt
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/China.txt > dist/ChinaIPv4v6.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV4地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
+        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt  
         #
         #生成不包含googleCN.txt中ip的ChinaIPV6地址
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
