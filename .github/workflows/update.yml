@@ -109,7 +109,7 @@ jobs:
         awk 'FNR==1{print ""}{print}' dist3/*.conf > dist3/china1.conf
         awk '!seen[$0]++' dist3/china1.conf | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist3/China2.conf
         #
-        #汇总，字符格式排序，删除空行，注释行，重复行
+        #生成不包含no-domestic.txt文本中的国内域名列表
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist3/no-domestic.txt dist3/China2.conf > dist3/ChinaDomain3.conf
         #
         #每行开头添加“server=/”字符，末尾添加“/114.114.114.114”字符，用于一般代理软件使用
