@@ -69,13 +69,13 @@ jobs:
         #汇总数据
         awk 'FNR==1{print ""}{print}' dist/*.txt > dist/China.txt
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/China.txt > dist/ChinaIPv4v6.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/China.txt > dist/ChinaIP.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV4地址
-        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt  
+        awk '!seen[$0]++' dist/ChinaIP.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt  
         #
         #生成不包含googleCN.txt中ip的ChinaIPV6地址
-        awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
+        awk '!seen[$0]++' dist/ChinaIP.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
         #
         #每行数据开头添加“blacklist-ip ”字符，生成SmartDNS使用的黑名单IP
         awk '{print "blacklist-ip " $0}' dist/ChinaIP.txt > dist/BlacklistIP.conf
