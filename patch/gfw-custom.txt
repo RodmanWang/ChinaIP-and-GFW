@@ -868,5 +868,6 @@ marsflag.com
 emby.media
 ya.ru
 oneskyapp.com
-msftncsi.com
-msftconnecttest.com
+torrentbay.to
+torrentbay.net
+wonkychickens.org
