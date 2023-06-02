@@ -872,3 +872,5 @@ torrentbay.to
 torrentbay.net
 wonkychickens.org
 nn.ci
+netlify.com
+giscus.app
