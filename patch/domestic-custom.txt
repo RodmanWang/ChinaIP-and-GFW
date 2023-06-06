@@ -1251,9 +1251,6 @@ zmzfile.com
 client.amplifi.com
 ip.bjango.com
 alphassl.com
-paypal.com
-paypal.me
-paypalobjects.com
 acg.rip
 animebytes.tv
 animetorrents.me
