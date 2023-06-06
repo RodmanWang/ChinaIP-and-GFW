@@ -874,3 +874,6 @@ wonkychickens.org
 nn.ci
 netlify.com
 giscus.app
+paypal.com
+paypal.me
+paypalobjects.com
