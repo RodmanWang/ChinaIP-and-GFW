@@ -879,3 +879,5 @@ paypal.me
 paypalobjects.com
 immersivetranslate.com
 mevarabon.com
+codecov.io
+containrrr.dev
