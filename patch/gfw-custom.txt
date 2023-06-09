@@ -877,3 +877,5 @@ giscus.app
 paypal.com
 paypal.me
 paypalobjects.com
+immersivetranslate.com
+mevarabon.com
