@@ -59,7 +59,7 @@ jobs:
         #GFW
         curl -LR -o dist4/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
         curl -LR -o dist4/gfw3.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-custom.txt"
-        curl -LR -o dist4/dns.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/dns.conf"
+        curl -LR -o dist4/dns.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/dns.txt"
         
     - name: Merge and IP lists and remove duplicates
       run: | 
