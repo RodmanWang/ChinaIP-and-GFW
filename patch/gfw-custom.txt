@@ -881,3 +881,5 @@ immersivetranslate.com
 mevarabon.com
 codecov.io
 containrrr.dev
+msftncsi.com
+msftconnecttest.com
