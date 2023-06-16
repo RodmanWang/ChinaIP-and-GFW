@@ -883,3 +883,7 @@ codecov.io
 containrrr.dev
 msftncsi.com
 msftconnecttest.com
+crx4chrome.com
+gofile.io
+rapidgator.net
+sitelock.com
