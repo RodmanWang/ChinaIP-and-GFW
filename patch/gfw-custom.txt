@@ -888,10 +888,3 @@ gofile.io
 rapidgator.net
 sitelock.com
 time.nist.gov
-cloudflare-dns.com
-one.one.one.one
-opendns.com
-quad9.net
-dns.google
-public.dns.iij.jp
-doh.dns.sb
