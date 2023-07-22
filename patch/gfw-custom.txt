@@ -898,3 +898,4 @@ ip2proxy.com
 cdn.adtidy.org
 adguard-vpn.com
 adguard-vpn.info
+rapidssl.com
