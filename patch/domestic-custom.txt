@@ -2056,7 +2056,6 @@ tags.tiqcdn.com
 force.com
 websites.cdn.getfeedback.com
 cdn.angruo.com
-razersynapse.com
 razer.com
 razerapi.com
 ls365.com
