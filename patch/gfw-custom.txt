@@ -893,3 +893,4 @@ eamwolf.cc
 unisvg.com
 hsforms.net
 pubsub.razersynapse.com
+pubsub-api.razersynapse.com
