@@ -896,3 +896,6 @@ pubsub-api.razersynapse.com
 geoiplookup.net
 ipgeolocation.io
 ip2proxy.com
+cdn.adtidy.org
+adguard-vpn.com
+adguard-vpn.info
