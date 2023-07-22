@@ -895,3 +895,4 @@ pubsub.razersynapse.com
 pubsub-api.razersynapse.com
 geoiplookup.net
 ipgeolocation.io
+ip2proxy.com
