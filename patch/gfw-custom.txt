@@ -272,7 +272,6 @@ abpchina.org
 adblockplus.org
 anrun.online
 adobe.com
-adtidy.org
 aerisapi.com
 airtable.com
 alfredapp.com
@@ -894,3 +893,5 @@ unisvg.com
 hsforms.net
 pubsub.razersynapse.com
 pubsub-api.razersynapse.com
+geoiplookup.net
+ipgeolocation.io
