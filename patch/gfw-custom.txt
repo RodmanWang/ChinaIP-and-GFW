@@ -899,3 +899,6 @@ cdn.adtidy.org
 adguard-vpn.com
 adguard-vpn.info
 rapidssl.com
+streamelements.com
+cf-ipfs.com
+global.poe.live-video.net
