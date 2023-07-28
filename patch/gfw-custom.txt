@@ -905,3 +905,5 @@ global.poe.live-video.net
 ext-twitch.tv
 soundalerts.com
 streamlabs.com
+sb.adtidy.org
+userscripts.adtidy.org
