@@ -890,12 +890,9 @@ qualifytring.com
 eamwolf.cc
 unisvg.com
 hsforms.net
-pubsub.razersynapse.com
-pubsub-api.razersynapse.com
 geoiplookup.net
 ipgeolocation.io
 ip2proxy.com
-cdn.adtidy.org
 adguard-vpn.com
 adguard-vpn.info
 rapidssl.com
@@ -905,7 +902,6 @@ global.poe.live-video.net
 ext-twitch.tv
 soundalerts.com
 streamlabs.com
-sb.adtidy.org
-userscripts.adtidy.org
-fs.razersynapse.com
+adtidy.org
+razersynapse.com
 ip-address-lookup-v4.com
