@@ -907,3 +907,4 @@ soundalerts.com
 streamlabs.com
 sb.adtidy.org
 userscripts.adtidy.org
+fs.razersynapse.com
