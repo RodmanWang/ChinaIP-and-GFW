@@ -8,4 +8,5 @@ doh.sb
 cloudflare-dns.com
 i.233py.com
 doh.18bit.cn
+cn-a.iqiqz.com
 1dot1dot1dot1.cloudflare-dns.com
