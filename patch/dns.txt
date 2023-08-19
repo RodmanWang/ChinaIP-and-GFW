@@ -1,12 +1,9 @@
-opendns.com
-quad9.net
+doh.opendns.com
+dns.quad9.net
 dns.google
 one.one.one.one
 dns.iij.jp
-dns.sb
-doh.sb
+doh.dns.sb
 cloudflare-dns.com
 i.233py.com
-doh.18bit.cn
 cn-a.iqiqz.com
-1dot1dot1dot1.cloudflare-dns.com
