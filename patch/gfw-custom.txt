@@ -1,6 +1,7 @@
 adguard.org
 adguard.com
 adguard-dns.io
+adtidy.org
 agrd.io
 apkfind.com
 memberful.com
@@ -902,7 +903,6 @@ global.poe.live-video.net
 ext-twitch.tv
 soundalerts.com
 streamlabs.com
-adtidy.org
 razersynapse.com
 ip-address-lookup-v4.com
 cdn.qdm.cloud
