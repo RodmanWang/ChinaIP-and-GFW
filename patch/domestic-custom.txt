@@ -1367,6 +1367,8 @@ playstation.net
 playstationnetwork.com
 sony.com
 sony.tv
+sony.co.uk
+sony.com.hk
 sonyentertainmentnetwork.com
 worldpay.com
 netspeedtestmaster.com
@@ -2077,7 +2079,6 @@ chajian5.com
 nas2x.com
 centos.org
 lineageos.org
-lencr.org
 xboxab.com
 gos-api.gos-gsp.io
 service-hero.game-mode.net
