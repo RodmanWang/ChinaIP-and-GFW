@@ -833,6 +833,8 @@ openaicom.imgix.net
 pypi.org
 83.ucp-ntfy.kaspersky-labs.com
 dc1-st.ksn.kaspersky-labs.com
+click.kaspersky.com
+content.kaspersky-labs.com
 omdbapi.com
 featuregates.org
 firecore.com
