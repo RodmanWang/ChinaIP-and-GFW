@@ -843,6 +843,7 @@ statistics.securelist.com
 kaspersky.de
 gbqofs.com
 gbss.io
+touch.kaspersky.com
 omdbapi.com
 featuregates.org
 firecore.com
