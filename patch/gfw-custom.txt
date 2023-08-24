@@ -835,6 +835,10 @@ pypi.org
 dc1-st.ksn.kaspersky-labs.com
 click.kaspersky.com
 content.kaspersky-labs.com
+pki.kaspersky.com
+redirect.kaspersky.com
+my.kaspersky.com
+ipm-klca.kaspersky.com
 omdbapi.com
 featuregates.org
 firecore.com
