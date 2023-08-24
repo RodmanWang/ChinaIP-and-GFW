@@ -44,8 +44,9 @@ jobs:
     - name: Obtain CN IP lists
       run: |
         #chinaIP
-        curl -LR -o dist/ChinaIPv4v6.txt "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
-        curl -LR -o dist/googleCN.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
+        curl -LR -o dist/CNIP.txt "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
+        curl -LR -o dist/googleCN.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
+        curl -LR -o dist/OtherCNIP.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/OtherCNIP.txt"
         
         #bogus-nxdomain   
         curl -LR -o dist2/bogus-nxdomain1.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
@@ -66,10 +67,11 @@ jobs:
       
         #
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
+        awk 'FNR==1{print ""}{print}' dist/*.txt > dist/ChinaIPv4v6.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV4地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV6地址
         awk '!seen[$0]++' dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
