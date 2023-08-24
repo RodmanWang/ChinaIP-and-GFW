@@ -839,6 +839,7 @@ pki.kaspersky.com
 redirect.kaspersky.com
 my.kaspersky.com
 ipm-klca.kaspersky.com
+statistics.securelist.com
 omdbapi.com
 featuregates.org
 firecore.com
