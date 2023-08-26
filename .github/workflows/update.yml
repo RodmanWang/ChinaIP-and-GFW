@@ -65,8 +65,9 @@ jobs:
         
     - name: Merge and IP lists and remove duplicates
       run: |
+      
         #CIDR列表合并
-        awk 'FNR==1{print ""}{print}' dist/*.txt | grep -Ev "^$|^\s*#" > dist/ChinaIPv4v6.txt
+        awk '!seen[$0]++' dist/*.txt | grep -Ev "^$|^\s*#" > dist3/China2.conf
         #
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
@@ -208,3 +209,9 @@ jobs:
         github_token: ${{ secrets.PERSON_TOKEN }}
         branch: release
         force: true
+        
+    - name: 删除旧的工作流
+      uses: Mattraks/delete-workflow-runs@v2
+      with:
+        retain_days: 1
+        keep_minimum_runs: 3
