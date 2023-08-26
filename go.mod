@@ -1,6 +1,6 @@
 module github.com/JMVoid/ipip2mmdb
 
-go 1.20
+go 1.19
 
 require (
 	github.com/EvilSuperstars/go-cidrman v0.0.0-20190607145828-28e79e32899a
