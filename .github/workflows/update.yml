@@ -67,7 +67,7 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
         #CIDR列表合并
-        cat dist/*.txt | ./dedup.c > dist/ChinaIPv4v6.txt
+        cat dist/*.txt | /bin/bash ./dedup.c > dist/ChinaIPv4v6.txt
         
     - name: Generate GeoIP2 database
       run: |
