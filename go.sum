@@ -2,13 +2,15 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/konsorten/go-windows-terminal-sequences v1.0.3 h1:CE8S1cTafDpPvMhIxNJKvHsGVBgn1xWYf1NbHQhywc8=
 github.com/konsorten/go-windows-terminal-sequences v1.0.3/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
-github.com/maxmind/mmdbwriter v0.0.0-20200911190049-91ab57d2e8e9 h1:2oQYvJZscxYHfsuTuDoSr13SnhdWQOmr70J+90Q9MEw=
-github.com/maxmind/mmdbwriter v0.0.0-20200911190049-91ab57d2e8e9/go.mod h1:IQ2qfMVFo9peJBYnhFCXDY8tolbfyZBhLzdaAapd9LI=
+github.com/maxmind/mmdbwriter v0.0.0-20230619164437-bb691ac3530c h1:0nrmOQhyoZ/qSRAhK+daN3UqxKtPYQbFneGHtqNlT3Y= 
+github.com/maxmind/mmdbwriter v0.0.0-20230619164437-bb691ac3530c/go.mod h1:1RuJQ3t4j6AAczNy9GfoA1U8glYwwIwrNh5WHXatOPE=
 github.com/oschwald/geoip2-golang v1.4.0 h1:5RlrjCgRyIGDz/mBmPfnAF4h8k0IAcRv9PvrpOfz+Ug=
 github.com/oschwald/geoip2-golang v1.4.0/go.mod h1:8QwxJvRImBH+Zl6Aa6MaIcs5YdlZSTKtzmPGzQqi9ng=
 github.com/oschwald/maxminddb-golang v1.6.0/go.mod h1:DUJFucBg2cvqx42YmDa/+xHvb0elJtOm3o4aFQ/nb/w=
 github.com/oschwald/maxminddb-golang v1.7.1-0.20200819192241-1f1e288ee3f9 h1:VA/ssbFy4lxVq8zTwwNlw2n0d9QTvKiq8uxhMVM2nl4=
 github.com/oschwald/maxminddb-golang v1.7.1-0.20200819192241-1f1e288ee3f9/go.mod h1:RXZtst0N6+FY/3qCNmZMBApR19cdQj43/NM9VkrNAis=
+github.com/oschwald/maxminddb-golang v1.11.0 h1:aSXMqYR/EPNjGE8epgqwDay+P30hCBZIveY0WZbAWh0=
+github.com/oschwald/maxminddb-golang v1.11.0/go.mod h1:YmVI+H0zh3ySFR3w+oz8PCfglAFj3PuCmui13+P9zDg=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
