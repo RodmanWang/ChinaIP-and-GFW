@@ -65,8 +65,8 @@ jobs:
         curl -LR -o dist4/dns.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/dns.txt"
         
     - name: Merge and IP lists and remove duplicates
-      run: | 
-
+      run: |
+      
         #CIDR 列表深度去重，除去被上级段覆盖的小段，合并相邻小段为一大段
         cat dist/*.txt | dist/dedup > dist/ChinaIPv4v6.txt
         #
