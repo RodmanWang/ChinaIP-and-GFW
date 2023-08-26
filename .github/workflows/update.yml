@@ -210,7 +210,7 @@ jobs:
         branch: release
         force: true
         
-    - name: 删除旧的工作流
+    - name: Delete workflow
       uses: Mattraks/delete-workflow-runs@v2
       with:
         retain_days: 1
