@@ -2,148 +2,130 @@ package main
 
 import (
 	"bufio"
-	"math/big"
-	"net/http"
-	"net/netip"
+	"flag"
+	"github.com/maxmind/mmdbwriter"
+	"github.com/maxmind/mmdbwriter/mmdbtype"
+	log "github.com/sirupsen/logrus"
 	"os"
-	"strconv"
+)
+		//"country": mmdbtype.Map{
+		//"continent": mmdbtype.Map{
+		//"code": mmdbtype.String("AS"),
+		//"geoname_id": mmdbtype.Uint32(6255147),
+		//"names":mmdbtype.Map{"de":mmdbtype.String("Asien"),
+		//"en":mmdbtype.String("Asia"),
+		//"es":mmdbtype.String("Asia"),
+		//"fr":mmdbtype.String("Asie"),
+		//"ja":mmdbtype.String("アジア"),
+		//"pt-BR":mmdbtype.String("Ásia"),
+		//"ru":mmdbtype.String("Азия"),
+		//"zh-CN":mmdbtype.String("亚洲")},
+		//},
+		//"country": mmdbtype.Map{
+		//"geoname_id":mmdbtype.Uint32(1814991),
+		//"is_in_european_union":mmdbtype.Bool(false),
+		//"iso_code":mmdbtype.String("CN"),
+		//"names":mmdbtype.Map{
+		//"de":mmdbtype.String("China"),
+		//"en":mmdbtype.String("China"),
+		//"es":mmdbtype.String("China"),
+		//"fr":mmdbtype.String("Chine"),
+		//"ja":mmdbtype.String("中国"),
+		//"pt-BR":mmdbtype.String("China"),
+		//"ru":mmdbtype.String("Китай"),
+		//"zh-CN":mmdbtype.String("中国"),
+		//},
+		//},
+		//"registered_country": mmdbtype.Map{
+		//"geoname_id":mmdbtype.Uint32(1814991),
+		//"is_in_european_union":mmdbtype.Bool(false),
+		//"iso_code":mmdbtype.String("CN"),
+		//"names":mmdbtype.Map{
+		//"de":mmdbtype.String("China"),
+		//"en":mmdbtype.String("China"),
+		//"es":mmdbtype.String("China"),
+		//"fr":mmdbtype.String("Chine"),
+		//"ja":mmdbtype.String("中国"),
+		//"pt-BR":mmdbtype.String("China"),
+		//"ru":mmdbtype.String("Китай"),
+		//"zh-CN":mmdbtype.String("中国"),
+		//},
+		//},
+		//"traits": mmdbtype.Map{
+		//"is_anonymous_proxy": mmdbtype.Bool(false),
+		//"is_satellite_provider":mmdbtype.Bool(false),
+		//},
+		//},
+
+var (
+	srcFile string
+	dstFile string
+	databaseType string
+	cnRecord = mmdbtype.Map{
+		"country": mmdbtype.Map{
+			"geoname_id":           mmdbtype.Uint32(1814991),
+			"is_in_european_union": mmdbtype.Bool(false),
+			"iso_code":             mmdbtype.String("CN"),
+			"names": mmdbtype.Map{
+				"de":    mmdbtype.String("China"),
+				"en":    mmdbtype.String("China"),
+				"es":    mmdbtype.String("China"),
+				"fr":    mmdbtype.String("Chine"),
+				"ja":    mmdbtype.String("中国"),
+				"pt-BR": mmdbtype.String("China"),
+				"ru":    mmdbtype.String("Китай"),
+				"zh-CN": mmdbtype.String("中国"),
+			},
+		},
+	}
 )
 
-func main() {
-	err := test()
-	if err != nil {
-		panic(err)
-	}
+func init()  {
+	flag.StringVar(&srcFile, "s", "ipip_cn.txt", "specify source ip list file")
+	flag.StringVar(&dstFile, "d", "Country.mmdb", "specify destination mmdb file")
+	flag.StringVar(&databaseType,"t", "GeoIP2-Country", "specify MaxMind database type")
+	flag.Parse()
 }
 
-func test() error {
-	u := "https://github.com/Hackl0us/GeoIP2-CN/raw/release/CN-ip-cidr.txt"
-	req, err := http.NewRequest(http.MethodGet, u, nil)
-	if err != nil {
-		return err
-	}
-
-	c := &http.Client{
-		// Transport: &http.Transport{
-		// 	Proxy: func(r *http.Request) (*url.URL, error) {
-		// 		return url.Parse("http://127.0.0.1:1080")
-		// 	},
-		// },
-	}
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	var (
-		cidr, ipv4Cidr, ipv6Cidr []string
-
-		br      = bufio.NewScanner(resp.Body)
-		rangeIp = []*big.Int{{}, {}, big.NewInt(1)}
-		lastV4  = []*big.Int{{}, {}}
-		lastV6  = []*big.Int{{}, {}}
-		fillBuf = make([]byte, 16)
+func main()  {
+	writer, err := mmdbwriter.New(
+		mmdbwriter.Options{
+			DatabaseType: databaseType,
+			RecordSize:   24,
+		},
 	)
-	for br.Scan() {
-		ip, err := netip.ParsePrefix(br.Text())
+	if err != nil {
+		log.Fatalf("fail to new writer %v\n", err)
+	}
+
+	var ipTxtList []string
+	fh, err := os.Open(srcFile)
+	if err != nil {
+		log.Fatalf("fail to open %s\n", err)
+	}
+	scanner := bufio.NewScanner(fh)
+	scanner.Split(bufio.ScanLines)
+
+	for scanner.Scan() {
+		ipTxtList = append(ipTxtList, scanner.Text())
+	}
+
+	ipList := parseCIDRs(ipTxtList)
+	for _, ip := range ipList {
+		err = writer.Insert(ip, cnRecord)
 		if err != nil {
-			continue
-		}
-
-		// rangeIp[0] 当前行起始ip地址
-		rangeIp[0].SetBytes(ip.Addr().AsSlice())
-		rangeIp[1].Set(rangeIp[0])
-
-		last, tmp, ipCidr, setBit := lastV4, fillBuf[:4], &ipv4Cidr, 31
-		if ip.Addr().Is6() {
-			last, tmp, ipCidr, setBit = lastV6, fillBuf, &ipv6Cidr, 127
-		}
-
-		for i := setBit - ip.Bits(); i >= 0; i-- {
-			rangeIp[1].SetBit(rangeIp[1], i, 1)
-		}
-		rangeIp[1].Add(rangeIp[1], rangeIp[2])
-
-		if last[1].Cmp(rangeIp[0]) == 0 {
-			// 本行起始ip是上一行结束ip+1,可以组成连续ip范围
-			last[1].Set(rangeIp[1])
-		} else {
-			if last[1].BitLen() > 0 {
-				cidr = ipRangeToCIDR(cidr[:0], tmp, last[0], last[1].Sub(last[1], rangeIp[2]))
-				*ipCidr = append(*ipCidr, cidr...) // 根据ip起止范围计算CIDR表达式
-			}
-			last[0].Set(rangeIp[0])
-			last[1].Set(rangeIp[1])
+			log.Fatalf("fail to insert to writer %v\n", err)
 		}
 	}
-	err = br.Err()
+
+	outFh, err := os.Create(dstFile)
 	if err != nil {
-		return err
+		log.Fatalf("fail to create output file %v\n", err)
 	}
 
-	if lastV4[1].BitLen() > 0 {
-		cidr = ipRangeToCIDR(cidr[:0], fillBuf[:4], lastV4[0], lastV4[1].Sub(lastV4[1], rangeIp[2]))
-		ipv4Cidr = append(ipv4Cidr, cidr...)
-	}
-	if lastV6[1].BitLen() > 0 {
-		cidr = ipRangeToCIDR(cidr[:0], fillBuf, lastV6[0], lastV6[1].Sub(lastV6[1], rangeIp[2]))
-		ipv6Cidr = append(ipv6Cidr, cidr...)
-	}
-
-	fwCidr := func(name string, cidr []string) error {
-		fw, err := os.Create(name)
-		if err != nil {
-			return err
-		}
-		defer fw.Close()
-		for _, v := range cidr {
-			fw.WriteString(v + "\n")
-		}
-		return nil
-	}
-
-	err = fwCidr("ipv4.txt", ipv4Cidr)
+	_, err = writer.WriteTo(outFh)
 	if err != nil {
-		return err
+		log.Fatalf("fail to write to file %v\n", err)
 	}
-	err = fwCidr("ipv6.txt", ipv6Cidr)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
-func ipRangeToCIDR(cidr []string, buf []byte, ipsInt, ipeInt *big.Int) []string {
-	var (
-		tmpInt = new(big.Int)
-		mask   = new(big.Int)
-		one    = big.NewInt(1)
-		bits   uint
-		maxBit = uint(len(buf) * 8)
-	)
-	for {
-		bits = 1
-		mask.SetUint64(1)
-		for bits < maxBit {
-			if (tmpInt.Or(ipsInt, mask).Cmp(ipeInt) > 0) ||
-				(tmpInt.Lsh(tmpInt.Rsh(ipsInt, bits), bits).Cmp(ipsInt) != 0) {
-				bits--
-				mask.Rsh(mask, 1)
-				break
-			}
-			bits++
-			mask.Add(mask.Lsh(mask, 1), one)
-		}
-
-		addr, _ := netip.AddrFromSlice(ipsInt.FillBytes(buf))
-		cidr = append(cidr, addr.String()+"/"+strconv.FormatUint(uint64(maxBit-bits), 10))
-
-		if tmpInt.Or(ipsInt, mask); tmpInt.Cmp(ipeInt) >= 0 {
-			break
-		}
-		ipsInt.Add(tmpInt, one)
-	}
-	return cidr
 }
