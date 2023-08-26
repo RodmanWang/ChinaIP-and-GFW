@@ -68,13 +68,6 @@ jobs:
       run: |
         #CIDR列表合并
         cat dist/*.txt | dist/dedup > dist/ChinaIPv4v6.txt
-        
-    - name: Generate GeoIP2 database
-      run: |
-        CURRENT_DIR=$(pwd)
-        cd dist
-        ./ipip2mmdb -s ./ChinaIPv4v6.txt -d Country.mmdb
-        cd $CURRENT_DIR
         #
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist5/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
@@ -154,6 +147,13 @@ jobs:
         awk '{print "nameserver /" $0 "/abroad"}' dist4/GFW.txt > dist4/GFW.conf
         #
         #
+        
+    - name: Generate GeoIP2 database
+      run: |
+        CURRENT_DIR=$(pwd)
+        cd dist
+        ./ipip2mmdb -s ./ChinaIPv4v6.txt -d Country.mmdb
+        cd $CURRENT_DIR
         
     - name: Push artifacts to release branch
       run: |
