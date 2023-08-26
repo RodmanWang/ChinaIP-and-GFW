@@ -40,7 +40,7 @@ jobs:
            mkdir -p dist4
            mkdir -p dist5
     - name: Compile GeoIP conversion bin (Golang)
-      run: /bin/bash ./build.sh
+      run: ./build.sh
 
     - name: Obtain CN IP lists
       run: |
