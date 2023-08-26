@@ -69,7 +69,7 @@ jobs:
         #CIDR列表合并
         cat dist/*.txt | dist/dedup > dist/ChinaIPv4v6.txt
         #
-    - name: 123
+    - name: wahahah
       run: |
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist5/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
