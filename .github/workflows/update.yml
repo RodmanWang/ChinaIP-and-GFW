@@ -19,7 +19,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.19
+        go-version: "stable"
       id: go
 
     - name: Check out code into the Go module directory
@@ -38,17 +38,16 @@ jobs:
            mkdir -p dist2
            mkdir -p dist3
            mkdir -p dist4
-           mkdir -p dist5
     - name: Compile GeoIP conversion bin (Golang)
       run: /bin/bash ./build.sh
-       
+
     - name: Obtain CN IP lists
       run: |
         #chinaIP
         curl -LR -o dist/ChinaIPv4-1.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
         curl -LR -o dist/ChinaIPv4-2.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
-        #curl -LR -o dist/ChinaIPv6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
-        curl -LR -o dist5/googleCN.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
+        curl -LR -o dist/ChinaIPv6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+        curl -LR -o dist/googleCN.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
         
         #bogus-nxdomain   
         curl -LR -o dist2/bogus-nxdomain1.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
@@ -67,16 +66,16 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
         #CIDR列表合并
-        cat dist/*.txt | dist/dedup > dist/ChinaIPv4v6.txt
+        awk 'FNR==1{print ""}{print}' dist/*.txt | grep -Ev "^$|^\s*#" > dist/ChinaIPv4v6.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist5/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV4地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist5/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist5/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
         #
         #每行数据开头添加“blacklist-ip ”字符，生成SmartDNS使用的黑名单IP
         awk '{print "blacklist-ip " $0}' dist/ChinaIP.txt > dist/BlacklistIP.conf
@@ -148,11 +147,12 @@ jobs:
         #
         #
         
+        
     - name: Generate GeoIP2 database
       run: |
         CURRENT_DIR=$(pwd)
         cd dist
-        ./ipip2mmdb -s ./ChinaIPv4v6.txt -d Country.mmdb
+        ./ipip2mmdb -s ./ChinaIP.txt -d Country.mmdb
         cd $CURRENT_DIR
         
     - name: Push artifacts to release branch
