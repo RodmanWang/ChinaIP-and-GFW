@@ -44,8 +44,11 @@ jobs:
     - name: Obtain CN IP lists
       run: |
         #chinaIP
-        curl -LR -o dist/ChinaIPv4v6.txt "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
-        curl -LR -o dist/googleCN.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
+        curl -LR -o dist/ChinaIPv4-1.txt "https://raw.githubusercontent.com/metowolf/iplist/master/data/special/china.txt"
+        curl -LR -o dist/ChinaIPv4-2.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
+        curl -LR -o dist/ChinaIPv4-3.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
+        curl -LR -o dist/ChinaIPv6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+        curl -LR -o dist/googleCN.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/googleCN.txt"
         
         #bogus-nxdomain   
         curl -LR -o dist2/bogus-nxdomain1.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
@@ -63,16 +66,18 @@ jobs:
         
     - name: Merge and IP lists and remove duplicates
       run: | 
-      
+
+        #CIDR 列表深度去重，除去被上级段覆盖的小段，合并相邻小段为一大段
+        cat dist/*.txt | dist/dedup > dist/ChinaIPv4v6.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV4地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPV6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.txt dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt  
         #
         #每行数据开头添加“blacklist-ip ”字符，生成SmartDNS使用的黑名单IP
         awk '{print "blacklist-ip " $0}' dist/ChinaIP.txt > dist/BlacklistIP.conf
