@@ -1,15 +1,9 @@
 module github.com/JMVoid/ipip2mmdb
 
-go 1.19
+go 1.14
 
 require (
-	github.com/EvilSuperstars/go-cidrman v0.0.0-20190607145828-28e79e32899a
-	github.com/maxmind/mmdbwriter v0.0.0-20230619164437-bb691ac3530c
-	github.com/spf13/pflag v1.0.5
-)
-
-require (
-	github.com/oschwald/maxminddb-golang v1.11.0 // indirect
-	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d // indirect
-	golang.org/x/sys v0.9.0 // indirect
+	github.com/maxmind/mmdbwriter v0.0.0-20200911190049-91ab57d2e8e9
+	github.com/sirupsen/logrus v1.6.0
+	github.com/oschwald/geoip2-golang v1.4.0
 )
