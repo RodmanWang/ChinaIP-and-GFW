@@ -66,7 +66,7 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
         #CIDR列表合并
-        sudo cat dist/*.txt | dist/dedup | grep -Ev "^$|^\s*#" > dist/ChinaIPv4v6.txt
+        sudo cat dist/*.txt | dist/dedup > dist/ChinaIPv4v6.txt
         #
         #生成不包含googleCN.txt中ip的ChinaIPv4v6地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/googleCN.conf dist/ChinaIPv4v6.txt > dist/ChinaIP.txt
