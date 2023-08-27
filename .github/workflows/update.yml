@@ -2,13 +2,13 @@ name: Update ChinaIP-and-GFW database
 
 on:
   workflow_dispatch:
-   schedule: 
-    - cron:  '30 0/3 * * *' 
-   inputs:
-    clean_cache:
-    description: 'Clear caches'
-    required: true
-    type: boolean
+    inputs:
+      clean_cache:
+      description: 'Clear caches'
+      required: true
+      type: boolean
+  schedule: 
+     - cron:  '30 0/3 * * *' 
   push:
     branches:
       - main
