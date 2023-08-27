@@ -1,6 +1,6 @@
 module github.com/JMVoid/ipip2mmdb
 
-go 1.19
+go 1.14
 
 require (
 	github.com/maxmind/mmdbwriter v0.0.0-20200911190049-91ab57d2e8e9
