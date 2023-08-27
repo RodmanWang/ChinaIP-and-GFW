@@ -2,13 +2,8 @@ name: Update ChinaIP-and-GFW database
 
 on:
   workflow_dispatch:
-    inputs:
-      clean_cache:
-      description: 'Clear caches'
-      required: true
-      type: boolean
   schedule: 
-     - cron:  '30 0/3 * * *' 
+    - cron:  '30 0/3 * * *' 
   push:
     branches:
       - main
@@ -30,12 +25,6 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v3
 
-    - name: cache
-      if: "${{ github.event.inputs.clean_cache == 'true' }}"
-      run: |
-        rm -rf cache/*
-        rm -rf cache/*.*
-        
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
