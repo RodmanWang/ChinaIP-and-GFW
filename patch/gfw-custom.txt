@@ -941,3 +941,12 @@ cxcs.microsoft.net
 fe2cr.update.microsoft.com
 fe3cr.delivery.mp.microsoft.com
 prod.do.dsp.mp.microsoft.com
+cdn.odc.officeapps.live.com
+mrodevicemgr.officeapps.live.com
+nleditor.osi.office.net
+odc.officeapps.live.com
+omex.cdn.office.net
+roaming.officeapps.live.com
+self.events.data.microsoft.com
+settings-win.data.microsoft.com
+slscr.update.microsoft.com
