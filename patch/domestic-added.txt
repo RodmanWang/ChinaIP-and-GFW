@@ -745,7 +745,6 @@ iop.org
 iopiopl.com
 iotwesim.com
 ip-cdn.com
-ip.sb
 ipanda.net
 ipcelou.com
 ipjisuanqi.com
@@ -810,7 +809,6 @@ kandian.tv
 kanyouxi.com
 kanyouxi.tv
 karger.com
-kaspersky-labs.com
 kaspersky.com.hk
 ke6payux9q4pih.com
 keepfrds.com
@@ -1160,7 +1158,6 @@ qyuner.com
 r6cq.com
 r79xqa8r7e93.com
 raokouling.net
-razer.com
 rcargol.com
 rdcnzz.com
 realcybertron.com
