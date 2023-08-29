@@ -125,7 +125,7 @@ jobs:
         awk '{print "nameserver /" $0 "/domestic"}' dist3/ChinaDomain3.conf > dist3/ChinaDomain.conf
         #
         #每行开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的Domestic国内域名文件
-        awk 'BEGIN {print "payload:\n#Time={DATE}\n#Lines={COUNT}\n"} {print "  - DOMAIN-SUFFIX," $0}' dist3/ChinaDomain
+        awk 'BEGIN {print "payload:\n#Time={DATE}\n#Lines={COUNT}\n"} {print "  - DOMAIN-SUFFIX," $0}' dist3/ChinaDomain3.conf > dist3/Domestic.yaml
         #
         #
         
