@@ -69,7 +69,7 @@ jobs:
       run: |
         #CIDR列表合并
         awk '!/^( *#.*| *$)/' dist/*.txt > dist/ChinaIPv4v6_temp.txt
-        chmod +x ./ipchange.sh
+        chmod +x ipchange.sh
         ./ipchange.sh dist/ChinaIPv4v6_temp.txt
         #
         #生成不包含exclude-domestic.txt中ip的ChinaIPv4v6地址
