@@ -6,7 +6,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 input_file="$1"
-output_file="disk/ChinaIPv4v6.txt"  # 输出到 disk/ChinaIPv4v6.txt 文件
+output_file="dist/ChinaIPv4v6.txt"  # 输出到 dist/ChinaIPv4v6.txt 文件
 
 awk -F "/" '{
     ip = $1;
