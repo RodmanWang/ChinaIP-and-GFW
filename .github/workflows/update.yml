@@ -66,8 +66,6 @@ jobs:
     - name: Merge and IP lists and remove duplicates
       run: |
       
-        #
-        #
         #CIDR列表合并
         awk '!/^( *#.*| *$)/' dist/*.txt > dist/ChinaIPv4v6.txt
         #
@@ -87,8 +85,7 @@ jobs:
         awk '{print "whitelist-ip " $0}' dist/ChinaIP.txt > dist/WhitelistIP.conf
         #
         #
-        
-        #
+
         #
         #汇总数据
         awk 'FNR==1{print ""}{print}' dist2/*.conf > dist2/nxdomain1.conf
@@ -102,18 +99,19 @@ jobs:
         #每行数据开头添加“bogus-nxdomain ”，生成SmartDNS使用的忽略IP解析文件
         awk '{print "bogus-nxdomain " $0 "/32"}' dist2/nxdomain2.conf > dist2/BogusNxdomain.conf
         #
-        #生成openclash使用的ip格式,添加注释行
-        awk 'BEGIN {print "payload:\n#Time={DATE}\n#Lines={COUNT}\n# >AD & BanIP"} {print "  - \x27" $0 "/32\x27"}' dist2/nxdomain2.conf > dist2/Ad·IP.yaml
+        #生成openclash使用的ip格式,添加2注释行
+        awk '{print "  - \x27" $0 "/32\x27"}' dist2/nxdomain2.conf | awk 'BEGIN {print "payload:"} {print}' > dist2/Ad·IP.yaml
+        awk 'NR==2{print "# >AD & BanIP"} 1' dist2/Ad·IP.yaml > temp && mv temp dist2/Ad·IP.yaml
         #
         #
 
         #
-        #
         #删除每行数据中的"server=/“或”/114.114.114.114“字符，并每行顶格，方便汇总，便与后续排序
-        awk '{gsub(/server=\//,""); gsub(/\/114\.114\.114\.114/,""); gsub(/[[:space:]]*/,"")}1' dist3/domains.china.conf > tmpfile && mv tmpfile dist3/domains.china.conf
+        awk '{gsub(/server=\//,""); gsub(/\/114\.114\.114\.114/,""); gsub(/[[:space:]]*/,"")}1' dist3/domains.china.conf > tmpfile && mv tmpfile dist3/domains.china.conf  
         #
         #汇总，字符格式排序，删除空行，注释行，重复行
-        awk 'FNR==1 && NR!=1{print ""} !seen[$0]++' dist3/*.conf | sort -t. -k1,1n | grep -Ev "^(#|\s*)$" > dist3/China2.conf
+        awk 'FNR==1{print ""}{print}' dist3/*.conf > dist3/china1.conf
+        awk '!seen[$0]++' dist3/china1.conf | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist3/China2.conf
         #
         #生成不包含exclude-domestic.txt文本中的国内域名列表
         grep -Fvf dist3/exclude-domestic.txt dist3/China2.conf > dist3/ChinaDomain3.conf
@@ -125,11 +123,10 @@ jobs:
         awk '{print "nameserver /" $0 "/domestic"}' dist3/ChinaDomain3.conf > dist3/ChinaDomain.conf
         #
         #每行开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的Domestic国内域名文件
-        awk 'BEGIN {print "payload:\n#Time={DATE}\n#Lines={COUNT}\n"} {print "  - DOMAIN-SUFFIX," $0}' dist3/ChinaDomain3.conf > dist3/Domestic.yaml
+        awk '{print "  - DOMAIN-SUFFIX," $0}' dist3/ChinaDomain3.conf | awk 'BEGIN {print "payload:"} {print}' > dist3/Domestic.yaml
         #
         #
         
-        #
         #
         #汇总
         awk 'FNR==1{print ""}{print}' dist4/*.txt > dist4/gfw1.txt
@@ -138,13 +135,13 @@ jobs:
         grep -Fvf dist4/exclude-domestic.conf dist4/gfw1.txt > dist4/gfw0.txt
         #
         #字符格式排序，删除空行，注释行，重复行
-        sort -t. -k1,1n -u dist4/gfw0.txt | grep -Ev "^(#|\s*)$" > dist4/GFW.txt
+        awk '!seen[$0]++' dist4/gfw0.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist4/GFW.txt
         #
         #每行数据开头添加“||”字符，生成代理使用的格式GFW 
-        awk '!seen[$0]++' dist4/GFW.txt | sed 's/^/||/' | uniq > dist4/AutoGFW.txt
+        awk '!seen[$0]++' dist4/GFW.txt | sed "s/^/\|\|&/p" | uniq > dist4/AutoGFW.txt
         #
         #每行数据开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的gfw域名文件
-        awk 'BEGIN {print "payload:\n#Time={DATE}\n#Lines={COUNT}\n"} {print "  - DOMAIN-SUFFIX," $0}' dist4/GFW.txt > dist4/Proxy.yaml 
+        awk '{print "  - DOMAIN-SUFFIX," $0}' dist4/GFW.txt | awk 'BEGIN {print "payload:"} {print}' > dist4/Proxy.yaml   
         #
         #每行数据开头添加“nameserver /”字符，末尾添加“/abroad”字符，生成SmartDNS使用的、指定解析组的GFW文件
         awk '{print "nameserver /" $0 "/abroad"}' dist4/GFW.txt > dist4/GFW.conf
