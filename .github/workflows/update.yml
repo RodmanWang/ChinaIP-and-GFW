@@ -75,7 +75,7 @@ jobs:
         awk '!/^( *#.*| *$)/' dist/*.txt > dist/ChinaIPv4v6_temp.txt
         sudo apt-get update
         sudo apt-get install dos2unix
-        dos2unix ips.sh
+        dos2unix ipchange.sh
         ./ipchange.sh dist/ChinaIPv4v6_temp.txt
         #
         #生成不包含exclude-domestic.txt中ip的ChinaIPv4v6地址
