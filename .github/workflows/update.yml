@@ -34,7 +34,8 @@ jobs:
         fi
         
     - name: Create dist folder
-      run: mkdir -p dist1
+      run: 
+           mkdir -p dist
            mkdir -p dist2
            mkdir -p dist3
            mkdir -p dist4
