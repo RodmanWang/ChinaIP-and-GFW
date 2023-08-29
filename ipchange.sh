@@ -50,4 +50,3 @@ END {
 }' "$input_file" > "$output_file"
 
 echo "Optimized IP ranges saved to $output_file"
-
