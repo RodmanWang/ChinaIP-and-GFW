@@ -1,10 +1,2 @@
 top
-doh.opendns.com
-dns.quad9.net
-dns.google
-one.one.one.one
-dns.iij.jp
-doh.dns.sb
-cloudflare-dns.com
-i.233py.com
-cn-a.iqiqz.com
+bing.com
