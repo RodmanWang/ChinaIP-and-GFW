@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <input_file>"
@@ -6,7 +6,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 input_file="$1"
-output_file="${input_file%.*}_new.txt"
+output_file="disk/ChinaIPv4v6.txt"  # 输出到 disk/ChinaIPv4v6.txt 文件
 
 awk -F "/" '{
     ip = $1;
