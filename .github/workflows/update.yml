@@ -67,7 +67,7 @@ jobs:
 
     - name: Change permissions
       run: |
-       chmod +x ./ipchange.sh
+        chmod +x ./ipchange.sh
     
     - name: Merge and IP lists and remove duplicates
       run: |
@@ -76,7 +76,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install dos2unix
         dos2unix ipchange.sh
-        ./ipchange.sh dist/ChinaIPv4v6_temp.txt
+        /bin/bash ./ipchange.sh dist/ChinaIPv4v6_temp.txt
         #
         #生成不包含exclude-domestic.txt中ip的ChinaIPv4v6地址
         grep -Fvf dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#" > dist/ChinaIP.txt
