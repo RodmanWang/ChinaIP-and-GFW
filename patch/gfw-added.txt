@@ -815,3 +815,5 @@ zoom.us
 gcr.io
 featuregates.org
 bing.com
+simplesvg.com
+dreamdata.cloud
