@@ -817,3 +817,5 @@ featuregates.org
 bing.com
 simplesvg.com
 dreamdata.cloud
+usertrust.com
+wilderssecurity.com
