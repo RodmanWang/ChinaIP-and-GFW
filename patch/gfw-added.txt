@@ -802,6 +802,9 @@ yandex.ru
 yastatic.net
 ycombinator.com
 yoozhibo.net
+zhiboche.com
+zhiboche.tv
+zhiboche.me
 yoyo.org
 yoyu.dev
 ypncdn.com
@@ -820,3 +823,5 @@ dreamdata.cloud
 usertrust.com
 wilderssecurity.com
 unpkg.com
+ghost.io
+midowatches.com
