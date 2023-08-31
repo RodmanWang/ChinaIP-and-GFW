@@ -87,6 +87,7 @@ bcvcdn.com
 bd2020.com
 beta.music.apple.com
 biggo.com.tw
+bing.com
 bing.net
 bintray.com
 bitbucket.org
@@ -166,6 +167,7 @@ content.office.net
 cookielaw.org
 coveo.com
 crittercism.com
+crx4chrome.com
 ctfassets.net
 ctl.io
 cuhk.edu.hk
@@ -212,6 +214,7 @@ dockeri.co
 domain.glass
 dotsrc.org
 dowjones.com
+dreamdata.cloud
 dribbble.com
 dropboxapi.com
 droplr.com
@@ -227,7 +230,6 @@ edditstatic.com
 edgecompute.app
 edgekey.net
 edgesuite.net
-edu
 elastic.co
 elastic.com
 emby.media
@@ -247,6 +249,7 @@ fanboy.co.nz
 fastgit.org
 fastly.net
 fastmail.com
+featuregates.org
 feedsportal.com
 fiftythree.com
 firech.at
@@ -278,6 +281,7 @@ fzlm.net
 g2.com
 gabia.net
 garena.com
+gcr.io
 gebi1.com
 generalsearches.com
 geni.us
@@ -285,6 +289,7 @@ getapp.com
 getcloudapp.com
 getfoxyProxy.org
 gfx.ms
+ghost.io
 ghostnoteapp.com
 gigacircle.com
 gitbook.com
@@ -309,7 +314,6 @@ googlesyndication.com
 googletagmanager.com
 googletagservices.com
 gosetsuden.jp
-gov
 grammarly.com
 greasyfork.org
 greencloudvps.com
@@ -446,13 +450,14 @@ mashable.com
 masiro.moe
 mathjax.org
 maven.org
+me-talk.ru
 measurlink.com
 medallia.com
 mediawiki.org
 megaupload.com
 memberful.com
 microsofttranslator.com
-mil
+midowatches.com
 mindnode.com
 mirror.ehv.weppel.nl
 mirror.hro.nl
@@ -609,6 +614,7 @@ sikwap.mobi
 similartech.com
 simp.ly
 simplenote.com
+simplesvg.com
 siterank.today
 skk.moe
 skydrive.wns.windows.com
@@ -619,6 +625,7 @@ smartcleaner.online
 smartmailcloud.com
 smoot.apple.com
 sms-activate.org
+smspva.com
 snapcraft.io
 softlibre.unizar.es
 softonic.com
@@ -691,11 +698,13 @@ tiktokv.com
 timeinc.net
 tinder.com
 tinypic.com
+tiqcdn.com
 tmblr.co
 tmdb.org
 toggleable.com
 tomshardware.com
 torrentbay.net
+torrentbay.to
 touch.kaspersky.com
 traffichaus.com
 trakt.tv
@@ -726,6 +735,7 @@ underground.com
 unfiltered.news
 unity3d.com
 unogs.com
+unpkg.com
 unsplash.com
 up.pt
 update.biv.sony.tv
@@ -734,6 +744,7 @@ uploader.jp
 upwork.com
 urbanairship.com
 urlscan.io
+usertrust.com
 usgs.gov
 uspto.gov
 uts-api.itunes.apple.com
@@ -774,9 +785,11 @@ wikisource.org
 wikiversity.org
 wikivoyage.org
 wiktionary.org
+wilderssecurity.com
 williamlam.com
 winudf.com
 wolframalpha.com
+wonkychickens.org
 workflow.is
 workflowy.com
 wr.pvp.net
@@ -802,26 +815,16 @@ yandex.ru
 yastatic.net
 ycombinator.com
 yoozhibo.net
-zhiboche.com
-zhiboche.tv
-zhiboche.me
 yoyo.org
 yoyu.dev
 ypncdn.com
 yxgxz.com
 zdassets.com
+zhiboche.com
+zhiboche.me
+zhiboche.tv
 ziffstatic.com
 zimuku.org
 zimuzimu.net
 zmk.pw
 zoom.us
-gcr.io
-featuregates.org
-bing.com
-simplesvg.com
-dreamdata.cloud
-usertrust.com
-wilderssecurity.com
-unpkg.com
-ghost.io
-midowatches.com
