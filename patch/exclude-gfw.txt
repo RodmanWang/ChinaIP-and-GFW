@@ -5,5 +5,3 @@ one.one.one.one
 dns.iij.jp
 doh.dns.sb
 cloudflare-dns.com
-i.233py.com
-cn-a.iqiqz.com
