@@ -171,6 +171,7 @@ jobs:
         
         cp -rf dist/ChinaIPv4.txt ./
         cp -rf dist/ChinaIPv6.txt ./
+        cp -rf dist/ChinaIP.txt ./
         cp -rf dist/BlacklistIP.conf  ./
         cp -rf dist/WhitelistIP.conf ./
         cp -rf dist/Country.mmdb ./
@@ -185,7 +186,8 @@ jobs:
         cp -rf dist4/GFW.conf ./
         cp -rf dist4/Proxy.yaml ./
                 
-        git add Country.mmdb         
+        git add Country.mmdb
+        git add ChinaIP.txt  
         git add ChinaIPv4.txt     
         git add ChinaIPv6.txt
         git add GFW.txt             #纯域名
