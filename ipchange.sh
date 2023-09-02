@@ -89,7 +89,7 @@ main() {
     fi
     p=${p.child[0]}
     p.flag=1
-  done < ip.txt
+  done < dist/ChinaIPv4v6_tamp.txt > dist/ChinaIPv4v6.txt
 
   merge "$root"
   print "$root" 0
