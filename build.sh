@@ -1,3 +1,3 @@
 go build -o dist/ipip2mmdb main.go ip2cidr.go
 go build -o dist/verify_ip verify/verify_ip.go
-gcc dist/ipchange.c -o ipchange
+gcc -o dist/ipchange ipchange.c
