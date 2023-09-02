@@ -1,52 +1,98 @@
 #!/bin/bash
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <input_file>"
-    exit 1
-fi
-
-input_file="$1"
-output_file="dist/ChinaIPv4v6.txt"
-
-awk -F "/" '{
-    ip = $1;
-    mask = $2;
-    type = "IPv6";
-
-    if (match(ip, ":")) {
-        type = "IPv6";
-    } else {
-        type = "IPv4";
-    }
-
-    if (type == "IPv4") {
-        v4[ip] = mask;
-    } else {
-        v6[ip] = mask;
-    }
+# Function to calculate MASK
+MASK() {
+  x=$1
+  if [ $x -ne 0 ]; then
+    echo $((~((1<<(32-x))-1)))
+  else
+    echo 0
+  fi
 }
-END {
-    for (ip in v4) {
-        split(ip, parts, ".");
-        prefix = parts[1]"."parts[2];
-        mask = v4[ip];
-        v4_ranges[prefix] = (prefix in v4_ranges) ? (v4_ranges[prefix]" "mask) : mask;
-    }
 
-    for (ip in v6) {
-        split(ip, parts, ":");
-        prefix = parts[1]":"parts[2]":"parts[3]":"parts[4]":"parts[5]":"parts[6]":"parts[7]":"parts[8];
-        mask = v6[ip];
-        v6_ranges[prefix] = (prefix in v6_ranges) ? (v6_ranges[prefix]" "mask) : mask;
-    }
+current=0
+root=""
 
-    for (prefix in v4_ranges) {
-        printf "%s/%s\n", prefix, v4_ranges[prefix];
-    }
+# Struct for Trie
+struct_Trie() {
+  flag=0
+  child=()
+}
 
-    for (prefix in v6_ranges) {
-        printf "%s/%s\n", prefix, v6_ranges[prefix];
-    }
-}' "$input_file" > "$output_file"
+# Function to merge Trie nodes
+merge() {
+  p=$1
+  if [ "$flag" -eq 1 ]; then
+    return 1
+  fi
 
-echo "Optimized IP ranges saved to $output_file"
+  if [ -z "${p.child[0]}" ] || [ -z "${p.child[1]}" ]; then
+    return 0
+  fi
+
+  if [ "$(merge ${p.child[0]})" -eq 1 ] && [ "$(merge ${p.child[1]})" -eq 1 ]; then
+    p.flag=1
+    return 1
+  fi
+
+  return 0
+}
+
+# Function to print merged subnets
+print() {
+  p=$1
+  depth=$2
+
+  if [ "$p.flag" -eq 1 ]; then
+    ip=$((current & $(MASK $depth)))
+    echo "$((ip>>24&0xff)).$((ip>>16&0xff)).$((ip>>8&0xff)).$((ip&0xff))/$depth"
+    return
+  fi
+
+  if [ -n "${p.child[0]}" ]; then
+    current=$((current & ~(1<<(31-depth))))
+    print "${p.child[0]}" $((depth+1))
+  fi
+
+  if [ -n "${p.child[1]}" ]; then
+    current=$((current | 1<<(31-depth)))
+    print "${p.child[1]}" $((depth+1))
+  fi
+}
+
+# Main function
+main() {
+  while read -r ip; do
+    IFS='/' read -ra parts <<< "$ip"
+    IFS='.' read -ra ip_parts <<< "${parts[0]}"
+    ip1=${ip_parts[0]}
+    ip2=${ip_parts[1]}
+    ip3=${ip_parts[2]}
+    ip4=${ip_parts[3]}
+    prefix_len=${parts[1]}
+
+    ip=$((($ip1<<24) | ($ip2<<16) | ($ip3<<8) | $ip4))
+    mask=$(MASK $prefix_len)
+
+    p=root
+    while [ "$mask" -ne 0 ]; do
+      if [ -z "${p.child[ip>>31]}" ]; then
+        p.child[ip>>31]=$(struct_Trie)
+      fi
+      p=${p.child[ip>>31]}
+      ip=$((ip<<1))
+      mask=$((mask<<1))
+    done
+
+    if [ -z "${p.child[0]}" ]; then
+      p.child[0]=$(struct_Trie)
+    fi
+    p=${p.child[0]}
+    p.flag=1
+  done < ip.txt
+
+  merge "$root"
+  print "$root" 0
+}
+
+main
