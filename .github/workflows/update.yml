@@ -70,7 +70,7 @@ jobs:
         #CIDR列表合并
         awk '!/^( *#.*| *$)/' dist/*.txt > dist/ChinaIPv4v6_tamp.txt
         #
-        ./ipchange < dist/ChinaIPv4v6_tamp.txt > dist/ChinaIPv4v6.txt
+        dist/ipchange < dist/ChinaIPv4v6_tamp.txt > dist/ChinaIPv4v6.txt
         #生成不包含exclude-domestic.txt中ip的ChinaIPv4v6地址
         grep -Fvf dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#" > dist/ChinaIP.txt
         #
