@@ -47,7 +47,6 @@ jobs:
         #chinaIP
         curl -LR -o dist/ChinaIPv4-1.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
         curl -LR -o dist/ChinaIPv4-2.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
-        curl -LR -o dist/ChinaIPv4-3.txt "https://raw.githubusercontent.com/metowolf/iplist/master/data/country/CN.txt"
         curl -LR -o dist/ChinaIPv6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
         curl -LR -o dist/exclude-domestic-ip.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-domestic-ip.txt"
         
