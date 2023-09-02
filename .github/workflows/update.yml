@@ -71,7 +71,7 @@ jobs:
         awk '!/^( *#.*| *$)/' dist/*.txt > dist/ChinaIPv4v6_tamp.txt
         #
         chmod +x ipchange.sh
-        ./ipchange.sh < dist/ChinaIPv4v6_tamp.txt > dist/ChinaIPv4v6.txt
+        ./ipchange.sh 
         #生成不包含exclude-domestic.txt中ip的ChinaIPv4v6地址
         grep -Fvf dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#" > dist/ChinaIP.txt
         #
