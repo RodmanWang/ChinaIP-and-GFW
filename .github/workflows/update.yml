@@ -115,13 +115,13 @@ jobs:
         grep -Fvf dist3/exclude-domestic.txt dist3/China2.conf > dist3/ChinaDomain3.conf
         #
         #每行开头添加“server=/”字符，末尾添加“/114.114.114.114”字符，用于一般代理软件使用
-        sort -u dist3/ChinaDomain3.conf | awk '{print "server=/", $0, "/114.114.114.114"}' > dist3/dist3/ChinaDomain2.conf
+        sort -u dist3/ChinaDomain3.conf | awk '{print "server=/", $0, "/114.114.114.114"}' > dist3/ChinaDomain2.conf
         #
         #每行开头添加“nameserver /”字符，末尾添加“/domestic”字符，生成SmartDNS使用的、指定解析组的国内域名文件
-        sort -u dist3/ChinaDomain3.conf | awk '{print "- DOMAIN-SUFFIX,", $0, "/domestic"}' > dist3/dist3/ChinaDomain.conf
+        sort -u dist3/ChinaDomain3.conf | awk '{print "nameserver /", $0, "/domestic"}' > dist3/ChinaDomain.conf
         #
         #每行开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的Domestic国内域名文件
-        sort -u dist3/ChinaDomain3.conf | awk '{print "- DOMAIN-SUFFIX,", $0 "/domestic"}' > dist3/ChinaDomain4.conf
+        sort -u dist3/ChinaDomain3.conf | awk '{print "  - DOMAIN-SUFFIX,", $0 "/domestic"}' > dist3/ChinaDomain4.conf
         #添加3行注释，时间，行数
         awk -v datetime="$(date +'%Y-%m-%d %H:%M:%S')" 'BEGIN { lines=0 } { content[lines++] = $0 } END {print "payload:"; print "# > lines: " lines; print "# > Times: " datetime; for(i=0; i<lines; i++) print content[i] }' dist3/ChinaDomain4.conf > dist3/Domestic.yaml
         #
