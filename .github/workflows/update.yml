@@ -121,7 +121,7 @@ jobs:
         sort -u dist3/ChinaDomain3.conf | awk '{print "nameserver /", $0, "/domestic"}' > dist3/ChinaDomain.conf
         #
         #每行开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的Domestic国内域名文件
-        sort -u dist3/ChinaDomain3.conf | awk '{print "  - DOMAIN-SUFFIX,", $0 "/domestic"}' > dist3/ChinaDomain4.conf
+        sort -u dist3/ChinaDomain3.conf | awk '{print "  - DOMAIN-SUFFIX,", $0}' > dist3/ChinaDomain4.conf
         #添加3行注释，时间，行数
         awk -v datetime="$(date +'%Y-%m-%d %H:%M:%S')" 'BEGIN { lines=0 } { content[lines++] = $0 } END {print "payload:"; print "# > lines: " lines; print "# > Times: " datetime; for(i=0; i<lines; i++) print content[i] }' dist3/ChinaDomain4.conf > dist3/Domestic.yaml
         #
