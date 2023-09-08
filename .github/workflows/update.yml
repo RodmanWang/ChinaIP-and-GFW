@@ -133,7 +133,7 @@ jobs:
         awk '!/^( *#.*| *$)/' dist4/*.txt > dist4/gfw1.txt
         #
         #生成不包含exclude-gfw.conf中域名的gfw地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist4/exclude-domestic.conf dist4/gfw1.txt > dist4/gfw0.txt
+        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist4/exclude-gfw.conf dist4/gfw1.txt > dist4/gfw0.txt
         #
         #字符格式排序，删除空行，注释行，重复行
         awk '!seen[$0]++' dist4/gfw0.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist4/GFW.txt
