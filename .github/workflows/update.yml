@@ -117,7 +117,7 @@ jobs:
         #提取China2.conf中不包含"."的行并在行首添加"."，然后将结果保存到China3.conf中
         grep -v '\.' dist3/China3.conf | sed 's/^/./' > dist3/China4.conf
         #删除China3.conf中与China4.conf中每行数据匹配结尾的字符串
-        grep -vf dist3/China4.conf dist3/China3.conf > ChinaDomain3.conf
+        grep -vf dist3/China4.conf dist3/China3.conf > dist3/ChinaDomain3.conf
         #
         #每行开头添加“server=/”字符，末尾添加“/114.114.114.114”字符，用于一般代理软件使用
         sort -u dist3/ChinaDomain3.conf | awk '{print "server=/"$0"/114.114.114.114"}' > dist3/ChinaDomain2.conf
