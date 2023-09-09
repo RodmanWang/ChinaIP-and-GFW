@@ -70,7 +70,7 @@ jobs:
         awk '!/^( *#.*| *$)/' dist/*.txt > dist/ChinaIPv4v6.txt
         #
         #生成不包含exclude-domestic.txt中ip的ChinaIPv4v6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#" > dist/ChinaIP.txt
+        grep -Fvxf dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt  | awk '!/^( *#.*| *$)/' > dist/ChinaIP.txt
         #
         #生成不包含exclude-domestic.txt中ip的ChinaIPV4地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
@@ -112,7 +112,7 @@ jobs:
         awk '!/^( *#.*| *$)/' dist3/*.conf | awk '!seen[$0]++' | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist3/China2.conf
         #
         #生成不包含exclude-domestic.txt文本中的国内域名列表
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist3/exclude-domestic.txt dist3/China2.conf > dist3/ChinaDomain3.conf
+        grep -Fvxf dist3/exclude-domestic.txt dist3/China2.conf | awk '!/^( *#.*| *$)/' > dist3/ChinaDomain3.conf
         #
         #每行开头添加“server=/”字符，末尾添加“/114.114.114.114”字符，用于一般代理软件使用
         sort -u dist3/ChinaDomain3.conf | awk '{print "server=/"$0"/114.114.114.114"}' > dist3/ChinaDomain2.conf
@@ -133,7 +133,7 @@ jobs:
         awk '!/^( *#.*| *$)/' dist4/*.txt > dist4/gfw1.txt
         #
         #生成不包含exclude-gfw.conf中域名的gfw地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist4/exclude-gfw.conf dist4/gfw1.txt > dist4/gfw0.txt
+        grep -Fvxf dist4/exclude-gfw.conf dist4/gfw1.txt | awk '!/^( *#.*| *$)/' > dist4/gfw0.txt
         #
         #字符格式排序，删除空行，注释行，重复行
         awk '!seen[$0]++' dist4/gfw0.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist4/GFW.txt
@@ -186,7 +186,6 @@ jobs:
         cp -rf dist4/AutoGFW.txt ./
         cp -rf dist4/GFW.conf ./
         cp -rf dist4/Proxy.yaml ./
-        cp -rf dist4/gfw1.txt ./
         git add Country.mmdb
         git add ChinaIP.txt  
         git add ChinaIPv4.txt     
@@ -203,7 +202,6 @@ jobs:
         git add Domestic.yaml       #OpenClash使用
         git add BogusNxdomain.conf  #SmartDNS格式，忽略解析IP
         git add Ad·IP.yaml  #openclash使用的ip格式P
-        git add gfw1.txt
         
         git commit -m "update : $(TZ=UTC-8 date "+%Y-%m-%d %H:%M:%S")"
         git branch -D release
