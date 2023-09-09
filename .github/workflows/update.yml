@@ -134,13 +134,13 @@ jobs:
         #
         #生成不包含exclude-gfw.conf中域名的gfw地址
         grep -Fvxf dist4/exclude-gfw.conf dist4/gfw1.txt | awk '!/^( *#.*| *$)/' > dist4/gfw0.txt
-        #
         #提取gfw0.txt中不包含"."的行并在行首添加"."，然后将结果保存到gfw1.txt中
-        grep -v '\.' dist4/gfw0.txt | sed 's/^/./' > dist4/gfw1.txt
+        grep -v '\.' dist4/gfw0.txt | sed 's/^/./' > dist4/gfw11.txt
         #删除gfw0.txt中与gfw1.txt中每行数据匹配结尾的字符串
-        rep -vf dist4/gfw1.txt dist4/gfw0.txt > dist4/gfw2.txt
+        rep -vf dist4/gfw11.txt dist4/gfw0.txt > dist4/gfw22.txt
+        #
         #字符格式排序，删除空行，注释行，重复行
-        awk '!seen[$0]++' dist4/gfw2.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist4/GFW.txt
+        awk '!seen[$0]++' dist4/gfw22.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist4/GFW.txt
         #
         #每行数据开头添加“||”字符，生成代理使用的格式GFW 
         sort -u dist4/GFW.txt | sed 's/^/||/' > dist4/AutoGFW.txt
