@@ -186,7 +186,7 @@ jobs:
         cp -rf dist4/AutoGFW.txt ./
         cp -rf dist4/GFW.conf ./
         cp -rf dist4/Proxy.yaml ./
-                
+        cp -rf dist4/gfw1.txt ./
         git add Country.mmdb
         git add ChinaIP.txt  
         git add ChinaIPv4.txt     
@@ -203,6 +203,7 @@ jobs:
         git add Domestic.yaml       #OpenClash使用
         git add BogusNxdomain.conf  #SmartDNS格式，忽略解析IP
         git add Ad·IP.yaml  #openclash使用的ip格式P
+        git add gfw1.txt
         
         git commit -m "update : $(TZ=UTC-8 date "+%Y-%m-%d %H:%M:%S")"
         git branch -D release
