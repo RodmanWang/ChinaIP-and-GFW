@@ -44,6 +44,7 @@ jobs:
 
     - name: Obtain CN IP lists
       run: |
+        #
         #chinaIP
         curl -LR -o dist/ChinaIPv4-1.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
         curl -LR -o dist/ChinaIPv4-2.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
@@ -66,6 +67,7 @@ jobs:
         
     - name: Merge and IP lists and remove duplicates
       run: |
+        #
         #CIDR列表合并
         awk '!/^( *#.*| *$)/' dist/*.txt > dist/ChinaIPv4v6.txt
         #
@@ -100,6 +102,7 @@ jobs:
         #
         #生成openclash使用的ip格式
         awk '{print "  - \x27" $0 "/32\x27"}' dist2/nxdomain2.conf > dist2/nxdomain3.conf
+        #
         #添加3注释，时间，行数
         awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" 'BEGIN { lines=0 } { content[lines++] = $0 } END {print "payload:"; print "# > AD & BanIP"; print "# > lines: " lines; print "# > Times: " datetime; for(i=0; i<lines; i++) print content[i] }' dist2/nxdomain3.conf > dist2/Ad·IP.yaml
         #
@@ -130,7 +133,7 @@ jobs:
         #
         #每行开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的Domestic国内域名文件
         sort -u dist3/ChinaDomain3.conf | awk '{print "  - DOMAIN-SUFFIX,"$0}' > dist3/ChinaDomain4.conf
-
+        #
         #添加3行注释，时间，行数
         awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" 'BEGIN { lines=0 } { content[lines++] = $0 } END {print "payload:"; print "# > lines: " lines; print "# > Times: " datetime; for(i=0; i<lines; i++) print content[i] }' dist3/ChinaDomain4.conf > dist3/Domestic.yaml
         #
@@ -153,7 +156,10 @@ jobs:
         awk '!seen[$0]++' dist4/gfw22.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist4/GFW.txt
         #
         #每行数据开头添加“||”字符，生成代理使用的格式GFW 
-        sort -u dist4/GFW.txt | sed 's/^/||/' > dist4/AutoGFW.txt
+        sort -u dist4/GFW.txt | sed 's/^/||/' > dist4/AutoGFW111.txt
+        #添加3注释，时间，行数
+        awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" 'BEGIN { lines=0 } { content[lines++] = $0 } END {print "# > lines: " lines; print "# > Times: " datetime; for(i=0; i<lines; i++) print content[i] }' dist4/AutoGFW111.txt > dist4/AutoGFW.txt
+        #
         #
         #每行数据开头添加“- DOMAIN-SUFFIX,”字符，生成OpenClash使用的gfw域名文件
         sort -u dist4/GFW.txt | awk '{print "  - DOMAIN-SUFFIX,"$0}' > dist4/GFW00000.txt
