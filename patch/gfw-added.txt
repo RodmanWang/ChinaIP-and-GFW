@@ -64,6 +64,7 @@ api.extensionplay.com
 api.mixpanel.com
 api.termius.com
 apkfind.com
+app-measurement.com
 appcenter.ms
 appleid.apple.com
 apps.apple.com
@@ -220,6 +221,7 @@ dropboxapi.com
 droplr.com
 duboxcdn.com
 dueapp.com
+duiadns.net
 duolingo.cn
 dyncdn.me
 easybib.com
@@ -310,6 +312,7 @@ godaddy.com
 gofile.me
 goog
 google
+google-analytics.com
 googlesyndication.com
 googletagmanager.com
 googletagservices.com
@@ -450,6 +453,7 @@ mashable.com
 masiro.moe
 mathjax.org
 maven.org
+mb3admin.com
 me-talk.ru
 measurlink.com
 medallia.com
@@ -575,6 +579,7 @@ pubu.tw
 pushwoosh.com
 python.org
 qooqlevideo.com
+qrserver.com
 quay.io
 quledu.net
 r2ray.com
@@ -724,6 +729,7 @@ typekit.net
 typography.com
 u1s1.io
 uProxy.org
+uaibozy.net
 ubertags.com
 ublock.org
 ubuntu.com
@@ -795,6 +801,7 @@ workflowy.com
 wr.pvp.net
 www.icloud.com
 www.mirrorservice.org
+xbdzyw.com
 xbmc.os6.org
 xclient.info
 xedo.me
@@ -818,6 +825,7 @@ yoozhibo.net
 yoyo.org
 yoyu.dev
 ypncdn.com
+ysdqwz.com
 yxgxz.com
 zdassets.com
 zhiboche.com
@@ -828,7 +836,3 @@ zimuku.org
 zimuzimu.net
 zmk.pw
 zoom.us
-mb3admin.com
-google-analytics.com
-duiadns.net
-app-measurement.com
