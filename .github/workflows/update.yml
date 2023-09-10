@@ -123,7 +123,7 @@ jobs:
         #提取China3.conf中不包含"."的行并在行首添加"."，然后将结果保存到China4.conf中
         grep -v '\.' dist3/China3.conf | sed 's/^/./' > dist3/China4.conf
         #删除China3.conf中与China4.conf中每行数据匹配结尾的字符串
-        grep -vf dist3/China4.conf dist3/China3.conf > dist3/ChinaDomain3.conf
+        grep -Fvf dist3/China4.conf dist3/China3.conf > dist3/ChinaDomain3.conf
         #
         #每行开头添加“server=/”字符，末尾添加“/114.114.114.114”字符，用于一般代理软件使用
         sort -u dist3/ChinaDomain3.conf | awk '{print "server=/"$0"/114.114.114.114"}' > dist3/ChinaDomain2.conf
@@ -145,12 +145,12 @@ jobs:
         #汇总
         awk '!/^( *#.*| *$)/' dist4/*.txt > dist4/gfw1.txt
         #
-        #生成不包含exclude-gfw.conf中域名的gfw地址
+        #生成不包含exclude-gfw.conf整行域名匹配gfw地址
         grep -Fvxf dist4/exclude-gfw.conf dist4/gfw1.txt | awk '!/^( *#.*| *$)/' > dist4/gfw0.txt
         #提取gfw0.txt中不包含"."的行并在行首添加"."，然后将结果保存到gfw1.txt中
         grep -v '\.' dist4/gfw0.txt | sed 's/^/./' > dist4/gfw11.txt
         #删除gfw0.txt中与gfw1.txt中每行数据匹配结尾的字符串
-        grep -vf dist4/gfw11.txt dist4/gfw0.txt > dist4/gfw22.txt
+        grep -Fvf dist4/gfw11.txt dist4/gfw0.txt > dist4/gfw22.txt
         #
         #字符格式排序，删除空行，注释行，重复行
         awk '!seen[$0]++' dist4/gfw22.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist4/GFW.txt
