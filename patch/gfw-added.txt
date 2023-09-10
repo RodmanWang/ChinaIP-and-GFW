@@ -839,3 +839,4 @@ zoom.us
 sony.net
 isc.org
 423down.com
+browser-intake-datadoghq.com
