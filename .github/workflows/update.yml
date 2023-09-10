@@ -77,10 +77,10 @@ jobs:
         grep -Fvxf dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt  | awk '!/^( *#.*| *$)/' > dist/ChinaIP.txt
         #
         #生成不包含exclude-domestic.txt中整行ip的ChinaIPV4地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
+        grep -Fvxf dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt  | awk '!/^(^$|^\s*#|.*\:.*)/' > dist/ChinaIP.txt
         #
         #生成不包含exclude-domestic.txt中整行ip的ChinaIPV6地址
-        awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt 
+        grep -Fvxf dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt  | awk '!/^( ^$|^\s*#|.*\..*)/' > dist/ChinaIP.txt 
         #
         #每行数据开头添加“blacklist-ip ”字符，生成SmartDNS使用的黑名单IP
         awk '{print "blacklist-ip " $0}' dist/ChinaIP.txt > dist/BlacklistIP.conf
