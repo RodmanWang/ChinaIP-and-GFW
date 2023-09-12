@@ -840,3 +840,6 @@ sony.net
 isc.org
 423down.com
 browser-intake-datadoghq.com
+bwg.net
+bwh81.net
+it7.net
