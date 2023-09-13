@@ -843,3 +843,5 @@ browser-intake-datadoghq.com
 bwg.net
 bwh81.net
 it7.net
+emeditor.blob.core.windows.net
+edge.avangate.net
