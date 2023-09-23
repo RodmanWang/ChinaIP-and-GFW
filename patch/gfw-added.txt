@@ -868,3 +868,4 @@ okjx.cc
 rdhk.net
 thefilehosting.com
 yangtu.top
+vortex.data.microsoft.com
