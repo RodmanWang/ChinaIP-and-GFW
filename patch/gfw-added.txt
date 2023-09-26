@@ -872,3 +872,4 @@ yangtu.top
 vortex.data.microsoft.com
 fe3cr.delivery.mp.microsoft.com
 manage.devcenter.microsoft.com
+time.nist.gov
