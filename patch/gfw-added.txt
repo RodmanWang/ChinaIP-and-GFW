@@ -879,3 +879,4 @@ imgs.ovh
 imgtp.com
 uy5.net
 mji.rip
+global.synologydownload.com
