@@ -874,3 +874,8 @@ fe3cr.delivery.mp.microsoft.com
 manage.devcenter.microsoft.com
 time.nist.gov
 ax1x.com
+94speed.com
+imgs.ovh
+imgtp.com
+uy5.net
+mji.rip
