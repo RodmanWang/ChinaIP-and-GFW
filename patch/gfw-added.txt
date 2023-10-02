@@ -890,3 +890,4 @@ hacs.xyz
 cartocdn.com
 pypi.org
 pythonhosted.org
+hasstatic.com
