@@ -888,3 +888,5 @@ radio-browser.info
 home-assistant.io
 hacs.xyz
 cartocdn.com
+pypi.org
+pythonhosted.org
