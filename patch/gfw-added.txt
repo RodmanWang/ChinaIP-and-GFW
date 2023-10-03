@@ -894,3 +894,4 @@ hasstatic.com
 go-mpulse.net
 akstat.io
 faststonesoft.net
+goatcounter.com
