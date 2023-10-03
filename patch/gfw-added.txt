@@ -899,3 +899,4 @@ buymeacoffee.com
 weblate.org
 contrib.rocks
 sonarcloud.io
+typechrome.com
