@@ -176,7 +176,6 @@ amapauto.com
 amazontrust.com
 amd.com
 amd.systemrequirementslab.com
-amemv.com
 amemv.net
 ams.org
 analog.com
@@ -209,7 +208,6 @@ ati.com
 atlab.ai
 authbus.com
 avec6ua79dc6.com
-awemeughun.com
 awemeuglang.com
 awemeugsoul.com
 awemeugwave.com
@@ -517,20 +515,13 @@ dongchediapp.com
 doseeing.co
 dotwe.org
 doutianshequ.com
-douyin.com
 douyinact.com
 douyinact.net
-douyincdn.com
 douyinclips.com
 douyinfe.com
-douyinliving.com
 douyinmusicclips.com
 douyinmusicvideo.com
-douyinpic.com
 douyinshortvideo.com
-douyinstatic.com
-douyinvideo.net
-douyinvod.com
 downg.com
 downg0.com
 downga.com
@@ -864,17 +855,11 @@ hukenb.com
 hukesxm.com
 hukewq.com
 hunaniptv.com
-huoshan.com
 huoshangroup.com
-huoshanimg.com
-huoshanlive.com
 huoshanparty.com
-huoshanstatic.com
 huoshante8.com
 huoshanvideo.net
-huoshanvod.com
 huoshanxiaoshipin.net
-huoshanzhibo.com
 huoshanzhibo.net
 huoxing.com
 huoyanyunying.com
@@ -899,10 +884,7 @@ icpapi.com
 icpenguin.com
 idouyinliving.com
 idouyinpic.com
-idouyinstatic.com
-idouyinvod.com
 ieee.org
-iesdouyin.com
 iesdouyin.net
 ieshs.com
 ieshs.net
@@ -913,7 +895,6 @@ ihappystudio.com
 ihappystudio.net
 ihst8.com
 ihuoshanimg.com
-ihuoshanlive.com
 ihuoshanstatic.com
 ihuoshanvod.com
 ikb.vc
@@ -1182,7 +1163,6 @@ mnbvdfg.com
 mobilemgr-global.com
 mobilemgr-global.net
 moomv.com
-moqu8.com
 morethan.tv
 mp4us.com
 mpg.de
@@ -1309,7 +1289,6 @@ podnapisi.net
 poiuytw.com
 pokercup.net
 poweron.cc
-ppkankan01.com
 pqyvzr56aceitx.com
 prayaya.com
 prayaya.net
@@ -1461,7 +1440,6 @@ samsungchina.net
 samsungchina.tt.omtrdc.net
 samsungcic.com
 samsungcloud.com
-samsungcloudcn.com
 samsungdm.com
 samsunggroup.cc
 samsungmcs.com
@@ -1578,7 +1556,6 @@ senderline.com
 senderline.net
 sensorsanalytics.com
 sensorsdata.cloud
-sensorsdata.com
 serverlessfans.com
 serverlessfans.net
 service-hero.game-mode.net
