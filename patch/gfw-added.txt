@@ -895,3 +895,8 @@ go-mpulse.net
 akstat.io
 faststonesoft.net
 goatcounter.com
+nn.ci
+buymeacoffee.com
+weblate.org
+contrib.rocks
+sonarcloud.io
