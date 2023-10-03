@@ -891,3 +891,5 @@ cartocdn.com
 pypi.org
 pythonhosted.org
 hasstatic.com
+go-mpulse.net
+akstat.io
