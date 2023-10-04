@@ -4,4 +4,7 @@ dns.google
 one.one.one.one
 dns.iij.jp
 doh.dns.sb
+doh.apad.pro
+dns11.quad9.net
+dns.adguard.com
 cloudflare-dns.com
