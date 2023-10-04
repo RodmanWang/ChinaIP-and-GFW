@@ -901,3 +901,4 @@ contrib.rocks
 sonarcloud.io
 typechrome.com
 met.no
+nextdns.io
