@@ -8,3 +8,4 @@ doh.apad.pro
 dns11.quad9.net
 dns.adguard.com
 cloudflare-dns.com
+nextdns.io
