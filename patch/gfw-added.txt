@@ -900,3 +900,4 @@ weblate.org
 contrib.rocks
 sonarcloud.io
 typechrome.com
+met.no
