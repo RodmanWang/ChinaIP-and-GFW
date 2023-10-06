@@ -1,1 +1,4 @@
 doh.apad.pro
+dns.twnic.tw
+public.dns.iij.jp
+doh.dns.sb
