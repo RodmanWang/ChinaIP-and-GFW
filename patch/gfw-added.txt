@@ -913,4 +913,5 @@ doh.opendns.com
 one.one.one.one
 adguard.com
 baibianxiaoying.com
+baibianxiaoying.top
 bbxy.shop
