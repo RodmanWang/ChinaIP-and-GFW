@@ -921,3 +921,5 @@ freetrial.store
 bitwarden.com
 adobeccstatic.com
 launchdarkly.com
+umd.edu
+princeton.edu
