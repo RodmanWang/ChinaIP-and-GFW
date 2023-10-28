@@ -920,3 +920,4 @@ freetrial.pro
 freetrial.store
 bitwarden.com
 adobeccstatic.com
+launchdarkly.com
