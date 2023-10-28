@@ -923,3 +923,7 @@ adobeccstatic.com
 launchdarkly.com
 umd.edu
 princeton.edu
+chatgpt.com
+openai.com
+ai.com
+statsigapi.net
