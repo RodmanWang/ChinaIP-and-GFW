@@ -930,3 +930,8 @@ ai.com
 statsigapi.net
 transifex.com
 newrelic.com
+accum.se
+onet.pl
+usp.br
+accum.se
+hosteurope.de
