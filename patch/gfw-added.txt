@@ -928,3 +928,5 @@ chatgpt.com
 openai.com
 ai.com
 statsigapi.net
+transifex.com
+newrelic.com
