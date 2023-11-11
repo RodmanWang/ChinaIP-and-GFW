@@ -943,3 +943,4 @@ omdbapi.com
 pwnedpasswords.com
 mapbox.com
 relayinfo.quickconnect.cn
+samsungiotcloud.com
