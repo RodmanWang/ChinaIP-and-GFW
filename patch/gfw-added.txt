@@ -942,4 +942,4 @@ ably.io
 omdbapi.com
 pwnedpasswords.com
 mapbox.com
-quickconnect.cn
+relayinfo.quickconnect.cn
