@@ -941,3 +941,4 @@ nfdns.top
 ably.io
 omdbapi.com
 pwnedpasswords.com
+mapbox.com
