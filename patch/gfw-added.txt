@@ -948,3 +948,4 @@ pusher.com
 anidb.net
 nolanstore.cc
 bootstrapcdn.com
+authenticator.cc
