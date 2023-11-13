@@ -947,3 +947,4 @@ samsungiotcloud.com
 pusher.com
 anidb.net
 nolanstore.cc
+bootstrapcdn.com
