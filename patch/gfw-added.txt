@@ -961,3 +961,4 @@ geo.asus.com
 km-ap.asus.com
 routerfeedback.asus.com
 dlcdnimgs.asus.com
+kmpic.asus.com
