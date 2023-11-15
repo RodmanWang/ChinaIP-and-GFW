@@ -972,3 +972,4 @@ client.samsungiotcloud.cn
 spigot-regional.samsungiotcloud.cn
 dls2.bigdata.samsung.com.cn
 coap.samsungihp.cn
+samsungapps.com
