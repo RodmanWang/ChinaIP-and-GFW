@@ -970,3 +970,4 @@ auth.samsungiotcloud.cn
 spigot-regional.samsungiotcloud.cn
 client.samsungiotcloud.cn
 spigot-regional.samsungiotcloud.cn
+dls2.bigdata.samsung.com.cn
