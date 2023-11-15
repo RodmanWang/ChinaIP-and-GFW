@@ -964,7 +964,6 @@ dlcdnimgs.asus.com
 kmpic.asus.com
 www.amazonaws.cn
 ocfconnect-shard-cn01.samsungiotcloud.cn
-cn-north-1.amazonaws.com.cn
 api.samsungiotcloud.cn
 auth.samsungiotcloud.cn
 spigot-regional.samsungiotcloud.cn
