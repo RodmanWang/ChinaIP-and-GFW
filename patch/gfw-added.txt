@@ -962,3 +962,6 @@ km-ap.asus.com
 routerfeedback.asus.com
 dlcdnimgs.asus.com
 kmpic.asus.com
+www.amazonaws.cn
+ec2-52-81-233-252.cn-north-1.compute.amazonaws.com.cn
+ocfconnect-shard-cn01.samsungiotcloud.cn
