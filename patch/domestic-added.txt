@@ -2032,3 +2032,5 @@ lanzouc.com
 szlanyou.com
 gsmgood.com
 samsungcloudsolution.com
+jquery.com
+vmware.com
