@@ -388,7 +388,6 @@ jiehua.tv
 jitpack.io
 jivosite.com
 jomashop.prismic.io
-jquery.com
 js.org
 js.revsci.net
 justmysocks.net
@@ -770,7 +769,6 @@ vimeocdn.com
 visualwebsiteoptimizer.com
 vivaldi.net
 vk.com
-vmware.com
 vmware.tt.omtrdc.net
 vox-cdn.com
 vsco.co
@@ -976,3 +974,4 @@ cn-ms.galaxyappstore.com
 uimetadata.samsungiotcloud.cn
 voipbuster.com
 srtku.com
+www.asus.com
