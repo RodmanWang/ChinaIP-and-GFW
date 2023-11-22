@@ -977,3 +977,4 @@ srtku.com
 www.asus.com
 aralego.com
 longwangbt.com
+ksn-stat-geo.kaspersky-labs.com
