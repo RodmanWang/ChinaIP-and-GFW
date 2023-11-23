@@ -978,3 +978,7 @@ www.asus.com
 aralego.com
 longwangbt.com
 ksn-stat-geo.kaspersky-labs.com
+dlcdnrog.asus.com
+geo.prod.do.dsp.mp.microsoft.com
+tsfe.trafficshaping.dsp.mp.microsoft.com
+fe2cr.update.microsoft.com
