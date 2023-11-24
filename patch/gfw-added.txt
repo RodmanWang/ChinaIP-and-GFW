@@ -967,8 +967,7 @@ spigot-regional.samsungiotcloud.cn
 client.samsungiotcloud.cn
 dls2.bigdata.samsung.com.cn
 coap.samsungihp.cn
-samsungapps.com
-sdk.pushmessage.samsung.com.cn
+samsungapps.comsdk.pushmessage.samsung.com.cn
 apis.samsungiotcloud.cn
 cn-ms.galaxyappstore.com
 uimetadata.samsungiotcloud.cn
