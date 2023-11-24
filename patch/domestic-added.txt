@@ -2034,3 +2034,7 @@ gsmgood.com
 samsungcloudsolution.com
 jquery.com
 vmware.com
+samsungosp.com
+samsungfeed.com
+samsungroaming.com
+srcgsre.com
