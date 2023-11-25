@@ -982,3 +982,5 @@ geo.prod.do.dsp.mp.microsoft.com
 tsfe.trafficshaping.dsp.mp.microsoft.com
 fe2cr.update.microsoft.com
 lcprd1.samsungqbe.cn
+china-gld.push.samsungosp.com.cn
+ocfconnect-shard-cn01.samsungiotcloud.cn
