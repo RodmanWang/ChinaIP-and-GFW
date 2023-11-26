@@ -986,3 +986,4 @@ china-gld.push.samsungosp.com.cn
 ocfconnect-shard-cn01.samsungiotcloud.cn
 isubtitles.info
 ainapian.com
+ibruce.info
