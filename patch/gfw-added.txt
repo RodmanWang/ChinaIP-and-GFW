@@ -987,3 +987,4 @@ ocfconnect-shard-cn01.samsungiotcloud.cn
 isubtitles.info
 ainapian.com
 ibruce.info
+cn-ureca.galaxyappstore.com
