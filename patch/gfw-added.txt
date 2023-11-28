@@ -988,3 +988,5 @@ isubtitles.info
 ainapian.com
 ibruce.info
 cn-ureca.galaxyappstore.com
+play.samsungcloudcn.com
+cn-auth2.samsungosp.com.cn
