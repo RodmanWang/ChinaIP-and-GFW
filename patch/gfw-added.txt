@@ -991,3 +991,4 @@ cn-ureca.galaxyappstore.com
 play.samsungcloudcn.com
 cn-auth2.samsungosp.com.cn
 ack.me.sony.com
+sdk.pushmessage.samsung.com.cn
