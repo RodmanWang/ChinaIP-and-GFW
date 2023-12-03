@@ -995,3 +995,5 @@ sdk.pushmessage.samsung.com.cn
 internetdownloadmanager.com
 epg.112114.xyz
 epg.pw
+epg.51zmt.top
+epg.aptvapp.com
