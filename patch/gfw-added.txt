@@ -993,3 +993,5 @@ cn-auth2.samsungosp.com.cn
 ack.me.sony.com
 sdk.pushmessage.samsung.com.cn
 internetdownloadmanager.com
+epg.112114.xyz
+epg.pw
