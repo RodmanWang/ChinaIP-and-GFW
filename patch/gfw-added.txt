@@ -983,7 +983,6 @@ tsfe.trafficshaping.dsp.mp.microsoft.com
 fe2cr.update.microsoft.com
 lcprd1.samsungqbe.cn
 china-gld.push.samsungosp.com.cn
-ocfconnect-shard-cn01.samsungiotcloud.cn
 isubtitles.info
 ainapian.com
 ibruce.info
@@ -997,3 +996,8 @@ epg.112114.xyz
 epg.pw
 epg.51zmt.top
 epg.aptvapp.com
+oaistatic.com
+oaiusercontent.com
+cdn.auth0.com
+claude.ai
+anthropic.com
