@@ -1002,3 +1002,4 @@ cdn.auth0.com
 claude.ai
 anthropic.com
 ueiwsp.com
+quickconnect.to
