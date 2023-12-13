@@ -1005,3 +1005,5 @@ ueiwsp.com
 quickconnect.to
 maoyan.lol
 ssl-images-amazon.com
+iot.samsungihp.cn
+vas.samsungapps.com
