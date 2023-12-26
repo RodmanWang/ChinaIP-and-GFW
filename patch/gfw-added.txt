@@ -978,3 +978,5 @@ quickconnect.to
 maoyan.lol
 tvtime.com
 sonymobile.com
+gnome.org
+ossplanet.net
