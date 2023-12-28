@@ -980,3 +980,5 @@ tvtime.com
 sonymobile.com
 gnome.org
 ossplanet.net
+sharon.io
+datatables.net
