@@ -2050,3 +2050,4 @@ m3u8.cloud
 bingdou.vip
 vving.vip
 1ljx.com
+images-fe.ssl-images-amazon.com
