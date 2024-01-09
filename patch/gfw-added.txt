@@ -984,3 +984,8 @@ sharon.io
 datatables.net
 shortbread.aws.dev
 aws.a2z.com
+sentry-cdn.com
+zerossl.com
+digicert.com
+haxx.se
+curl.se
