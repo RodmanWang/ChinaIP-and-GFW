@@ -989,3 +989,5 @@ zerossl.com
 digicert.com
 haxx.se
 curl.se
+status.io
+discourse-cdn.com
