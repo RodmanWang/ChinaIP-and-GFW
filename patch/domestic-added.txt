@@ -2052,3 +2052,5 @@ vving.vip
 images-fe.ssl-images-amazon.com
 images-cn.ssl-images-amazon.com
 thanju.com
+c3c.lat
+tdchatvip.us
