@@ -995,3 +995,5 @@ discourse-cdn.com
 tdvip.us
 urlnode.com
 v2rayssr.com
+sprig.com
+patreonusercontent.com
