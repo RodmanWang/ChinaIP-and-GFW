@@ -1003,3 +1003,4 @@ dvblogic.com
 unisvg.com
 int08h.com
 clarity.ms
+samsungknox.com
