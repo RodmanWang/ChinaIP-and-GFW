@@ -910,6 +910,8 @@ dns11.quad9.net
 doh.opendns.com
 one.one.one.one
 adguard.com
+adguard-dns.com
+doh-jp.blahdns.com
 baibianxiaoying.com
 baibianxiaoying.top
 bbxy.shop
