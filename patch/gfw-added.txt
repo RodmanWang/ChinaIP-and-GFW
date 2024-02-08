@@ -911,6 +911,7 @@ doh.opendns.com
 one.one.one.one
 adguard.com
 adguard-dns.com
+doh.dns.sb
 doh-jp.blahdns.com
 baibianxiaoying.com
 baibianxiaoying.top
