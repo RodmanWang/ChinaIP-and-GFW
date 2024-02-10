@@ -1009,3 +1009,5 @@ clarity.ms
 samsungknox.com
 dc1-pp.ksn.kaspersky-labs.com
 sbixby.com
+services.ucp.kaspersky-labs.com
+shuax.com
