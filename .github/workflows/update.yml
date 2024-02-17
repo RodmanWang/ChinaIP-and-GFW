@@ -53,6 +53,7 @@ jobs:
         #bogus-nxdomain   
         curl -LR -o dist2/bogus-nxdomain1.conf "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
         curl -LR -o dist2/bogus-nxdomain2.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/bogus-nxdomain-added.txt"
+        curl -LR -o dist2/bogus-nxdomain3.conf "https://pgl.yoyo.org/adservers/iplist.php"
         #
         #Domestic-Domain
         curl -LR -o dist3/domains.china.txt "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
