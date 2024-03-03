@@ -18,8 +18,8 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version-file: ./custom/go.mod
-        cache-dependency-path: ./custom/go.sum
+        go-version: stable
+      id: go
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
