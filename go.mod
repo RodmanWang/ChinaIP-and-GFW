@@ -1,9 +1,15 @@
-module github.com/JMVoid/ipip2mmdb
+module github.com/oschwald/geoip2-golang
 
-go 1.20
+go 1.19
 
 require (
-	github.com/maxmind/mmdbwriter v0.0.0-20200911190049-91ab57d2e8e9
-	github.com/sirupsen/logrus v1.9.3
-	github.com/oschwald/geoip2-golang v1.9.0
+	github.com/oschwald/maxminddb-golang v1.12.0
+	github.com/stretchr/testify v1.8.4
+)
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	golang.org/x/sys v0.10.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
