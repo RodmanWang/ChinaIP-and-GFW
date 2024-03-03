@@ -71,8 +71,10 @@ jobs:
       run: |
         #
         #CIDR列表合并
-        awk '!/^( *#.*| *$)/' dist/*.txt > dist/ChinaIPv4v6.txt
+        awk '!/^( *#.*| *$)/' dist/*.txt > dist/China-IP.txt
         #
+        #ip格式排序，删除空行，注释行，重复行
+        awk '!seen[$0]++' dist/China-IP.txt | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^$|^\s*#" > dist/ChinaIPv4v6.txt
         #生成不包含exclude-domestic.txt中整行ip的ChinaIPv4v6地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#" > dist/ChinaIP.txt
         #
