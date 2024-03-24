@@ -1024,3 +1024,6 @@ syno.community
 ds.kaspersky.com
 netlify.com
 giscus.app
+sanity.io
+qualified.com
+hsforms.com
