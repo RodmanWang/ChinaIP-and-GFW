@@ -1022,3 +1022,5 @@ turbobita.net
 lz-cdn7.com
 syno.community
 ds.kaspersky.com
+netlify.com
+giscus.app
