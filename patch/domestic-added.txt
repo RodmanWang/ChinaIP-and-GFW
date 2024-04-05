@@ -2073,3 +2073,5 @@ tizen.org
 sifasongda.com
 app.link
 easytomessage.com
+dot-pure.onedns.net
+doh-pure.onedns.net
