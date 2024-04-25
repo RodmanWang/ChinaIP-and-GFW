@@ -1034,3 +1034,7 @@ bytedapm.com
 autorefresh.io
 lantern.io
 wcnmdmht.lol
+gnu.org
+cabextract.org.uk
+gnupg.org
+freedesktop.org
