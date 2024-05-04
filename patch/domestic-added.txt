@@ -2073,3 +2073,4 @@ app.link
 easytomessage.com
 dot-pure.onedns.net
 doh-pure.onedns.net
+iotwish.com
