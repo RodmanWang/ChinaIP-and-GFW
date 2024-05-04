@@ -1038,8 +1038,6 @@ gnu.org
 cabextract.org.uk
 gnupg.org
 freedesktop.org
-public.dns.iij.jp
-dns.twnic.tw
 x.com
 copilot.microsoft.com
 cnbeta.com
