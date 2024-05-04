@@ -1040,3 +1040,4 @@ gnupg.org
 freedesktop.org
 public.dns.iij.jp
 dns.twnic.tw
+x.com
