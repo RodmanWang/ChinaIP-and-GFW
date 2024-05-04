@@ -2074,3 +2074,6 @@ easytomessage.com
 dot-pure.onedns.net
 doh-pure.onedns.net
 iotwish.com
+public.dns.iij.jp
+dns.twnic.tw
+doh.dns.sb
