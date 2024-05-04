@@ -1043,4 +1043,7 @@ dns.twnic.tw
 x.com
 copilot.microsoft.com
 cnbeta.com
-cnbeta.com.tw
+cnbeta.com.tw 
+bingapis.com
+meta.ai
+perplexity.ai
