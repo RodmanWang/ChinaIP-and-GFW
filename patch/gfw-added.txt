@@ -1044,3 +1044,4 @@ cnbeta.com.tw 
 bingapis.com
 meta.ai
 perplexity.ai
+api.samsungcal.com
