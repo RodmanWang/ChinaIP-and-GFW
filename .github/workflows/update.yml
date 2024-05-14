@@ -70,8 +70,8 @@ jobs:
       run: |
         #
         #CIDR列表合并
-        awk '!/^( *#.*| *$)/' dist/*.txt > dist/China-IP.txt
-        cat dist/China-IP.txt | dist/dedup > dist/ChinaIPv4v6.txt
+        #awk '!/^( *#.*| *$)/' dist/*.txt > dist/China-IP.txt
+        cat dist/*.txt | dist/dedup > dist/ChinaIPv4v6.txt
         #
         #ip格式排序，删除空行，注释行，重复行
         #awk '!seen[$0]++' dist/China-IP.txt | grep -Ev "^$|^\s*#" | \
