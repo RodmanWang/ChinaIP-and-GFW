@@ -2077,3 +2077,4 @@ iotwish.com
 public.dns.iij.jp
 dns.twnic.tw
 doh.dns.sb
+psmartcloud.com
