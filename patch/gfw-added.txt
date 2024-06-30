@@ -1051,4 +1051,6 @@ liferay.com
 apps-imiconnect.io
 imiconnect.io
 openssl.org
-coap.samsungihp.cn
+samsungihp.cn
+samsungqbe.cn
+samsungiotcloud.cn
