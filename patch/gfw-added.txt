@@ -1005,7 +1005,6 @@ dvblogic.com
 unisvg.com
 int08h.com
 clarity.ms
-samsungknox.com
 dc1-pp.ksn.kaspersky-labs.com
 sbixby.com
 services.ucp.kaspersky-labs.com
@@ -1043,7 +1042,6 @@ cnbeta.com.tw 
 bingapis.com
 meta.ai
 perplexity.ai
-api.samsungcal.com
 imi.chat
 broadcom.com
 onetrust.com
@@ -1051,6 +1049,8 @@ liferay.com
 apps-imiconnect.io
 imiconnect.io
 openssl.org
+samsungknox.com
+samsungcal.com
 samsungihp.cn
 samsungqbe.cn
 samsungiotcloud.cn
