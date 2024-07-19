@@ -1049,8 +1049,3 @@ liferay.com
 apps-imiconnect.io
 imiconnect.io
 openssl.org
-samsungknox.com
-samsungcal.com
-samsungihp.cn
-samsungqbe.cn
-samsungiotcloud.cn
