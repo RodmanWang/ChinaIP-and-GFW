@@ -1053,3 +1053,7 @@ imbd.com
 hdtrailers.net
 hd-trailers.net
 samsungknox.com
+ij.start.canon
+ij.manual.canon
+posterartist.canon
+myid.canon
