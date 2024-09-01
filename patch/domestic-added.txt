@@ -2080,7 +2080,3 @@ doh.dns.sb
 psmartcloud.com
 autorefresh.io
 hsjsby.com
-ij.start.canon
-ij.manual.canon
-posterartist.canon
-myid.canon
