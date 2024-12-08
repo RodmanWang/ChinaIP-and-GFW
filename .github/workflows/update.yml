@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
+    - name: Set up Go
+      uses: actions/setup-go@v3
       with:
-        go-version: ^1.14
+        go-version: stable
       id: go
 
     - name: Check out code into the Go module directory
@@ -263,3 +263,4 @@ jobs:
       with:
         retain_days: 1
         keep_minimum_runs: 3
+  
