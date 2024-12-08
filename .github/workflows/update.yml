@@ -18,7 +18,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: stable
+        go-version: 1.14
       id: go
 
     - name: Check out code into the Go module directory
@@ -71,15 +71,14 @@ jobs:
       run: |
         #
         #CIDR列表合并
-        #awk '!/^( *#.*| *$)/' dist/*.txt > dist/China-IP.txt
-        awk '!/^( *#.*| *$)/' dist/*.txt > dist/ChinaIPv4v6.txt
+        awk '!/^( *#.*| *$)/' dist/*.txt > dist/China-IP.txt
         #
         #ip格式排序，删除空行，注释行，重复行
-        #awk '!seen[$0]++' dist/China-IP.txt | grep -Ev "^$|^\s*#" | \
-        #awk -F. '$1~/^[0-9]+$/{print "ipv4",$0;next} {print "ipv6",$0}' | \
-        #sort -t' ' -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n | \
-        #awk '{print $2}' | \
-        #sort -t. -k1,1n -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n > dist/ChinaIPv4v6.txt
+        awk '!seen[$0]++' dist/China-IP.txt | grep -Ev "^$|^\s*#" | \
+        awk -F. '$1~/^[0-9]+$/{print "ipv4",$0;next} {print "ipv6",$0}' | \
+        sort -t' ' -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n | \
+        awk '{print $2}' | \
+        sort -t. -k1,1n -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n > dist/ChinaIPv4v6.txt
 
         #生成不包含exclude-domestic.txt中整行ip的ChinaIPv4v6地址
         awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#" > dist/ChinaIP.txt
