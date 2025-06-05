@@ -2088,7 +2088,8 @@ hk1.pro.xns.one
 hk2.pro.xns.one
 hk.kahkee.xns.one
 hk-pro.nxns.link
-p.nxns.link
+jp.nxns.link
+hk.nxns.link
 hk-kahkee.nxns.link
 hk.pro.xns.rodeo
 hk1.pro.xns.rodeo
