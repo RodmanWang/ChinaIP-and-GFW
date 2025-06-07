@@ -1433,3 +1433,4 @@ mili.one
 font.im
 beget.com
 noohub.ru
+clash.wiki
