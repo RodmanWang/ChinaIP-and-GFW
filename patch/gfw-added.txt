@@ -1427,3 +1427,4 @@ faststone.org
 zopim.com
 s2s.singular.net
 cpatrk.com
+v3.account.samsung.com
