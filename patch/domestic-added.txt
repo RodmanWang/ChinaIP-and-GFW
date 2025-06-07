@@ -2097,3 +2097,4 @@ jp.pro.xns.rodeo
 jp.kahkee.xns.rodeo
 adguard-dns.com
 adguard-dns.io
+samsungosp.com
