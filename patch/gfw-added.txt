@@ -112,7 +112,6 @@ app-measurement.com
 appcenter.ms
 appleid.apple.com
 apps-imiconnect.io
-apps.apple.com
 appsflyersdk.com
 appspot.com
 appsto.re
@@ -161,7 +160,6 @@ blogcdn.com
 blogger.com
 blogsmithmedia.com
 blusterhawspontaneous.com
-bookkeeper.itunes.apple.com
 booklive.jp
 books.itunes.apple.com
 boomtrain.com
@@ -623,7 +621,6 @@ it7.net
 itasoftware.com
 itgonglun.com
 itun.es
-itunes.apple.com
 iui.im
 javdb.com
 jdbimgs.com
@@ -822,7 +819,6 @@ ntppool.org
 ntunhs.net
 oaistatic.com
 oaiusercontent.com
-ocsp.apple.com
 ocsp.digicert.com
 ocsp.entrust.net
 ocsps.ssl.com
@@ -897,9 +893,7 @@ piratebay.live
 pixelmator.com
 pixiv.net
 pki.kaspersky.com
-play.itunes.apple.com
 po18.tw
-podcasts.apple.com
 podnapisi.net
 pokemon.com
 polyfill.io
@@ -1141,7 +1135,6 @@ ttwstatic.com
 tumblr.co
 turbobita.net
 tutanota.com
-tv.apple.com
 tvsubtitles.net
 tvtime.com
 tweetmarker.net
@@ -1275,7 +1268,6 @@ xl720.com
 xn--90wwvt03e.com
 xn--ngstr-lra8j.com
 xnxx-cdn.com
-xp.apple.com
 xsts.auth.xboxlive.com
 xteko.com
 xtracloud.net
