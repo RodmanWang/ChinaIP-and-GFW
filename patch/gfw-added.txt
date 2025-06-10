@@ -1464,3 +1464,5 @@ zoom.us
 zooqle.com
 zopim.com
 sb.music.apple.com
+p146-fmf.icloud.com
+p40-buy.itunes.apple.com
