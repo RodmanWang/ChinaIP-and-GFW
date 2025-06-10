@@ -1429,3 +1429,8 @@ clash.wiki
 gspe1-ssl.ls.apple.com
 captive.apple.com
 setup.icloud.com
+gsp-ssl.ls.apple.com
+gsa.apple.com
+fpinit.itunes.apple.com
+afs.ampaeservices.com
+tdms.apple.com
