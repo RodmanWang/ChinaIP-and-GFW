@@ -1435,3 +1435,9 @@ fpinit.itunes.apple.com
 afs.ampaeservices.com
 tdms.apple.com
 gdmf-ados.apple.com
+gsp85-ssl.ls.apple.com
+weather-edge.apple.com
+mask-api.icloud.com
+p146-quota.icloud.com
+sandbox.itunes.apple.com
+partiality.itunes.apple.com
