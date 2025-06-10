@@ -1426,3 +1426,6 @@ font.im
 beget.com
 noohub.ru
 clash.wiki
+gspe1-ssl.ls.apple.com
+captive.apple.com
+setup.icloud.com
