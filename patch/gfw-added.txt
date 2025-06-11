@@ -1467,3 +1467,6 @@ sb.music.apple.com
 p146-fmf.icloud.com
 p40-buy.itunes.apple.com
 dmv.org
+gspe19-ssl.ls.apple.com
+mask-h2.icloud.com
+code.org
