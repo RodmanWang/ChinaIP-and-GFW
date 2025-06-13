@@ -2100,3 +2100,7 @@ adguard-dns.io
 samsungosp.com
 daocloud.io
 shouhougou.com
+pcwatch.com
+300624.com
+wondershare.de
+wondershare.com.br
