@@ -1471,3 +1471,5 @@ gspe19-ssl.ls.apple.com
 mask-h2.icloud.com
 code.org
 goodnotes-devops.com
+fastly.xns.my.id
+global.novaxns.one
