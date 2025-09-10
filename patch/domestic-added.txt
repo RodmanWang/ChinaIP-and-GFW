@@ -2100,6 +2100,7 @@ jp.pro.xns.rodeo
 kr.pro.xns.one
 sg.kahkee.xns.one
 vxcdn.novaxns.one
+v.xns.one
 adguard-dns.com
 adguard-dns.io
 samsungosp.com
