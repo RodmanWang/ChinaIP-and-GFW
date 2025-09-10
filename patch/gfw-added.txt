@@ -1473,4 +1473,5 @@ code.org
 goodnotes-devops.com
 fastly.xns.my.id
 global.novaxns.one
+f.xns.one
 phncdn.com
