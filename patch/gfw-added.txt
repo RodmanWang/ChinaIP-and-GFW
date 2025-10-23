@@ -1475,3 +1475,5 @@ fastly.xns.my.id
 global.novaxns.one
 f.xns.one
 phncdn.com
+npr.org
+samsungmobile.com
