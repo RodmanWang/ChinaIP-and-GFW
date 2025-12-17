@@ -97,38 +97,28 @@ jobs:
         #
         #
 
-    - name: 合并 Bogus-Nxdomain 列表并生成规则
+    - name: Merge and Bogus-Nxdomain lists and remove duplicates
       run: |
-        # 排除空行、注释行
+        #
+        #排除空行、注释行和包含非数字、非点字符的行
         awk '!/^[[:space:]]*(#|$)/' dist2/bogus-nxdomain1.txt > dist2/bogus-nxdomain1-1.txt
-        # 删除每行中的 bogus-nxdomain=
         awk '{sub(/bogus-nxdomain=/,""); print}' dist2/bogus-nxdomain1-1.txt > dist2/bogus-nxdomain1.conf
-
-        # 删除 || 和 $all
+        #删除每行数据中的“bogus-nxdomain=”字符
         awk '{sub(/\|\|/,""); sub(/\$all/,""); print}' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3-1.txt
-
-        # 提取 IPv4 地址
-        awk '/^([0-9]{1,3}\.){3}[0-9]{1,3}$/' dist2/bogus-nxdomain3-1.txt > dist2/ipv4.tmp
-        # 过滤非法 IPv4（>255）
-        awk '{split($0,a,"."); if(a[1]<=255&&a[2]<=255&&a[3]<=255&&a[4]<=255) print}' dist2/ipv4.tmp > dist2/ipv4.conf
-        # 提取 IPv6 地址
-        awk '/^[0-9a-fA-F:]+$/ && /:/' dist2/bogus-nxdomain3-1.txt > dist2/ipv6.conf
-        # 汇总 .conf 文件并去重
-        sort dist2/*.conf | uniq > dist2/nxdomain2.conf
-        # 生成 SmartDNS IPv4 规则（/32）
-        awk '{print "bogus-nxdomain " $0 "/32"}' dist2/ipv4.conf > dist2/BogusNxdomain-ipv4.conf
-        # 生成 SmartDNS IPv6 规则（/128）
-        awk '{print "bogus-nxdomain " $0 "/128"}' dist2/ipv6.conf > dist2/BogusNxdomain-ipv6.conf
-        # 合并 SmartDNS 规则
-        cat dist2/BogusNxdomain-ipv4.conf dist2/BogusNxdomain-ipv6.conf > dist2/BogusNxdomain.conf
-
-        # 生成 OpenClash IPv4 payload
-        awk '{print "  - \x27" $0 "/32\x27"}' dist2/ipv4.conf > dist2/nxdomain-ipv4.conf
-        # 生成 OpenClash IPv6 payload
-        awk '{print "  - \x27" $0 "/128\x27"}' dist2/ipv6.conf > dist2/nxdomain-ipv6.conf
-        # 合并 OpenClash payload
-        cat dist2/nxdomain-ipv4.conf dist2/nxdomain-ipv6.conf > dist2/nxdomain3.conf
-        # 生成 OpenClash YAML 文件（包含时间和规则数量）
+        #文件中提取包含有效 IP 地址的行，同时排除空行、注释行和包含非数字、非点字符的行
+        awk '!/^[[:space:]]*(#|$)/ && /([0-9]{1,3}\.){3}[0-9]{1,3}/ && !/[^0-9.]/' dist2/bogus-nxdomain3-1.txt > dist2/bogus-nxdomain3.conf
+        #
+        #汇总文件，ip格式排序，删除空行，注释行，重复行
+        awk '!seen[$0]++' dist2/*.conf | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^$|^\s*#" > dist2/nxdomain2.conf
+        #
+        #
+        #每行数据开头添加“bogus-nxdomain ”，生成SmartDNS使用的忽略IP解析文件
+        awk '{print "bogus-nxdomain " $0 (index($0,":")?"/128":"/32")}' dist2/nxdomain2.conf > dist2/BogusNxdomain.conf
+        #
+        #
+        #生成openclash使用的ip格式
+        awk '{print "  - \x27" $0 (index($0,":")?"/128":"/32") "\x27"}' dist2/nxdomain2.conf > dist2/nxdomain3.conf
+        #添加3注释，时间，行数
         awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" 'BEGIN { lines=0 } { content[lines++] = $0 } END {print "payload:"; print "# > AD & BanIP"; print "# > lines: " lines; print "# > Times: " datetime; for(i=0; i<lines; i++) print content[i] }' dist2/nxdomain3.conf > dist2/Ad·IP.yaml
         #
         #
