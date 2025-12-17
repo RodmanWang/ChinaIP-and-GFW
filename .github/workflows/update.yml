@@ -97,82 +97,38 @@ jobs:
         #
         #
 
-    - name: 合并 Bogus-Nxdomain 列表并去重生成规则
-    shell: bash
-    run: |
-     set -euo pipefail
-    # 排除空行、注释行
-     awk '!/^[[:space:]]*(#|$)/' dist2/bogus-nxdomain1.txt > dist2/bogus-nxdomain1-1.txt
-    # 删除每行中的 bogus-nxdomain=
-     awk '{sub(/bogus-nxdomain=/,""); print}' dist2/bogus-nxdomain1-1.txt > dist2/bogus-nxdomain1.conf
-
-    # 删除 || 和 $all
-     awk '{sub(/\|\|/,""); sub(/\$all/,""); print}' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3-1.txt
-    # 提取合法 IP（支持 IPv4 / IPv6）
-     awk '!/^[[:space:]]*(#|$)/ {
-       if ($0 ~ /^([0-9]{1,3}\.){3}[0-9]{1,3}$/) {
-        split($0,a,".")
-        if (a[1]<=255 && a[2]<=255 && a[3]<=255 && a[4]<=255) print
-      } else if (index($0,":")) {
-        print
-      }
-    }' dist2/bogus-nxdomain3-1.txt > dist2/bogus-nxdomain3.conf
-
-    # 汇总 .conf 文件，排序并去重
-    sort dist2/*.conf | uniq > dist2/nxdomain2.conf
-
-    # 生成 SmartDNS 使用的 bogus-nxdomain 规则（IPv4 /32，IPv6 /128）
-    awk 'index($0,":"){print "bogus-nxdomain " $0 "/128"; next} {print "bogus-nxdomain " $0 "/32"}' dist2/nxdomain2.conf > dist2/BogusNxdomain.conf
-
-    # 生成 OpenClash 使用的 payload 列表（IPv4 /32，IPv6 /128）
-    awk 'index($0,":"){print "  - \x27" $0 "/128\x27"; next} {print "  - \x27" $0 "/32\x27"}' dist2/nxdomain2.conf > dist2/nxdomain3.conf
-
-    # 生成 OpenClash YAML 文件（包含时间和规则数量）
-    awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" 'BEGIN{lines=0}{content[lines++]=$0}END{print "payload:";print "# > 广告与异常 IP 屏蔽规则";print "# > 规则数量: " lines;print "# > 生成时间: " datetime;for(i=0;i<lines;i++)print content[i]}' dist2/nxdomain3.conf > dist2/Ad-IP.yaml
-        #
-        #
-        
-- name: 合并 Bogus-Nxdomain 列表并生成规则
-  shell: bash
-  run: |
-    set -euo pipefail
-
-    # 排除空行、注释行
-    awk '!/^[[:space:]]*(#|$)/' dist2/bogus-nxdomain1.txt > dist2/bogus-nxdomain1-1.txt
-    # 删除每行中的 bogus-nxdomain=
-    awk '{sub(/bogus-nxdomain=/,""); print}' dist2/bogus-nxdomain1-1.txt > dist2/bogus-nxdomain1.conf
-
-    # 删除 || 和 $all
-    awk '{sub(/\|\|/,""); sub(/\$all/,""); print}' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3-1.txt
-
-    # 提取 IPv4 地址
-    awk '/^([0-9]{1,3}\.){3}[0-9]{1,3}$/' dist2/bogus-nxdomain3-1.txt > dist2/ipv4.tmp
-    # 过滤非法 IPv4（>255）
-    awk '{split($0,a,"."); if(a[1]<=255&&a[2]<=255&&a[3]<=255&&a[4]<=255) print}' dist2/ipv4.tmp > dist2/ipv4.conf
-
-    # 提取 IPv6 地址
-    awk '/:/' dist2/bogus-nxdomain3-1.txt > dist2/ipv6.conf
-
-    # 汇总 .conf 文件并去重
-    sort dist2/*.conf | uniq > dist2/nxdomain2.conf
-
-    # 生成 SmartDNS IPv4 规则（/32）
-    awk '{print "bogus-nxdomain " $0 "/32"}' dist2/ipv4.conf > dist2/BogusNxdomain-ipv4.conf
-    # 生成 SmartDNS IPv6 规则（/128）
-    awk '{print "bogus-nxdomain " $0 "/128"}' dist2/ipv6.conf > dist2/BogusNxdomain-ipv6.conf
-    # 合并 SmartDNS 规则
-    cat dist2/BogusNxdomain-ipv4.conf dist2/BogusNxdomain-ipv6.conf > dist2/BogusNxdomain.conf
-
-    # 生成 OpenClash IPv4 payload
-    awk '{print "  - \x27" $0 "/32\x27"}' dist2/ipv4.conf > dist2/nxdomain-ipv4.conf
-    # 生成 OpenClash IPv6 payload
-    awk '{print "  - \x27" $0 "/128\x27"}' dist2/ipv6.conf > dist2/nxdomain-ipv6.conf
-    # 合并 OpenClash payload
-    cat dist2/nxdomain-ipv4.conf dist2/nxdomain-ipv6.conf > dist2/nxdomain3.conf
-
-    # 生成 OpenClash YAML 文件（包含时间和规则数量）
-    awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" 'BEGIN{lines=0}{content[lines++]=$0}END{print "payload:";print "# > 广告与异常 IP 屏蔽规则";print "# > 规则数量: " lines;print "# > 生成时间: " datetime;for(i=0;i<lines;i++)print content[i]}' dist2/nxdomain3.conf > dist2/Ad-IP.yaml
-
+    - name: 合并 Bogus-Nxdomain 列表并生成规则
+      shell: bash
+      run: |
+        set -euo pipefail
+        # 排除空行、注释行
+        awk '!/^[[:space:]]*(#|$)/' dist2/bogus-nxdomain1.txt > dist2/bogus-nxdomain1-1.txt
+        # 删除每行中的 bogus-nxdomain=
+        awk '{sub(/bogus-nxdomain=/,""); print}' dist2/bogus-nxdomain1-1.txt > dist2/bogus-nxdomain1.conf
+        # 删除 || 和 $all
+        awk '{sub(/\|\|/,""); sub(/\$all/,""); print}' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3-1.txt
+        # 提取 IPv4 地址
+        awk '/^([0-9]{1,3}\.){3}[0-9]{1,3}$/' dist2/bogus-nxdomain3-1.txt > dist2/ipv4.tmp
+        # 过滤非法 IPv4（>255）
+        awk '{split($0,a,"."); if(a[1]<=255&&a[2]<=255&&a[3]<=255&&a[4]<=255) print}' dist2/ipv4.tmp > dist2/ipv4.conf
+        # 提取 IPv6 地址
+        awk '/:/' dist2/bogus-nxdomain3-1.txt > dist2/ipv6.conf
+        # 汇总 .conf 文件并去重
+        sort dist2/*.conf | uniq > dist2/nxdomain2.conf
+        # 生成 SmartDNS IPv4 规则（/32）
+        awk '{print "bogus-nxdomain " $0 "/32"}' dist2/ipv4.conf > dist2/BogusNxdomain-ipv4.conf
+        # 生成 SmartDNS IPv6 规则（/128）
+        awk '{print "bogus-nxdomain " $0 "/128"}' dist2/ipv6.conf > dist2/BogusNxdomain-ipv6.conf
+        # 合并 SmartDNS 规则
+        cat dist2/BogusNxdomain-ipv4.conf dist2/BogusNxdomain-ipv6.conf > dist2/BogusNxdomain.conf
+        # 生成 OpenClash IPv4 payload
+        awk '{print "  - \x27" $0 "/32\x27"}' dist2/ipv4.conf > dist2/nxdomain-ipv4.conf
+        # 生成 OpenClash IPv6 payload
+        awk '{print "  - \x27" $0 "/128\x27"}' dist2/ipv6.conf > dist2/nxdomain-ipv6.conf
+        # 合并 OpenClash payload
+        cat dist2/nxdomain-ipv4.conf dist2/nxdomain-ipv6.conf > dist2/nxdomain3.conf
+        # 生成 OpenClash YAML 文件（包含时间和规则数量）
+        awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" 'BEGIN{lines=0}{content[lines++]=$0}END{print "payload:";print "# > 广告与异常 IP 屏蔽规则";print "# > 规则数量: " lines;print "# > 生成时间: " datetime;for(i=0;i<lines;i++)print content[i]}' dist2/nxdomain3.conf > dist2/Ad-IP.yaml
         #
         #
         
