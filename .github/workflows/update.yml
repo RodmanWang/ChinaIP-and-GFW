@@ -128,7 +128,7 @@ jobs:
         # 合并 OpenClash payload
         cat dist2/nxdomain-ipv4.conf dist2/nxdomain-ipv6.conf > dist2/nxdomain3.conf
         # 生成 OpenClash YAML 文件（包含时间和规则数量）
-        awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" 'BEGIN{lines=0}{content[lines++]=$0}END{print "payload:";print "# > 广告与异常 IP 屏蔽规则";print "# > 规则数量: " lines;print "# > 生成时间: " datetime;for(i=0;i<lines;i++)print content[i]}' dist2/nxdomain3.conf > dist2/Ad-IP.yaml
+        awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" 'BEGIN{lines=0}{content[lines++]=$0}END{print "payload:";print "# > 广告与异常 IP 屏蔽规则";print "# > 规则数量: " lines;print "# > 生成时间: " datetime;for(i=0;i<lines;i++)print content[i]}' dist2/nxdomain3.conf > dist2/Ad·IP.yaml
         #
         #
         
