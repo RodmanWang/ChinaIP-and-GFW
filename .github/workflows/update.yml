@@ -106,8 +106,9 @@ jobs:
         #删除每行数据中的“bogus-nxdomain=”字符
         awk '{sub(/\|\|/,""); sub(/\$all/,""); print}' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3-1.txt
         #文件中提取包含有效 IP 地址的行，同时排除空行、注释行和包含非数字、非点字符的行
-        awk '!/^[[:space:]]*(#|$)/ && /([0-9]{1,3}\.){3}[0-9]{1,3}/ && !/[^0-9.]/' dist2/bogus-nxdomain3-1.txt > dist2/bogus-nxdomain3.conf
-        #
+        awk '!/^[[:space:]]*(#|$)/ && /([0-9]{1,3}\.){3}[0-9]{1,3}/ && !/[^0-9.]/' dist2/bogus-nxdomain3-1.txt > dist2/bogus-nxdomain3.txt
+        #过滤IPv4 每段≤255
+        awk '{split($0,a,"."); if(a[1]<=255&&a[2]<=255&&a[3]<=255&&a[4]<=255) print}' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3.conf
         #汇总文件，ip格式排序，删除空行，注释行，重复行
         awk '!seen[$0]++' dist2/*.conf | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^$|^\s*#" > dist2/nxdomain2.conf
         #
