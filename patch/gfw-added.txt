@@ -51,6 +51,9 @@ adguard-vpn.info
 adguard.com
 adguard.info
 adguard.org
+adguardaccount.com
+adguardcdn.com
+adguardcdn.net
 adobe.com
 adobe.io
 adobe.net
