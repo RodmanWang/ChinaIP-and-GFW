@@ -2,17 +2,13 @@ name: Update ChinaIP-and-GFW database
 
 on:
   workflow_dispatch:
-  schedule: 
+  schedule:
     - cron: '30 0/3 * * *'
   push:
     branches:
       - main
     paths-ignore:
       - "**/README.md"
-
-defaults:
-  run:
-    shell: bash
 
 jobs:
   build:
@@ -30,7 +26,6 @@ jobs:
 
       - name: Get dependencies
         run: |
-          set -euo pipefail
           go get -v -t -d ./...
           if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
@@ -38,18 +33,13 @@ jobs:
           fi
 
       - name: Create dist folders
-        run: |
-          set -euo pipefail
-          mkdir -p dist dist2 dist3 dist4
+        run: mkdir -p dist dist2 dist3 dist4
 
       - name: Compile GeoIP conversion binary
-        run: |
-          set -euo pipefail
-          /bin/bash ./build.sh
+        run: /bin/bash ./build.sh
 
-      - name: Download IP and domain lists
+      - name: Obtain CN IP lists
         run: |
-          set -euo pipefail
           # China IP
           curl -LR -o dist/ChinaIPv4-1.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
           curl -LR -o dist/ChinaIPv4-2.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
@@ -71,95 +61,26 @@ jobs:
           curl -LR -o dist4/gfw3.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-added.txt"
           curl -LR -o dist4/exclude-gfw.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-gfw.txt"
 
-      - name: Merge IP lists
-        run: |
-          set -euo pipefail
-          awk '!/^( *#.*| *$)/' dist/*.txt > dist/China-IP.txt
-          awk '!seen[$0]++' dist/China-IP.txt | grep -Ev "^$|^\s*#" | \
-            awk -F. '$1~/^[0-9]+$/{print "ipv4",$0;next} {print "ipv6",$0}' | \
-            sort -t' ' -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n | \
-            awk '{print $2}' | \
-            sort -t. -k1,1n -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n > dist/ChinaIPv4v6.txt
+      # 以下的步骤保持原来的脚本逻辑，不加 pipefail
+      - name: Merge and IP lists and remove duplicates
+        run: /bin/bash ./merge-ip.sh
 
-          # Remove excluded IPs
-          awk 'NR==FNR{a[$0];next} {for(i in a) if(i~$0) next} 1' dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#" > dist/ChinaIP.txt
-          awk 'NR==FNR{a[$0];next} {for(i in a) if(i~$0) next} 1' dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
-          awk 'NR==FNR{a[$0];next} {for(i in a) if(i~$0) next} 1' dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt | grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt
+      - name: Merge and Bogus-Nxdomain lists and remove duplicates
+        run: /bin/bash ./merge-nxdomain.sh
 
-          awk '{print "blacklist-ip " $0}' dist/ChinaIP.txt > dist/BlacklistIP.conf
-          awk '{print "whitelist-ip " $0}' dist/ChinaIP.txt > dist/WhitelistIP.conf
+      - name: Merge and China-Domains lists and remove duplicates
+        run: /bin/bash ./merge-domestic.sh
 
-      - name: Merge Bogus-NXDOMAIN
-        run: |
-          set -euo pipefail
-          awk '!/^[[:space:]]*(#|$)/' dist2/bogus-nxdomain1.txt > dist2/bogus-nxdomain1-1.txt
-          awk '{sub(/bogus-nxdomain=/,""); print}' dist2/bogus-nxdomain1-1.txt > dist2/bogus-nxdomain1.conf
-          awk '{sub(/\|\|/,""); sub(/\$all/,""); print}' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3-1.txt
-          awk '!/^[[:space:]]*(#|$)/ && /([0-9]{1,3}\.){3}[0-9]{1,3}/ && !/[^0-9.]/' dist2/bogus-nxdomain3-1.txt > dist2/bogus-nxdomain3.txt
-          awk '{split($0,a,"."); if(a[1]<=255&&a[2]<=255&&a[3]<=255&&a[4]<=255) print}' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3.conf
-          awk '!seen[$0]++' dist2/*.conf | sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n | grep -Ev "^$|^\s*#" > dist2/nxdomain2.conf
-          awk '{print "bogus-nxdomain " $0 (index($0,":")?"/128":"/32")}' dist2/nxdomain2.conf > dist2/BogusNxdomain.conf
-          awk '{print "  - \x27" $0 (index($0,":")?"/128":"/32") "\x27"}' dist2/nxdomain2.conf > dist2/nxdomain3.conf
-          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" \
-            'BEGIN{lines=0}{content[lines++]=$0}END{print "payload:";print "# > AD & BanIP";print "# > lines: " lines;print "# > Times: " datetime;for(i=0;i<lines;i++) print content[i]}' \
-            dist2/nxdomain3.conf > dist2/Ad·IP.yaml
-
-      - name: Merge Domestic Domains
-        run: |
-          set -euo pipefail
-          awk '{gsub(/server=\/|\/114\.114\.114\.114|[[:space:]]*/, "")}1' dist3/domains.china.txt > dist3/domains.china.conf
-          awk '!/^( *#.*| *$)/' dist3/*.conf | awk '!seen[$0]++' | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist3/China2.conf
-          grep -Fvxf dist3/exclude-domestic.txt dist3/China2.conf | awk '!/^( *#.*| *$)/' > dist3/China3.conf
-          grep -v '\.' dist3/China3.conf | sed 's/^/./' > dist3/China4.conf
-          grep -Fvf dist3/China4.conf dist3/China3.conf > dist3/ChinaDomain3.conf
-          sort -u dist3/ChinaDomain3.conf | awk '{print "server=/"$0"/114.114.114.114"}' > dist3/ChinaDomain2.conf
-          sort -u dist3/ChinaDomain3.conf | awk '{print "nameserver /"$0"/domestic"}' > dist3/ChinaDomain.conf
-          sort -u dist3/ChinaDomain3.conf | awk '{print "  - DOMAIN-SUFFIX,"$0}' > dist3/ChinaDomain4.conf
-          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" \
-            'BEGIN{lines=0}{content[lines++]=$0}END{print "payload:";print "# > lines: " lines;print "# > Times: " datetime;for(i=0;i<lines;i++) print content[i]}' \
-            dist3/ChinaDomain4.conf > dist3/Domestic.yaml
-
-      - name: Merge GFW Domains
-        run: |
-          set -euo pipefail
-          awk '!/^( *#.*| *$)/' dist4/*.txt > dist4/gfw1.txt
-          grep -Fvxf dist4/exclude-gfw.conf dist4/gfw1.txt | awk '!/^( *#.*| *$)/' > dist4/gfw0.txt
-          grep -v '\.' dist4/gfw0.txt | sed 's/^/./' > dist4/gfw11.txt
-          grep -Fvf dist4/gfw11.txt dist4/gfw0.txt > dist4/gfw22.txt
-          awk '!seen[$0]++' dist4/gfw22.txt | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist4/GFW.txt
-          sort -u dist4/GFW.txt | sed 's/^/||/' > dist4/AutoGFW.txt
-          sort -u dist4/GFW.txt | awk '{print "  - DOMAIN-SUFFIX,"$0}' > dist4/GFW00000.txt
-          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" \
-            'BEGIN{lines=0}{content[lines++]=$0}END{print "payload:";print "# > lines: " lines;print "# > Times: " datetime;for(i=0;i<lines;i++) print content[i]}' \
-            dist4/GFW00000.txt > dist4/Proxy.yaml
-          sort -u dist4/GFW.txt | awk '{print "nameserver /"$0"/abroad"}' > dist4/GFW.conf
+      - name: Merge and GFW-Domains lists and remove duplicates
+        run: /bin/bash ./merge-gfw.sh
 
       - name: Generate GeoIP2 database
-        run: |
-          set -euo pipefail
-          CURRENT_DIR=$(pwd)
-          cd dist
-          ./ipip2mmdb -s ./ChinaIP.txt -d Country.mmdb
-          cd $CURRENT_DIR
+        run: /bin/bash ./generate-geoip2.sh
 
       - name: Push artifacts to release branch
-        run: |
-          set -euo pipefail
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git reset --hard HEAD
-          git fetch
-          git checkout --orphan release
-          git rm -rf .
-          cp -rf dist/ChinaIPv4.txt dist/ChinaIPv6.txt dist/ChinaIP.txt dist/BlacklistIP.conf dist/WhitelistIP.conf dist/Country.mmdb \
-                 dist2/BogusNxdomain.conf dist2/Ad·IP.yaml \
-                 dist3/ChinaDomain.conf dist3/ChinaDomain2.conf dist3/ChinaDomain3.conf dist3/Domestic.yaml \
-                 dist4/GFW.txt dist4/AutoGFW.txt dist4/GFW.conf dist4/Proxy.yaml ./
-          git add .
-          git commit -m "update : $(TZ=UTC-8 date "+%Y-%m-%d %H:%M:%S")"
-          git push -f origin release
+        run: /bin/bash ./push-release.sh
 
-      - name: Cleanup old workflow runs
+      - name: Delete old workflow runs
         uses: Mattraks/delete-workflow-runs@v2
         with:
           retain_days: 1
