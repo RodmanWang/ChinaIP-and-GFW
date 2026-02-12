@@ -309,7 +309,6 @@ perfops.net
 pgl.yoyo.org
 photos.live.com
 pianyuan.org
-pinterest.
 piratebay.live
 pki.kaspersky.com
 podnapisi.net
@@ -357,7 +356,6 @@ sentry.io
 settings-win.data.microsoft.com
 shuax.com
 skk.moe
-skydrive
 skydrive.wns.windows.com
 skype.com
 slscr.update.microsoft.com
@@ -427,7 +425,6 @@ urldefense.com
 urleecher.com
 uy5.net
 v1.mk
-v2ex.
 v3.account.samsung.com
 vas.samsungapps.com
 vectranet.pl
@@ -437,7 +434,6 @@ videolan.org
 vmware.com
 vmware.tt.omtrdc.net
 vortex.data.microsoft.com
-whatsapp.
 wheel-size.cn
 wikileaks-forum.com
 wikileaks.info
@@ -456,7 +452,6 @@ xns.one
 xns.rodeo
 xsts.auth.xboxlive.com
 yadro.ru
-yandex.
 yangtu.top
 yastatic.net
 yifysubtitles.com
