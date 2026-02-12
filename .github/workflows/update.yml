@@ -5,83 +5,190 @@ on:
   schedule:
     - cron: '30 0/3 * * *'
   push:
-    branches:
-      - main
+    branches: [ main ]
     paths-ignore:
       - "**/README.md"
 
+defaults:
+  run:
+    shell: bash -o pipefail
+
 jobs:
   build:
-    name: Generate GeoIP2 database
     runs-on: ubuntu-latest
+
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: stable
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: stable
+        cache: true
 
-      - name: Check out code
-        uses: actions/checkout@v4
+    - name: Go deps
+      run: |
+        go mod download || true
+        go mod tidy || true
 
-      - name: Get dependencies
-        run: |
-          go get -v -t -d ./...
-          if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-          fi
+    - name: Prepare folders
+      run: mkdir -p dist dist2 dist3 dist4
 
-      - name: Create dist folders
-        run: mkdir -p dist dist2 dist3 dist4
+    - name: Build tool
+      run: bash ./build.sh
 
-      - name: Compile GeoIP conversion binary
-        run: /bin/bash ./build.sh
+    - name: Download sources
+      run: |
+        # China IP
+        curl -L --fail -o dist/ip1.txt https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt
+        curl -L --fail -o dist/ip2.txt https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt
+        curl -L --fail -o dist/ip6.txt https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt
+        curl -L --fail -o dist/exclude-ip.txt https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-domestic-ip.txt
 
-      - name: Obtain CN IP lists
-        run: |
-          # China IP
-          curl -LR -o dist/ChinaIPv4-1.txt "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
-          curl -LR -o dist/ChinaIPv4-2.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
-          curl -LR -o dist/ChinaIPv6.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
-          curl -LR -o dist/exclude-domestic-ip.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-domestic-ip.txt"
+        # Bogus
+        curl -L --fail -o dist2/a.txt https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf
+        curl -L --fail -o dist2/b.conf https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/bogus-nxdomain-added.txt
+        curl -L --fail -o dist2/c.txt https://urlhaus-filter.pages.dev/urlhaus-filter-ag-online.txt
 
-          # Bogus NXDOMAIN
-          curl -LR -o dist2/bogus-nxdomain1.txt "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
-          curl -LR -o dist2/bogus-nxdomain2.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/bogus-nxdomain-added.txt"
-          curl -LR -o dist2/bogus-nxdomain3.txt "https://urlhaus-filter.pages.dev/urlhaus-filter-ag-online.txt"
+        # Domestic
+        curl -L --fail -o dist3/dom.txt https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf
+        curl -L --fail -o dist3/add.conf https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-added.txt
+        curl -L --fail -o dist3/exclude.txt https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-domestic.txt
 
-          # Domestic domains
-          curl -LR -o dist3/domains.china.txt "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
-          curl -LR -o dist3/domestic-added.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-added.txt"
-          curl -LR -o dist3/exclude-domestic.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-domestic.txt"
+        # GFW
+        curl -L --fail -o dist4/gfw.txt https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt
+        curl -L --fail -o dist4/add.txt https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-added.txt
+        curl -L --fail -o dist4/exclude.txt https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-gfw.txt
 
-          # GFW domains
-          curl -LR -o dist4/gfw2.txt "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
-          curl -LR -o dist4/gfw3.txt "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-added.txt"
-          curl -LR -o dist4/exclude-gfw.conf "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-gfw.txt"
+    - name: Build China IP
+      run: |
+        awk '!/^( *#|$)/' dist/*.txt > dist/all.txt
 
-      # 以下的步骤保持原来的脚本逻辑，不加 pipefail
-      - name: Merge and IP lists and remove duplicates
-        run: /bin/bash ./merge-ip.sh
+        awk '!seen[$0]++' dist/all.txt | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n > dist/all2.txt
 
-      - name: Merge and Bogus-Nxdomain lists and remove duplicates
-        run: /bin/bash ./merge-nxdomain.sh
+        grep -Fvxf dist/exclude-ip.txt dist/all2.txt || true > dist/ChinaIP.txt
+        grep -Ev ':' dist/ChinaIP.txt > dist/ChinaIPv4.txt
+        grep ':' dist/ChinaIP.txt || true > dist/ChinaIPv6.txt
 
-      - name: Merge and China-Domains lists and remove duplicates
-        run: /bin/bash ./merge-domestic.sh
+        awk '{print "blacklist-ip "$0}' dist/ChinaIP.txt > dist/BlacklistIP.conf
+        awk '{print "whitelist-ip "$0}' dist/ChinaIP.txt > dist/WhitelistIP.conf
 
-      - name: Merge and GFW-Domains lists and remove duplicates
-        run: /bin/bash ./merge-gfw.sh
+    - name: Build Bogus
+      run: |
+        sed 's/bogus-nxdomain=//' dist2/a.txt > dist2/a.conf
+        sed 's/||//;s/\$all//' dist2/c.txt > dist2/c2.txt
 
-      - name: Generate GeoIP2 database
-        run: /bin/bash ./generate-geoip2.sh
+        awk '/([0-9]{1,3}\.){3}[0-9]{1,3}/' dist2/c2.txt > dist2/ip.conf
 
-      - name: Push artifacts to release branch
-        run: /bin/bash ./push-release.sh
+        awk '!seen[$0]++' dist2/*.conf | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n > dist2/all.txt
 
-      - name: Delete old workflow runs
-        uses: Mattraks/delete-workflow-runs@v2
-        with:
-          retain_days: 1
-          keep_minimum_runs: 3
+        awk '{print "bogus-nxdomain "$0"/32"}' dist2/all.txt > dist2/BogusNxdomain.conf
+
+        awk '{print "  - \x27"$0"/32\x27"}' dist2/all.txt > dist2/ip.yaml
+
+        awk -v t="$(TZ=UTC-8 date +'%F %T')" '
+        {c[++n]=$0}
+        END{
+          print "payload:"
+          print "# > lines: " n
+          print "# > Times: " t
+          for(i=1;i<=n;i++)print c[i]
+        }' dist2/ip.yaml > dist2/Ad·IP.yaml
+
+    - name: Build China domains
+      run: |
+        sed 's/server=\/\|\/114\.114\.114\.114//g' dist3/dom.txt > dist3/a.conf
+
+        awk '!/^( *#|$)/' dist3/*.conf | awk '!seen[$0]++' | sort > dist3/all.txt
+
+        grep -Fvxf dist3/exclude.txt dist3/all.txt || true > dist3/f.txt
+
+        grep -v '\.' dist3/f.txt | sed 's/^/./' > dist3/suffix.txt
+        grep -Fvf dist3/suffix.txt dist3/f.txt || true > dist3/final.txt
+
+        cp dist3/final.txt dist3/ChinaDomain.conf
+
+        awk '{print "server=/"$0"/114.114.114.114"}' dist3/final.txt > dist3/ChinaDomain2.conf
+
+        awk '{print "  - DOMAIN-SUFFIX,"$0}' dist3/final.txt > dist3/dom.yaml
+
+        awk -v t="$(TZ=UTC-8 date +'%F %T')" '
+        {c[++n]=$0}
+        END{
+          print "payload:"
+          print "# > lines: " n
+          print "# > Times: " t
+          for(i=1;i<=n;i++)print c[i]
+        }' dist3/dom.yaml > dist3/Domestic.yaml
+
+    - name: Build GFW domains
+      run: |
+        awk '!/^( *#|$)/' dist4/*.txt > dist4/all.txt
+
+        grep -Fvxf dist4/exclude.txt dist4/all.txt || true > dist4/f.txt
+
+        grep -v '\.' dist4/f.txt | sed 's/^/./' > dist4/suffix.txt
+        grep -Fvf dist4/suffix.txt dist4/f.txt || true > dist4/final.txt
+
+        awk '!seen[$0]++' dist4/final.txt | sort > dist4/GFW.txt
+
+        sed 's/^/||/' dist4/GFW.txt > dist4/AutoGFW.txt
+        cp dist4/GFW.txt dist4/GFW.conf
+
+        awk '{print "  - DOMAIN-SUFFIX,"$0}' dist4/GFW.txt > dist4/gfw.yaml
+
+        awk -v t="$(TZ=UTC-8 date +'%F %T')" '
+        {c[++n]=$0}
+        END{
+          print "payload:"
+          print "# > lines: " n
+          print "# > Times: " t
+          for(i=1;i<=n;i++)print c[i]
+        }' dist4/gfw.yaml > dist4/Proxy.yaml
+
+    - name: Generate mmdb
+      run: |
+        cd dist
+        ./ipip2mmdb -s ChinaIP.txt -d Country.mmdb
+
+    - name: Push release
+      run: |
+        git config user.name "github-actions"
+        git config user.email "action@github.com"
+
+        git checkout --orphan release-tmp
+        git rm -rf .
+
+        cp dist/Country.mmdb .
+        cp dist/ChinaIP*.txt .
+        cp dist/BlacklistIP.conf .
+        cp dist/WhitelistIP.conf .
+        cp dist2/BogusNxdomain.conf .
+        cp dist2/Ad·IP.yaml .
+        cp dist3/ChinaDomain.conf .
+        cp dist3/ChinaDomain2.conf .
+        cp dist3/Domestic.yaml .
+        cp dist4/GFW.txt .
+        cp dist4/AutoGFW.txt .
+        cp dist4/GFW.conf .
+        cp dist4/Proxy.yaml .
+
+        git add .
+        git commit -m "update $(TZ=UTC-8 date '+%F %T')"
+
+        git branch -D release || true
+        git branch -m release
+
+    - name: Push GitHub
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.PERSON_TOKEN }}
+        branch: release
+        force: true
+
+    - name: Cleanup runs
+      uses: Mattraks/delete-workflow-runs@v2
+      with:
+        retain_days: 1
+        keep_minimum_runs: 3
