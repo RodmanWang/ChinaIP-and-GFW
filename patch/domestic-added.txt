@@ -125,11 +125,8 @@
 99bxwx.com
 9shuyuan.org
 Xhsxsw.com
-a-map.
 a9vg.com
 abchina.com
-accessibility-union.
-accessibilityunion.
 acctdns.com
 acctdns.net
 acg.tv
@@ -146,11 +143,8 @@ algolianet.com
 ali-expo.com
 ali213.com
 ali213.net
-aliapp
-aliba
 alibench.com
 alicdn.com
-alicloud
 alicontainer.com
 alidayu.com
 alidns.com
@@ -166,7 +160,6 @@ alimebot.com
 alimei.com
 alimmdn.com
 alipan.com
-alipay
 aliplus.com
 aliresearch.com
 alisoft.com
@@ -177,7 +170,6 @@ aliunicorn.com
 alivecdn.com
 aliway.com
 alixiaomi.com
-aliyun
 all-in-data.com
 amap.com
 amemv.com
@@ -213,7 +205,6 @@ b5200.net
 b5200.org
 bababian.com
 babahome.net
-baidu
 baidupan.com
 baifubao.com
 baijincdn.com
@@ -254,12 +245,7 @@ bhuvgy.com
 bidige.com
 biduoxs.com
 bijiago.com
-biliapi.
-bilibili.
-bilibilipay.
-biligame.
 bilinovel.com
-bilivideo.
 biqu5200.net
 biqudu.com
 biquge.name
@@ -320,7 +306,6 @@ c8uixr96iv79.com
 cainiao.com
 cainiaoyizhan.com
 caiyunapp.com
-canon
 cccpan.com
 cctv.com
 cctvcdn.com
@@ -412,7 +397,6 @@ ctripgslb.com
 ctripqa.com
 cxzww.com
 d-ctrip.com
-d3m30|i.com
 daluo.com
 damaoli.com
 dangbei.com
@@ -443,7 +427,6 @@ dingtalk.com
 dingtalkapps.com
 dingweilishi.com
 dingxiang-inc.com
-discuz.
 dnmcn.com
 dns.pub
 dnsdaquan.com
@@ -709,7 +692,6 @@ iyouxia.com
 jaeapp.com
 jaecdn.com
 jbzyk.com
-jcloud
 jclps.com
 jd-ex.com
 jd.com
@@ -717,7 +699,6 @@ jd.hk
 jdbusiness.com
 jdcache.com
 jdcdn.com
-jdcloud
 jddapeigou.com
 jddebug.com
 jddglobal.com
@@ -948,13 +929,10 @@ p4pfile.com
 paike.com
 pailitao.com
 paipai.com
-pangolin-
-panplayable-
 panshizhaopin.com
 pcmgr-global.com
 pdske.com
 pengyou.com
-pglstatp-
 phpweblog.net
 piaotia.com
 piaotianwenxue.com
@@ -1031,7 +1009,6 @@ qnssl.com
 qnydns.com
 qnydns.net
 qplus.com
-qq.
 qqfamily.com
 qqgamemall.com
 qqhangjia.com
@@ -1167,7 +1144,6 @@ talldns.com
 tamaegis.com
 tanx.com
 tao123.com
-taobao.
 taobaocdn.com
 taohua.com
 taojianghu.com
@@ -1186,8 +1162,6 @@ tdatamaster.com
 tdlcdn.com
 tencdns.com
 tencdns.net
-tencent-
-tencentcloud
 tengmed.com
 tengyunqq.com
 tenovatech.com
@@ -1210,7 +1184,6 @@ tongcn.com
 topcto50.com
 toplife.com
 toscdn.com
-toutiao
 touying.com
 tpiccdn.com
 tqcyjy.com
@@ -1288,7 +1261,6 @@ waptxt.com
 wasu.tv
 wcxsw.org
 weathercn.com
-wechat.
 wechatapp.com
 wechatpay.com.hk
 wegame.com
@@ -1354,7 +1326,6 @@ xhscdn.com
 xhslink.com
 xhytd.com
 xiajiaoapp.com
-xiami.
 xianyuso.com
 xiaobai.com
 xiaohongshu.com
@@ -1405,7 +1376,6 @@ yiqisooimg.com
 yitao.com
 yixun.com
 yiyaojd.com
-yjs-cdn
 ykimg.com
 yodao.com
 yodao.net
@@ -1426,7 +1396,6 @@ yulusy.com
 yundunddos.com
 yundunwaf.com
 yunfengdie.com
-yunjiasu
 yunos.com
 yunpei.com
 yunqi.org
