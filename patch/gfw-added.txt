@@ -471,3 +471,11 @@ zmk.lol
 zmk.pw
 zopim.com
 gamma.app
+honeycomb.io
+knock.app
+birdie.so
+sentry-cdn.com
+canny.io
+intercomcdn.com
+intercom.help
+intercom.io
