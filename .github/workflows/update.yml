@@ -13,8 +13,6 @@ jobs:
   build:
     name: Generate GeoIP2 database
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # <--- 加在这里
     steps:
     - name: Set up Go
       uses: actions/setup-go@v3
