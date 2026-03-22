@@ -488,3 +488,7 @@ ipfind.com
 adguard-mail.com
 autorefresh.io
 linux.do
+ssl.com
+idcflare.com
+statsigapi.net
+beyondwickedmapping.org
