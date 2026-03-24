@@ -492,3 +492,4 @@ ssl.com
 idcflare.com
 statsigapi.net
 beyondwickedmapping.org
+certum.pl
