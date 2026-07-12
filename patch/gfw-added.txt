@@ -2019,4 +2019,4 @@ woo15.com
 55kp.app
 tudoutudou.top
 cartocdn.com
-  - DOMAIN-SUFFIX,blocklist.de
+blocklist.de
