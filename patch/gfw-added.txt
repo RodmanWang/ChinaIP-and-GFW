@@ -500,3 +500,5 @@ zmk.lol
 zmk.pw
 zopim.com
 samsungcloudsolution.net
+samsungcloudsolution.ne
+symcd.com
