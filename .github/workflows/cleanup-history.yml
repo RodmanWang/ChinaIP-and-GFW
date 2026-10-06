@@ -1,15 +1,15 @@
-name: Preview ChinaIP-and-GFW history cleanup
+name: Preview ChinaIP-and-GFW history rebuild
 
 on:
   workflow_dispatch:
 
 concurrency:
-  group: preview-chinaip-gfw-cleanup
+  group: preview-chinaip-history-rebuild
   cancel-in-progress: true
 
 jobs:
   preview:
-    name: Preview cleanup result
+    name: Preview history rebuild
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -20,12 +20,17 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Install tools
+      - name: Prepare test copy
         run: |
-          sudo apt update
-          sudo apt install -y git-filter-repo
+          set -e
 
-      - name: Create preview cleanup
+          mkdir ../original
+
+          rsync -a --exclude=.git ./ ../original/
+
+          git clone . ../rewrite-test
+
+      - name: Calculate history range
         run: |
           set -e
 
@@ -37,31 +42,71 @@ jobs:
           echo "Cutoff:"
           date -d "@$CUTOFF"
 
-          git clone . ../clean-preview
+          cd ../rewrite-test
 
-          cd ../clean-preview
+          FIRST_KEEP=$(git rev-list --reverse main | while read COMMIT
+          do
+            TIME=$(git show -s --format=%ct "$COMMIT")
 
-          git filter-repo \
-            --force \
-            --commit-callback "if int(commit.author_date.split()[0]) < $CUTOFF: commit.skip()"
+            if [ "$TIME" -ge "$CUTOFF" ]; then
+              echo "$COMMIT"
+              break
+            fi
+          done)
+
+          echo "First commit kept:"
+          echo "$FIRST_KEEP"
+
+          echo "$FIRST_KEEP" > /tmp/first_keep_commit
+
+      - name: Rebuild preview history
+        run: |
+          set -e
+
+          cd ../rewrite-test
+
+          FIRST_KEEP=$(cat /tmp/first_keep_commit)
+
+          if [ -z "$FIRST_KEEP" ]; then
+            echo "No cleanup required"
+            exit 0
+          fi
+
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "GitHub Actions Bot"
+
+          git checkout --orphan clean-main
+
+          git rm -rf . >/dev/null 2>&1 || true
+
+          rsync -a ../original/ ./
+
+          git add .
+
+          git commit -m "Initial history snapshot"
+
+          git cherry-pick "$FIRST_KEEP"..main || true
 
       - name: Compare result
         run: |
+          set -e
+
           echo "Original commits:"
-          git rev-list --count HEAD
+          cd "$GITHUB_WORKSPACE"
+          git rev-list --count main
 
           echo ""
 
           echo "Preview commits:"
-          cd ../clean-preview
-          git rev-list --count HEAD
+          cd ../rewrite-test
+          git rev-list --count clean-main
 
           echo ""
 
           echo "Preview latest commits:"
-          git log --oneline -20
+          git log clean-main --oneline -20
 
           echo ""
 
-          echo "Preview size:"
+          echo "Preview repository size:"
           du -sh .git
