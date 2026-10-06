@@ -1,153 +1,56 @@
-name: Cleanup git history
+name: Check ad history cleanup
 
 on:
   workflow_dispatch:
 
-  schedule:
-    - cron: '0 3 1 * *'
-
 concurrency:
-  group: cleanup-chinaip-git-history
+  group: check-ad-history-cleanup
   cancel-in-progress: true
 
 jobs:
   cleanup:
-    name: Compress old git history
+    name: Check git history
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
-      - name: Checkout main history
+      - name: Checkout master history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: main
+          ref: master
 
-      - name: Find cutoff commit
+      - name: Check repository history
         run: |
           set -e
 
           KEEP_DAYS=180
 
-          CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
-
           echo "Keep days:"
           echo "$KEEP_DAYS"
 
-          echo "Cutoff:"
+          CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
+
+          echo ""
+          echo "Cutoff date:"
           date -d "@$CUTOFF"
 
-          FIRST_KEEP=""
-
-          while read COMMIT
-          do
-            TIME=$(git show -s --format=%ct "$COMMIT")
-
-            if [ "$TIME" -ge "$CUTOFF" ]; then
-              FIRST_KEEP="$COMMIT"
-              break
-            fi
-
-          done < <(git rev-list --reverse HEAD)
-
-          if [ -z "$FIRST_KEEP" ]; then
-            echo "No cleanup required"
-            exit 0
-          fi
-
-          echo "$FIRST_KEEP" > /tmp/first_keep
-
-          echo "First commit kept:"
-          git show -s --format="%h %ad %s" --date=short "$FIRST_KEEP"
-
-
-      - name: Rebuild clean history
-        run: |
-          set -e
-
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git config user.name "GitHub Actions Bot"
-
-          FIRST_KEEP=$(cat /tmp/first_keep)
-
-          OLD_HEAD=$(git rev-parse HEAD)
-
-          echo "Save current source"
-
-          mkdir -p /tmp/current-source
-
-          git archive "$OLD_HEAD" | tar -x -C /tmp/current-source
-
-
-          echo "Create clean main"
-
-          git checkout --orphan clean-main
-
-          git rm -rf . >/dev/null 2>&1 || true
-
-          cp -a /tmp/current-source/. .
-
-          git add .
-
-          git commit \
-            -m "Initial history snapshot"
-
-
-          echo "Apply recent commits"
-
-          git cherry-pick "$FIRST_KEEP".."$OLD_HEAD" || true
-
-
-          while git rev-parse --verify CHERRY_PICK_HEAD >/dev/null 2>&1
-          do
-            echo "Resolve conflict"
-
-            git checkout --theirs .
-
-            git add .
-
-            git cherry-pick --continue || git cherry-pick --skip || true
-          done
-
-
-          echo "Rename branch"
-
-          git branch -M main
-
-
-      - name: Cleanup git objects
-        run: |
-          set -e
-
-          git reflog expire --expire=now --all
-
-          git gc --prune=now
-
-
-      - name: Verify result
-        run: |
-          set -e
-
-          echo "===================="
-
-          echo "Commit count:"
+          echo ""
+          echo "Total commits:"
           git rev-list --count HEAD
 
           echo ""
-
           echo "Latest commits:"
-          git log --oneline -30
+          git log --oneline -20
 
           echo ""
+          echo "Oldest commit:"
+          git log --reverse --format="%h %ad %s" --date=short | head -1
 
-          echo "Repository size:"
-          du -sh .git
+          echo ""
+          echo "Newest commit:"
+          git log -1 --format="%h %ad %s" --date=short
 
-
-      - name: Push cleaned history
+      - name: Check repository size
         run: |
-          set -e
-
-          echo "Force push cleaned main"
-
-          git push origin main --force
+          du -sh .git
