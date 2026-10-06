@@ -20,20 +20,12 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Install tools
+      - name: Install git-filter-repo
         run: |
           sudo apt update
           sudo apt install -y git-filter-repo
 
-      - name: Backup current tree
-        run: |
-          set -e
-
-          git archive HEAD | tar -x -C /tmp
-
-          echo "Current source saved"
-
-      - name: Find cutoff commit
+      - name: Find cleanup point
         run: |
           set -e
 
@@ -57,7 +49,6 @@ jobs:
               FIRST_KEEP="$COMMIT"
               break
             fi
-
           done < <(git rev-list --reverse HEAD)
 
           if [ -z "$FIRST_KEEP" ]; then
@@ -70,24 +61,35 @@ jobs:
           echo "First kept commit:"
           cat /tmp/first_keep
 
-
-      - name: Rewrite history
+      - name: Rewrite old history
         run: |
           set -e
 
           FIRST_KEEP=$(cat /tmp/first_keep)
 
-          cat > /tmp/filter.py <<'PY'
-commit = commit
-PY
+          echo "Create temporary branch"
+
+          git branch cleanup-base "$FIRST_KEEP"
+
+          git checkout cleanup-base
+
+          echo "Before cleanup:"
+          git rev-list --count HEAD
 
           git filter-repo \
             --force \
-            --commit-callback '
-if commit.original_id == b"'$(git rev-parse "$FIRST_KEEP")'":
-    commit.parents = []
-'
+            --parent-filter '
+              while read parent
+              do
+                if echo "$parent" | grep -q "^parent"
+                then
+                  continue
+                fi
+              done
+            '
 
+          echo "After cleanup:"
+          git rev-list --count HEAD
 
       - name: Verify result
         run: |
@@ -95,13 +97,13 @@ if commit.original_id == b"'$(git rev-parse "$FIRST_KEEP")'":
 
           echo "===================="
 
-          echo "Commit count:"
-          git rev-list --count HEAD
+          echo "Current commits:"
+          git log --oneline -30
 
           echo ""
 
-          echo "Latest commits:"
-          git log --oneline -30
+          echo "Commit count:"
+          git rev-list --count HEAD
 
           echo ""
 
