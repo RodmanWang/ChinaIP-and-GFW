@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Prepare test repository
+      - name: Prepare repository
         run: |
           set -e
 
@@ -33,12 +33,6 @@ jobs:
           KEEP_DAYS=180
 
           CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
-
-          echo "Keep days:"
-          echo "$KEEP_DAYS"
-
-          echo "Cutoff date:"
-          date -d "@$CUTOFF"
 
           cd ../rewrite-test
 
@@ -54,6 +48,7 @@ jobs:
               FIRST_KEEP="$COMMIT"
               break
             fi
+
           done < <(git rev-list --reverse HEAD)
 
           if [ -z "$FIRST_KEEP" ]; then
@@ -64,19 +59,21 @@ jobs:
           echo "$OLD_HEAD" > /tmp/old_head
           echo "$FIRST_KEEP" > /tmp/first_keep
 
-          echo ""
-          echo "Old HEAD:"
+          echo "Old head:"
           cat /tmp/old_head
 
           echo ""
-          echo "First kept commit:"
+
+          echo "First commit kept:"
           cat /tmp/first_keep
 
           echo ""
-          echo "Commits to keep:"
+
+          echo "Commits after cutoff:"
           git rev-list --count "$FIRST_KEEP".."$OLD_HEAD"
 
-      - name: Rebuild preview history
+
+      - name: Create rebuilt history
         run: |
           set -e
 
@@ -88,23 +85,29 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "GitHub Actions Bot"
 
-          echo "Create clean branch"
+          mkdir ../current-source
 
-          git checkout "$FIRST_KEEP"
+          git archive "$OLD_HEAD" | tar -x -C ../current-source
 
-          git checkout -b clean-main
+          git checkout --orphan clean-main
 
-          echo ""
-          echo "Cherry-pick recent history"
+          git rm -rf . >/dev/null 2>&1 || true
+
+          cp -a ../current-source/. .
+
+          git add .
+
+          git commit -m "Initial history snapshot"
+
+          echo "Apply recent commits"
 
           git cherry-pick "$FIRST_KEEP".."$OLD_HEAD" || true
 
           while git rev-parse --verify CHERRY_PICK_HEAD >/dev/null 2>&1
           do
-            echo "Skip empty cherry-pick"
-
             git cherry-pick --skip || true
           done
+
 
       - name: Compare result
         run: |
@@ -124,10 +127,10 @@ jobs:
 
           echo ""
 
-          echo "Preview latest commits:"
-          git log clean-main --oneline -20
+          echo "Preview history:"
+          git log clean-main --oneline -30
 
           echo ""
 
-          echo "Preview repository size:"
+          echo "Repository size:"
           du -sh .git
