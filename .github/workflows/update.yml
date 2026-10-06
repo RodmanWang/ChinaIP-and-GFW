@@ -132,11 +132,15 @@ jobs:
         #汇总，字符格式排序，删除空行，注释行，重复行
         awk '!/^( *#.*| *$)/' dist3/*.conf | awk '!seen[$0]++' | sort -t. -k1 | grep -Ev "^$|^\s*#" > dist3/China2.conf
         #
-        #生成不包含exclude-domestic.txt文本中整行域名的的国内域名列表
-        grep -Fvxf dist3/exclude-domestic.txt dist3/China2.conf | awk '!/^( *#.*| *$)/' > dist3/China3.conf
+        #清理exclude-domestic.txt，去除空行、注释、CR字符
+        sed 's/\r$//' dist3/exclude-domestic.txt | awk '!/^( *#.*| *$)/' > dist3/exclude-domestic.tmp
+        #
+        #生成不包含exclude-domestic.txt文本中整行域名的国内域名列表
+        grep -Fvxf dist3/exclude-domestic.tmp dist3/China2.conf | awk '!/^( *#.*| *$)/' > dist3/China3.conf
         #
         #提取China3.conf中不包含"."的行并在行首添加"."，然后将结果保存到China4.conf中
         grep -v '\.' dist3/China3.conf | sed 's/^/./' > dist3/China4.conf
+        #
         #删除China3.conf中与China4.conf中每行数据作为后缀匹配的域名
         grep -Fvf dist3/China4.conf dist3/China3.conf > dist3/ChinaDomain3.conf
         #
