@@ -20,24 +20,13 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Install git-filter-repo
-        run: |
-          sudo apt update
-          sudo apt install -y git-filter-repo
-
-      - name: Find first commit to keep
+      - name: Find cutoff
         run: |
           set -e
 
           KEEP_DAYS=180
 
           CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
-
-          echo "Keep days:"
-          echo "$KEEP_DAYS"
-
-          echo "Cutoff:"
-          date -d "@$CUTOFF"
 
           FIRST_KEEP=""
 
@@ -53,52 +42,59 @@ jobs:
           done < <(git rev-list --reverse HEAD)
 
           if [ -z "$FIRST_KEEP" ]; then
-            echo "No cleanup required"
+            echo "Nothing to clean"
             exit 0
           fi
 
           echo "$FIRST_KEEP" > /tmp/first_keep
 
-          echo "First keep commit:"
-          cat /tmp/first_keep
+          echo "Keep from:"
+          git show -s --format="%h %ad %s" --date=short "$FIRST_KEEP"
 
-      - name: Rewrite history
+
+      - name: Rebuild clean history
         run: |
           set -e
 
           FIRST_KEEP=$(cat /tmp/first_keep)
 
-          python3 > /tmp/filter.py <<PY
-KEEP_COMMIT = b"$FIRST_KEEP"
+          OLD_HEAD=$(git rev-parse HEAD)
 
-def callback(commit, metadata):
-    if commit.original_id == KEEP_COMMIT:
-        commit.parents = []
+          mkdir /tmp/source
 
-PY
+          git archive "$OLD_HEAD" | tar -x -C /tmp/source
 
-          echo "Before cleanup:"
-          git rev-list --count HEAD
+          git checkout --orphan clean-main
 
-          git filter-repo \
-            --force \
-            --commit-callback "$(cat /tmp/filter.py)"
+          git rm -rf . >/dev/null 2>&1 || true
 
-      - name: Verify result
+          cp -a /tmp/source/. .
+
+          git add .
+
+          git commit -m "Initial history snapshot"
+
+          echo "Apply recent commits"
+
+          git cherry-pick "$FIRST_KEEP".."$OLD_HEAD" || true
+
+          while git rev-parse --verify CHERRY_PICK_HEAD >/dev/null 2>&1
+          do
+            git cherry-pick --skip || true
+          done
+
+
+      - name: Verify
         run: |
           set -e
-
-          echo "===================="
 
           echo "Commit count:"
           git rev-list --count HEAD
 
           echo ""
 
-          echo "Latest commits:"
           git log --oneline -30
 
           echo ""
 
-          echo "Repository size:"
           du -sh .git
