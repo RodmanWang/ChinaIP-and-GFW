@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Prepare test copy
+      - name: Prepare test repository
         run: |
           set -e
 
@@ -28,7 +28,7 @@ jobs:
 
           git clone . ../rewrite-test
 
-      - name: Calculate commits
+      - name: Calculate keep commits
         run: |
           set -e
 
@@ -36,19 +36,32 @@ jobs:
 
           CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
 
+          echo "Keep days:"
+          echo "$KEEP_DAYS"
+
+          echo "Cutoff:"
+          date -d "@$CUTOFF"
+
           cd ../rewrite-test
 
           OLD_HEAD=$(git rev-parse HEAD)
 
-          FIRST_KEEP=$(git rev-list --reverse HEAD | while read COMMIT
+          FIRST_KEEP=""
+
+          while read COMMIT
           do
             TIME=$(git show -s --format=%ct "$COMMIT")
 
             if [ "$TIME" -ge "$CUTOFF" ]; then
-              echo "$COMMIT"
+              FIRST_KEEP="$COMMIT"
               break
             fi
-          done)
+          done < <(git rev-list --reverse HEAD)
+
+          if [ -z "$FIRST_KEEP" ]; then
+            echo "No cleanup required"
+            exit 0
+          fi
 
           echo "$OLD_HEAD" > /tmp/old_head
           echo "$FIRST_KEEP" > /tmp/first_keep
@@ -58,6 +71,9 @@ jobs:
 
           echo "First keep:"
           cat /tmp/first_keep
+
+          echo "Commits to keep:"
+          git rev-list --count "$FIRST_KEEP".."$OLD_HEAD"
 
       - name: Rebuild preview history
         run: |
@@ -81,12 +97,13 @@ jobs:
 
           git commit -m "Initial history snapshot"
 
-          git cherry-pick "$FIRST_KEEP" "$OLD_HEAD" || true
+          git cherry-pick "$FIRST_KEEP".."$OLD_HEAD"
 
       - name: Compare result
         run: |
           set -e
 
+          echo "===================="
           echo "Original commits:"
           cd "$GITHUB_WORKSPACE"
           git rev-list --count HEAD
