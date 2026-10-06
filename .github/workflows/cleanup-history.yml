@@ -20,13 +20,19 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Find cutoff
+      - name: Find cutoff commit
         run: |
           set -e
 
           KEEP_DAYS=180
 
           CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
+
+          echo "Keep days:"
+          echo "$KEEP_DAYS"
+
+          echo "Cutoff:"
+          date -d "@$CUTOFF"
 
           FIRST_KEEP=""
 
@@ -42,59 +48,79 @@ jobs:
           done < <(git rev-list --reverse HEAD)
 
           if [ -z "$FIRST_KEEP" ]; then
-            echo "Nothing to clean"
+            echo "No cleanup required"
             exit 0
           fi
 
           echo "$FIRST_KEEP" > /tmp/first_keep
 
-          echo "Keep from:"
+          echo "First commit to keep:"
           git show -s --format="%h %ad %s" --date=short "$FIRST_KEEP"
-
 
       - name: Rebuild clean history
         run: |
           set -e
 
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "GitHub Actions Bot"
+
           FIRST_KEEP=$(cat /tmp/first_keep)
 
           OLD_HEAD=$(git rev-parse HEAD)
 
-          mkdir /tmp/source
+          echo "Save current source"
 
-          git archive "$OLD_HEAD" | tar -x -C /tmp/source
+          mkdir -p /tmp/current-source
+
+          git archive "$OLD_HEAD" | tar -x -C /tmp/current-source
+
+          echo "Create clean branch"
 
           git checkout --orphan clean-main
 
           git rm -rf . >/dev/null 2>&1 || true
 
-          cp -a /tmp/source/. .
+          cp -a /tmp/current-source/. .
 
           git add .
 
           git commit -m "Initial history snapshot"
 
-          echo "Apply recent commits"
+          echo "Apply recent history"
 
           git cherry-pick "$FIRST_KEEP".."$OLD_HEAD" || true
 
           while git rev-parse --verify CHERRY_PICK_HEAD >/dev/null 2>&1
           do
-            git cherry-pick --skip || true
+            echo "Resolve conflict automatically"
+
+            git checkout --theirs .
+
+            git add .
+
+            git cherry-pick --continue || git cherry-pick --skip || true
           done
 
-
-      - name: Verify
+      - name: Verify result
         run: |
           set -e
 
-          echo "Commit count:"
+          echo "===================="
+
+          echo "Original commits:"
+          git rev-list --count main
+
+          echo ""
+
+          echo "Preview commits:"
           git rev-list --count HEAD
 
           echo ""
 
+          echo "Latest commits:"
           git log --oneline -30
 
           echo ""
 
+          echo "Repository size:"
           du -sh .git
