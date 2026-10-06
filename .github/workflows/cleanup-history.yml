@@ -24,13 +24,11 @@ jobs:
         run: |
           set -e
 
-          mkdir ../original
-
           rsync -a --exclude=.git ./ ../original/
 
           git clone . ../rewrite-test
 
-      - name: Calculate history range
+      - name: Calculate commits
         run: |
           set -e
 
@@ -38,13 +36,11 @@ jobs:
 
           CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
 
-          echo "Keep days: $KEEP_DAYS"
-          echo "Cutoff:"
-          date -d "@$CUTOFF"
-
           cd ../rewrite-test
 
-          FIRST_KEEP=$(git rev-list --reverse main | while read COMMIT
+          OLD_HEAD=$(git rev-parse HEAD)
+
+          FIRST_KEEP=$(git rev-list --reverse HEAD | while read COMMIT
           do
             TIME=$(git show -s --format=%ct "$COMMIT")
 
@@ -54,10 +50,14 @@ jobs:
             fi
           done)
 
-          echo "First commit kept:"
-          echo "$FIRST_KEEP"
+          echo "$OLD_HEAD" > /tmp/old_head
+          echo "$FIRST_KEEP" > /tmp/first_keep
 
-          echo "$FIRST_KEEP" > /tmp/first_keep_commit
+          echo "Old head:"
+          cat /tmp/old_head
+
+          echo "First keep:"
+          cat /tmp/first_keep
 
       - name: Rebuild preview history
         run: |
@@ -65,12 +65,8 @@ jobs:
 
           cd ../rewrite-test
 
-          FIRST_KEEP=$(cat /tmp/first_keep_commit)
-
-          if [ -z "$FIRST_KEEP" ]; then
-            echo "No cleanup required"
-            exit 0
-          fi
+          OLD_HEAD=$(cat /tmp/old_head)
+          FIRST_KEEP=$(cat /tmp/first_keep)
 
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "GitHub Actions Bot"
@@ -85,7 +81,7 @@ jobs:
 
           git commit -m "Initial history snapshot"
 
-          git cherry-pick "$FIRST_KEEP"..main || true
+          git cherry-pick "$FIRST_KEEP" "$OLD_HEAD" || true
 
       - name: Compare result
         run: |
@@ -93,7 +89,7 @@ jobs:
 
           echo "Original commits:"
           cd "$GITHUB_WORKSPACE"
-          git rev-list --count main
+          git rev-list --count HEAD
 
           echo ""
 
