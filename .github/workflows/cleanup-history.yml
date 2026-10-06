@@ -73,7 +73,7 @@ jobs:
           cat /tmp/first_keep
 
           echo ""
-          echo "Commits kept:"
+          echo "Commits to keep:"
           git rev-list --count "$FIRST_KEEP".."$OLD_HEAD"
 
       - name: Rebuild preview history
@@ -97,13 +97,21 @@ jobs:
           echo ""
           echo "Cherry-pick recent history"
 
-          git cherry-pick "$FIRST_KEEP".."$OLD_HEAD"
+          git cherry-pick "$FIRST_KEEP".."$OLD_HEAD" || true
+
+          while git rev-parse --verify CHERRY_PICK_HEAD >/dev/null 2>&1
+          do
+            echo "Skip empty cherry-pick"
+
+            git cherry-pick --skip || true
+          done
 
       - name: Compare result
         run: |
           set -e
 
           echo "===================="
+
           echo "Original commits:"
           cd "$GITHUB_WORKSPACE"
           git rev-list --count HEAD
