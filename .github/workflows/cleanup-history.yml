@@ -20,7 +20,12 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Find cutoff commit
+      - name: Install git-filter-repo
+        run: |
+          sudo apt update
+          sudo apt install -y git-filter-repo
+
+      - name: Find first commit to keep
         run: |
           set -e
 
@@ -30,6 +35,9 @@ jobs:
 
           echo "Keep days:"
           echo "$KEEP_DAYS"
+
+          echo "Cutoff:"
+          date -d "@$CUTOFF"
 
           FIRST_KEEP=""
 
@@ -51,41 +59,46 @@ jobs:
 
           echo "$FIRST_KEEP" > /tmp/first_keep
 
-          echo "First kept commit:"
+          echo "First keep commit:"
           cat /tmp/first_keep
 
-      - name: Rewrite history preview
+      - name: Rewrite history
         run: |
           set -e
 
           FIRST_KEEP=$(cat /tmp/first_keep)
 
-          git checkout -b cleanup-preview "$FIRST_KEEP"
+          python3 > /tmp/filter.py <<PY
+KEEP_COMMIT = b"$FIRST_KEEP"
 
-          echo "Before:"
+def callback(commit, metadata):
+    if commit.original_id == KEEP_COMMIT:
+        commit.parents = []
+
+PY
+
+          echo "Before cleanup:"
           git rev-list --count HEAD
 
-          git checkout main
-
-          git filter-branch \
+          git filter-repo \
             --force \
-            --env-filter '
-            ' \
-            -- --all
+            --commit-callback "$(cat /tmp/filter.py)"
 
-          git checkout cleanup-preview
-
-          echo "After:"
-          git rev-list --count HEAD
-
-      - name: Verify
+      - name: Verify result
         run: |
           set -e
 
-          echo "Commit list:"
+          echo "===================="
+
+          echo "Commit count:"
+          git rev-list --count HEAD
+
+          echo ""
+
+          echo "Latest commits:"
           git log --oneline -30
 
           echo ""
 
-          echo "Count:"
-          git rev-list --count HEAD
+          echo "Repository size:"
+          du -sh .git
