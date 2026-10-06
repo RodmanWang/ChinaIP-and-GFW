@@ -24,11 +24,9 @@ jobs:
         run: |
           set -e
 
-          rsync -a --exclude=.git ./ ../original/
-
           git clone . ../rewrite-test
 
-      - name: Calculate keep commits
+      - name: Calculate history range
         run: |
           set -e
 
@@ -39,7 +37,7 @@ jobs:
           echo "Keep days:"
           echo "$KEEP_DAYS"
 
-          echo "Cutoff:"
+          echo "Cutoff date:"
           date -d "@$CUTOFF"
 
           cd ../rewrite-test
@@ -66,13 +64,16 @@ jobs:
           echo "$OLD_HEAD" > /tmp/old_head
           echo "$FIRST_KEEP" > /tmp/first_keep
 
-          echo "Old head:"
+          echo ""
+          echo "Old HEAD:"
           cat /tmp/old_head
 
-          echo "First keep:"
+          echo ""
+          echo "First kept commit:"
           cat /tmp/first_keep
 
-          echo "Commits to keep:"
+          echo ""
+          echo "Commits kept:"
           git rev-list --count "$FIRST_KEEP".."$OLD_HEAD"
 
       - name: Rebuild preview history
@@ -87,15 +88,14 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "GitHub Actions Bot"
 
-          git checkout --orphan clean-main
+          echo "Create clean branch"
 
-          git rm -rf . >/dev/null 2>&1 || true
+          git checkout "$FIRST_KEEP"
 
-          rsync -a ../original/ ./
+          git checkout -b clean-main
 
-          git add .
-
-          git commit -m "Initial history snapshot"
+          echo ""
+          echo "Cherry-pick recent history"
 
           git cherry-pick "$FIRST_KEEP".."$OLD_HEAD"
 
