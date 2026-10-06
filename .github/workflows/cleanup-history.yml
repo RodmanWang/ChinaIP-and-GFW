@@ -1,15 +1,15 @@
-name: Preview ChinaIP-and-GFW history rebuild
+name: Preview ChinaIP-and-GFW history cleanup
 
 on:
   workflow_dispatch:
 
 concurrency:
-  group: preview-chinaip-history-rebuild
+  group: preview-chinaip-history-cleanup
   cancel-in-progress: true
 
 jobs:
   preview:
-    name: Preview history rebuild
+    name: Preview history cleanup
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -20,13 +20,20 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Prepare repository
+      - name: Install tools
+        run: |
+          sudo apt update
+          sudo apt install -y git-filter-repo
+
+      - name: Backup current tree
         run: |
           set -e
 
-          git clone . ../rewrite-test
+          git archive HEAD | tar -x -C /tmp
 
-      - name: Calculate history range
+          echo "Current source saved"
+
+      - name: Find cutoff commit
         run: |
           set -e
 
@@ -34,9 +41,11 @@ jobs:
 
           CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
 
-          cd ../rewrite-test
+          echo "Keep days:"
+          echo "$KEEP_DAYS"
 
-          OLD_HEAD=$(git rev-parse HEAD)
+          echo "Cutoff:"
+          date -d "@$CUTOFF"
 
           FIRST_KEEP=""
 
@@ -56,79 +65,43 @@ jobs:
             exit 0
           fi
 
-          echo "$OLD_HEAD" > /tmp/old_head
           echo "$FIRST_KEEP" > /tmp/first_keep
 
-          echo "Old head:"
-          cat /tmp/old_head
-
-          echo ""
-
-          echo "First commit kept:"
+          echo "First kept commit:"
           cat /tmp/first_keep
 
-          echo ""
 
-          echo "Commits after cutoff:"
-          git rev-list --count "$FIRST_KEEP".."$OLD_HEAD"
-
-
-      - name: Create rebuilt history
+      - name: Rewrite history
         run: |
           set -e
 
-          cd ../rewrite-test
-
-          OLD_HEAD=$(cat /tmp/old_head)
           FIRST_KEEP=$(cat /tmp/first_keep)
 
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git config user.name "GitHub Actions Bot"
+          cat > /tmp/filter.py <<'PY'
+commit = commit
+PY
 
-          mkdir ../current-source
-
-          git archive "$OLD_HEAD" | tar -x -C ../current-source
-
-          git checkout --orphan clean-main
-
-          git rm -rf . >/dev/null 2>&1 || true
-
-          cp -a ../current-source/. .
-
-          git add .
-
-          git commit -m "Initial history snapshot"
-
-          echo "Apply recent commits"
-
-          git cherry-pick "$FIRST_KEEP".."$OLD_HEAD" || true
-
-          while git rev-parse --verify CHERRY_PICK_HEAD >/dev/null 2>&1
-          do
-            git cherry-pick --skip || true
-          done
+          git filter-repo \
+            --force \
+            --commit-callback '
+if commit.original_id == b"'$(git rev-parse "$FIRST_KEEP")'":
+    commit.parents = []
+'
 
 
-      - name: Compare result
+      - name: Verify result
         run: |
           set -e
 
           echo "===================="
 
-          echo "Original commits:"
-          cd "$GITHUB_WORKSPACE"
+          echo "Commit count:"
           git rev-list --count HEAD
 
           echo ""
 
-          echo "Preview commits:"
-          cd ../rewrite-test
-          git rev-list --count clean-main
-
-          echo ""
-
-          echo "Preview history:"
-          git log clean-main --oneline -30
+          echo "Latest commits:"
+          git log --oneline -30
 
           echo ""
 
