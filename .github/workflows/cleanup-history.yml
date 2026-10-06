@@ -1,15 +1,15 @@
-name: Check ChinaIP-and-GFW history
+name: Preview ChinaIP-and-GFW history cleanup
 
 on:
   workflow_dispatch:
 
 concurrency:
-  group: check-chinaip-gfw-history
+  group: preview-chinaip-gfw-cleanup
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Check git history
+  preview:
+    name: Preview cleanup result
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -20,42 +20,48 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Check repository history
+      - name: Install tools
+        run: |
+          sudo apt update
+          sudo apt install -y git-filter-repo
+
+      - name: Create preview cleanup
         run: |
           set -e
 
           KEEP_DAYS=180
 
-          echo "Keep days:"
-          echo "$KEEP_DAYS"
-
           CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
 
-          echo ""
-          echo "Cutoff timestamp:"
-          echo "$CUTOFF"
-
-          echo ""
-          echo "Cutoff date:"
+          echo "Keep days: $KEEP_DAYS"
+          echo "Cutoff:"
           date -d "@$CUTOFF"
 
-          echo ""
-          echo "Total commits:"
+          git clone . ../clean-preview
+
+          cd ../clean-preview
+
+          git filter-repo \
+            --force \
+            --commit-callback "if int(commit.author_date.split()[0]) < $CUTOFF: commit.skip()"
+
+      - name: Compare result
+        run: |
+          echo "Original commits:"
           git rev-list --count HEAD
 
           echo ""
-          echo "Latest commits:"
+
+          echo "Preview commits:"
+          cd ../clean-preview
+          git rev-list --count HEAD
+
+          echo ""
+
+          echo "Preview latest commits:"
           git log --oneline -20
 
           echo ""
-          echo "Oldest commit:"
-          git log --reverse --format="%h %ad %s" --date=short | head -1
 
-          echo ""
-          echo "Newest commit:"
-          git log -1 --format="%h %ad %s" --date=short
-
-      - name: Check repository size
-        run: |
-          echo "Git size:"
+          echo "Preview size:"
           du -sh .git
