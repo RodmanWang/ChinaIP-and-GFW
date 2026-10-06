@@ -1,24 +1,24 @@
-name: Check ad history cleanup
+name: Check ChinaIP-and-GFW history
 
 on:
   workflow_dispatch:
 
 concurrency:
-  group: check-ad-history-cleanup
+  group: check-chinaip-gfw-history
   cancel-in-progress: true
 
 jobs:
-  cleanup:
+  check:
     name: Check git history
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
-      - name: Checkout master history
+      - name: Checkout main history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: master
+          ref: main
 
       - name: Check repository history
         run: |
@@ -30,6 +30,10 @@ jobs:
           echo "$KEEP_DAYS"
 
           CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
+
+          echo ""
+          echo "Cutoff timestamp:"
+          echo "$CUTOFF"
 
           echo ""
           echo "Cutoff date:"
@@ -53,4 +57,5 @@ jobs:
 
       - name: Check repository size
         run: |
+          echo "Git size:"
           du -sh .git
