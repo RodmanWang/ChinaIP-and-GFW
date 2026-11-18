@@ -87,8 +87,8 @@ jobs:
       - name: 设置清理参数
         id: settings
         env:
-          INPUT_DAYS: ${{ inputs.保留天数 }}
-          INPUT_COUNT: ${{ inputs.保留数量 }}
+          INPUT_DAYS: ${{ github.event.inputs['保留天数'] }}
+          INPUT_COUNT: ${{ github.event.inputs['保留数量'] }}
         shell: bash
         run: |
           set -euo pipefail
