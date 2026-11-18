@@ -11,18 +11,18 @@ on:
       保留天数:
         description: "保留最近多少天的 Actions 运行记录和 main 分支提交？"
         required: true
-        default: 3
+        default: 7
         type: number
 
       保留数量:
         description: "在保留天数范围内，最多保留多少条 Actions 运行记录和 main 主线提交？"
         required: true
-        default: 7
+        default: 30
         type: number
 
   # 每天北京时间 03:30 自动运行
   schedule:
-    - cron: '30 19 * * *'
+    - cron: '30 */8 * * *'
 
   push:
     branches:
