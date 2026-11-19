@@ -46,8 +46,8 @@ jobs:
       GH_REPO: ${{ github.repository }}
       DEFAULT_BRANCH: main
 
-      DEFAULT_RETENTION_DAYS: "3"
-      DEFAULT_RETENTION_COUNT: "7"
+      DEFAULT_RETENTION_DAYS: "7"
+      DEFAULT_RETENTION_COUNT: "30"
 
     steps:
       # 0. 检查 PERSON_TOKEN
