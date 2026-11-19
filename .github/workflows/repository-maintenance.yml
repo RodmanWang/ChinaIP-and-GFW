@@ -1,0 +1,822 @@
+name: ChinaIP-and-GFW Maintenance
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      workflow_runs_keep_days:
+        description: "Workflow Runs retention (days)"
+        required: false
+        default: 7 # RETENTION_DEFAULT_RUNS
+        type: number
+
+      commits_keep_days:
+        description: "Main Commits retention (days)"
+        required: false
+        default: 30 # RETENTION_DEFAULT_COMMITS
+        type: number
+
+      update_interval_hours:
+        description: "Automatic update interval (hours)"
+        required: false
+        default: 23 # RETENTION_DEFAULT_INTERVAL
+        type: number
+
+  # 每15分钟检查一次，按用户设置的间隔执行更新
+  schedule:
+  - cron: '7,22,37,52 * * * *'
+
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/README.md"
+      - ".github/workflows/repository-maintenance.yml"
+      - ".github/maintenance-state.json"
+
+concurrency:
+  group: chinaip-and-gfw-maintenance
+  cancel-in-progress: false
+
+jobs:
+  maintenance:
+    name: Build, Publish and Cleanup
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      GH_TOKEN: ${{ secrets.PERSON_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+
+      DEFAULT_RUNS_DAYS: "7" # RETENTION_DEFAULT_RUNS
+      DEFAULT_COMMITS_DAYS: "30" # RETENTION_DEFAULT_COMMITS
+      DEFAULT_UPDATE_INTERVAL: "23" # RETENTION_DEFAULT_INTERVAL
+
+    steps:
+      # 0. 检查 PERSON_TOKEN
+      - name: Validate PERSON_TOKEN
+        shell: bash
+        env:
+          PERSON_TOKEN: ${{ secrets.PERSON_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$PERSON_TOKEN" ]; then
+            echo "::error::Repository secret PERSON_TOKEN is missing."
+            exit 1
+          fi
+
+          echo "PERSON_TOKEN is configured."
+
+      # 1. Checkout main
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.PERSON_TOKEN }}
+          persist-credentials: true
+
+      # 2. Configure Git
+      - name: Configure Git
+        run: |
+          set -euo pipefail
+
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "GitHub Actions Bot"
+
+      # 3. Resolve settings
+      - name: Set maintenance settings
+        id: settings
+        env:
+          INPUT_RUNS_DAYS: ${{ inputs.workflow_runs_keep_days }}
+          INPUT_COMMITS_DAYS: ${{ inputs.commits_keep_days }}
+          INPUT_UPDATE_INTERVAL: ${{ inputs.update_interval_hours }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            RUNS_DAYS="${INPUT_RUNS_DAYS:-$DEFAULT_RUNS_DAYS}"
+            COMMITS_DAYS="${INPUT_COMMITS_DAYS:-$DEFAULT_COMMITS_DAYS}"
+            UPDATE_INTERVAL="${INPUT_UPDATE_INTERVAL:-$DEFAULT_UPDATE_INTERVAL}"
+          else
+            RUNS_DAYS="$DEFAULT_RUNS_DAYS"
+            COMMITS_DAYS="$DEFAULT_COMMITS_DAYS"
+            UPDATE_INTERVAL="$DEFAULT_UPDATE_INTERVAL"
+          fi
+
+          if ! [[ "$RUNS_DAYS" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::Workflow Runs retention must be a positive integer."
+            exit 1
+          fi
+
+          if ! [[ "$COMMITS_DAYS" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::Main commits retention must be a positive integer."
+            exit 1
+          fi
+
+          if ! [[ "$UPDATE_INTERVAL" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::Update interval must be a positive integer."
+            exit 1
+          fi
+
+          echo "runs_days=$RUNS_DAYS" >> "$GITHUB_OUTPUT"
+          echo "commits_days=$COMMITS_DAYS" >> "$GITHUB_OUTPUT"
+          echo "update_interval=$UPDATE_INTERVAL" >> "$GITHUB_OUTPUT"
+
+          echo "================================"
+          echo "Workflow Runs retention: $RUNS_DAYS days"
+          echo "Main commits retention: $COMMITS_DAYS days"
+          echo "Update interval: $UPDATE_INTERVAL hours"
+          echo "================================"
+
+          {
+            echo "## Maintenance Settings"
+            echo ""
+            echo "- Workflow Runs retention: **$RUNS_DAYS days**"
+            echo "- Main commits retention: **$COMMITS_DAYS days**"
+            echo "- Automatic update interval: **$UPDATE_INTERVAL hours**"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 4. Remember manual settings
+      - name: Remember manual settings
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        env:
+          NEW_RUNS_DAYS: ${{ steps.settings.outputs.runs_days }}
+          NEW_COMMITS_DAYS: ${{ steps.settings.outputs.commits_days }}
+          NEW_UPDATE_INTERVAL: ${{ steps.settings.outputs.update_interval }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          WORKFLOW_FILE=".github/workflows/repository-maintenance.yml"
+
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          path = Path(".github/workflows/repository-maintenance.yml")
+          content = path.read_text()
+
+          values = [
+              ("RETENTION_DEFAULT_RUNS", os.environ["NEW_RUNS_DAYS"]),
+              ("RETENTION_DEFAULT_COMMITS", os.environ["NEW_COMMITS_DAYS"]),
+              ("RETENTION_DEFAULT_INTERVAL", os.environ["NEW_UPDATE_INTERVAL"]),
+          ]
+
+          for marker, value in values:
+              pattern = (
+                  r'(?m)^(\s*default:\s*)\d+(\s+# '
+                  + re.escape(marker)
+                  + r')$'
+              )
+
+              content, count = re.subn(
+                  pattern,
+                  lambda m: m.group(1) + value + m.group(2),
+                  content
+              )
+
+              if count != 1:
+                  raise SystemExit(
+                      f"Could not update input default: {marker}"
+                  )
+
+              env_names = {
+                  "RETENTION_DEFAULT_RUNS": "DEFAULT_RUNS_DAYS",
+                  "RETENTION_DEFAULT_COMMITS": "DEFAULT_COMMITS_DAYS",
+                  "RETENTION_DEFAULT_INTERVAL": "DEFAULT_UPDATE_INTERVAL",
+              }
+
+              env_name = env_names[marker]
+
+              env_pattern = (
+                  r'(?m)^(\s*'
+                  + re.escape(env_name)
+                  + r':\s*)"\d+"(\s+# '
+                  + re.escape(marker)
+                  + r')$'
+              )
+
+              content, count = re.subn(
+                  env_pattern,
+                  lambda m: m.group(1) + '"' + value + '"' + m.group(2),
+                  content
+              )
+
+              if count != 1:
+                  raise SystemExit(
+                      f"Could not update environment default: {marker}"
+                  )
+
+          path.write_text(content)
+          print("All manual settings saved.")
+          PY
+
+          git add "$WORKFLOW_FILE"
+
+          if git diff --cached --quiet; then
+            echo "Settings unchanged. No commit required."
+          else
+            git commit -m "chore: update maintenance defaults [skip ci]"
+            git push origin HEAD:main
+            echo "New defaults saved to main."
+          fi
+
+      # 5. Check automatic update interval
+      - name: Check automatic update interval
+        id: gate
+        env:
+          UPDATE_INTERVAL: ${{ steps.settings.outputs.update_interval }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SHOULD_RUN=false
+          NOW=$(date -u +%s)
+
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            SHOULD_RUN=true
+            echo "Manual trigger: run immediately."
+
+          elif [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            SHOULD_RUN=true
+            echo "Main branch update detected."
+
+          else
+            STATE_FILE=".github/maintenance-state.json"
+
+            if [ -f "$STATE_FILE" ]; then
+              LAST_UPDATE=$(python3 -c \
+                'import json; print(json.load(open(".github/maintenance-state.json")).get("last_update_epoch", 0))')
+            else
+              LAST_UPDATE=0
+            fi
+
+            if ! [[ "$LAST_UPDATE" =~ ^[0-9]+$ ]]; then
+              LAST_UPDATE=0
+            fi
+
+            INTERVAL_SECONDS=$((UPDATE_INTERVAL * 3600))
+            ELAPSED=$((NOW - LAST_UPDATE))
+
+            echo "Last update: $LAST_UPDATE"
+            echo "Elapsed seconds: $ELAPSED"
+            echo "Required seconds: $INTERVAL_SECONDS"
+
+            if [ "$LAST_UPDATE" -eq 0 ] ||
+               [ "$ELAPSED" -ge "$INTERVAL_SECONDS" ]; then
+              SHOULD_RUN=true
+              echo "Update interval reached."
+            else
+              REMAINING=$((INTERVAL_SECONDS - ELAPSED))
+              echo "Not yet due. Remaining seconds: $REMAINING"
+            fi
+          fi
+
+          echo "run_maintenance=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
+
+          if [ "$SHOULD_RUN" = "false" ]; then
+            echo "Maintenance skipped."
+          fi
+
+      # 6. Delete old Workflow Runs
+      - name: Delete old Workflow Runs
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        uses: Mattraks/delete-workflow-runs@v2.1.0
+        with:
+          token: ${{ secrets.PERSON_TOKEN }}
+          retain_days: ${{ steps.settings.outputs.runs_days }}
+          keep_minimum_runs: 7
+
+      # 7. Set up Go
+      - name: Set up Go
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.4'
+
+      # 8. Get dependencies
+      - name: Get dependencies
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          go get -v -t -d ./...
+
+          if [ -f Gopkg.toml ]; then
+            curl -LR -o /tmp/dep-install.sh \
+              https://raw.githubusercontent.com/golang/dep/master/install.sh
+            sh /tmp/dep-install.sh
+            dep ensure
+          fi
+
+      # 9. Create dist folders
+      - name: Create dist folders
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p dist
+          mkdir -p dist2
+          mkdir -p dist3
+          mkdir -p dist4
+
+      # 10. Compile GeoIP conversion binary
+      - name: Compile GeoIP conversion binary
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+          /bin/bash ./build.sh
+
+      # 11. Obtain source lists
+      - name: Obtain source lists
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          # China IP
+          curl -fLR -o dist/ChinaIPv4-1.txt \
+            "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
+
+          curl -fLR -o dist/ChinaIPv4-2.txt \
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
+
+          curl -fLR -o dist/ChinaIPv6.txt \
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+
+          curl -fLR -o dist/exclude-domestic-ip.conf \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-domestic-ip.txt"
+
+          # Bogus-Nxdomain
+          curl -fLR -o dist2/bogus-nxdomain1.txt \
+            "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
+
+          curl -fLR -o dist2/bogus-nxdomain2.conf \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/bogus-nxdomain-added.txt"
+
+          curl -fLR -o dist2/bogus-nxdomain3.txt \
+            "https://urlhaus-filter.pages.dev/urlhaus-filter-ag-online.txt"
+
+          # Domestic domains
+          curl -fLR -o dist3/domains.china.txt \
+            "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
+
+          curl -fLR -o dist3/domestic-added.conf \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-added.txt"
+
+          curl -fLR -o dist3/exclude-domestic.txt \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-domestic.txt"
+
+          # GFW
+          curl -fLR -o dist4/gfw2.txt \
+            "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
+
+          curl -fLR -o dist4/gfw3.txt \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-added.txt"
+
+          curl -fLR -o dist4/exclude-gfw.conf \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-gfw.txt"
+
+      # 12. Merge China IP lists
+      - name: Merge China IP lists
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          awk '!/^( *#.*| *$)/' dist/*.txt > dist/China-IP.txt
+
+          awk '!seen[$0]++' dist/China-IP.txt |
+            grep -Ev "^$|^\s*#" |
+            awk -F. '$1~/^[0-9]+$/{print "ipv4",$0;next} {print "ipv6",$0}' |
+            sort -t' ' -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n |
+            awk '{print $2}' |
+            sort -t. -k1,1n -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n \
+            > dist/ChinaIPv4v6.txt
+
+          awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' \
+            dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt |
+            grep -Ev "^$|^\s*#" > dist/ChinaIP.txt
+
+          awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' \
+            dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt |
+            grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
+
+          awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' \
+            dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt |
+            grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt
+
+          awk '{print "blacklist-ip " $0}' \
+            dist/ChinaIP.txt > dist/BlacklistIP.conf
+
+          awk '{print "whitelist-ip " $0}' \
+            dist/ChinaIP.txt > dist/WhitelistIP.conf
+
+      # 13. Merge Bogus-Nxdomain lists
+      - name: Merge Bogus-Nxdomain lists
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          awk '!/^[[:space:]]*(#|$)/' \
+            dist2/bogus-nxdomain1.txt > dist2/bogus-nxdomain1-1.txt
+
+          awk '{sub(/bogus-nxdomain=/,""); print}' \
+            dist2/bogus-nxdomain1-1.txt > dist2/bogus-nxdomain1.conf
+
+          awk '{sub(/\|\|/,""); sub(/\$all/,""); print}' \
+            dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3-1.txt
+
+          awk '!/^[[:space:]]*(#|$)/ && /([0-9]{1,3}\.){3}[0-9]{1,3}/ && !/[^0-9.]/' \
+            dist2/bogus-nxdomain3-1.txt > dist2/bogus-nxdomain3.txt
+
+          awk '{
+            split($0,a,".");
+            if(a[1]<=255&&a[2]<=255&&a[3]<=255&&a[4]<=255) print
+          }' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3.conf
+
+          awk '!seen[$0]++' dist2/*.conf |
+            sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n |
+            grep -Ev "^$|^\s*#" > dist2/nxdomain2.conf
+
+          awk '{print "bogus-nxdomain " $0 (index($0,":")?"/128":"/32")}' \
+            dist2/nxdomain2.conf > dist2/BogusNxdomain.conf
+
+          awk '{print "  - \x27" $0 (index($0,":")?"/128":"/32") "\x27"}' \
+            dist2/nxdomain2.conf > dist2/nxdomain3.conf
+
+          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" '
+            BEGIN { lines=0 }
+            { content[lines++] = $0 }
+            END {
+              print "payload:"
+              print "# > AD & BanIP"
+              print "# > lines: " lines
+              print "# > Times: " datetime
+              for(i=0; i<lines; i++) print content[i]
+            }' dist2/nxdomain3.conf > dist2/Ad·IP.yaml
+
+      # 14. Merge China domain lists
+      - name: Merge China domain lists
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          awk '{gsub(/server=\/|\/114\.114\.114\.114|[[:space:]]*/, "")} 1' \
+            dist3/domains.china.txt > dist3/domains.china.conf
+
+          awk '!/^( *#.*| *$)/' dist3/*.conf |
+            awk '!seen[$0]++' |
+            sort -t. -k1 |
+            grep -Ev "^$|^\s*#" > dist3/China2.conf
+
+          sed 's/\r$//' dist3/exclude-domestic.txt |
+            awk '!/^( *#.*| *$)/' > dist3/exclude-domestic.tmp
+
+          grep -Fvxf dist3/exclude-domestic.tmp dist3/China2.conf |
+            awk '!/^( *#.*| *$)/' > dist3/China3.conf
+
+          grep -v '\.' dist3/China3.conf |
+            sed 's/^/./' > dist3/China4.conf
+
+          grep -Fvf dist3/China4.conf dist3/China3.conf \
+            > dist3/ChinaDomain3.conf
+
+          sort -u dist3/ChinaDomain3.conf |
+            awk '{print "server=/"$0"/114.114.114.114"}' \
+            > dist3/ChinaDomain2.conf
+
+          sort -u dist3/ChinaDomain3.conf |
+            awk '{print "nameserver /"$0"/domestic"}' \
+            > dist3/ChinaDomain.conf
+
+          sort -u dist3/ChinaDomain3.conf |
+            awk '{print "  - DOMAIN-SUFFIX,"$0}' \
+            > dist3/ChinaDomain4.conf
+
+          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" '
+            BEGIN { lines=0 }
+            { content[lines++] = $0 }
+            END {
+              print "payload:"
+              print "# > lines: " lines
+              print "# > Times: " datetime
+              for(i=0; i<lines; i++) print content[i]
+            }' dist3/ChinaDomain4.conf > dist3/Domestic.yaml
+
+      # 15. Merge GFW domain lists
+      - name: Merge GFW domain lists
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          awk '!/^( *#.*| *$)/' dist4/*.txt > dist4/gfw1.txt
+
+          sed 's/\r$//' dist4/exclude-gfw.conf |
+            awk '!/^( *#.*| *$)/' > dist4/exclude.tmp
+
+          grep -Fvxf dist4/exclude.tmp dist4/gfw1.txt |
+            awk '!/^( *#.*| *$)/' > dist4/gfw0.txt
+
+          grep -v '\.' dist4/gfw0.txt |
+            sed 's/^/./' > dist4/gfw11.txt
+
+          grep -Fvf dist4/gfw11.txt dist4/gfw0.txt \
+            > dist4/gfw22.txt
+
+          awk '!seen[$0]++' dist4/gfw22.txt |
+            sort -t. -k1 |
+            grep -Ev "^$|^\s*#" > dist4/GFW.txt
+
+          sort -u dist4/GFW.txt |
+            sed 's/^/||/' > dist4/AutoGFW111.txt
+
+          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" '
+            BEGIN { lines=0 }
+            { content[lines++] = $0 }
+            END {
+              print "# > lines: " lines
+              print "# > Times: " datetime
+              for(i=0; i<lines; i++) print content[i]
+            }' dist4/AutoGFW111.txt > dist4/AutoGFW.txt
+
+          sort -u dist4/GFW.txt |
+            awk '{print "  - DOMAIN-SUFFIX,"$0}' \
+            > dist4/GFW00000.txt
+
+          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" '
+            BEGIN { lines=0 }
+            { content[lines++] = $0 }
+            END {
+              print "payload:"
+              print "# > lines: " lines
+              print "# > Times: " datetime
+              for(i=0; i<lines; i++) print content[i]
+            }' dist4/GFW00000.txt > dist4/Proxy.yaml
+
+          sort -u dist4/GFW.txt |
+            awk '{print "nameserver /"$0"/abroad"}' \
+            > dist4/GFW.conf
+
+      # 16. Generate GeoIP2 database
+      - name: Generate GeoIP2 database
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          CURRENT_DIR=$(pwd)
+          cd dist
+          ./ipip2mmdb -s ./ChinaIP.txt -d Country.mmdb
+          cd "$CURRENT_DIR"
+
+      # 17. Prepare release artifacts
+      - name: Prepare release artifacts
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ARTIFACT_DIR="/tmp/release-artifacts"
+          mkdir -p "$ARTIFACT_DIR"
+
+          cp dist/Country.mmdb "$ARTIFACT_DIR/"
+          cp dist/ChinaIPv4.txt "$ARTIFACT_DIR/"
+          cp dist/ChinaIPv6.txt "$ARTIFACT_DIR/"
+          cp dist/ChinaIP.txt "$ARTIFACT_DIR/"
+          cp dist/BlacklistIP.conf "$ARTIFACT_DIR/"
+          cp dist/WhitelistIP.conf "$ARTIFACT_DIR/"
+
+          cp dist2/BogusNxdomain.conf "$ARTIFACT_DIR/"
+          cp "dist2/Ad·IP.yaml" "$ARTIFACT_DIR/"
+
+          cp dist3/ChinaDomain.conf "$ARTIFACT_DIR/"
+          cp dist3/ChinaDomain2.conf "$ARTIFACT_DIR/"
+          cp dist3/ChinaDomain3.conf "$ARTIFACT_DIR/"
+          cp dist3/Domestic.yaml "$ARTIFACT_DIR/"
+
+          cp dist4/GFW.txt "$ARTIFACT_DIR/"
+          cp dist4/AutoGFW.txt "$ARTIFACT_DIR/"
+          cp dist4/GFW.conf "$ARTIFACT_DIR/"
+          cp dist4/Proxy.yaml "$ARTIFACT_DIR/"
+
+      # 18. Publish artifacts to release branch
+      - name: Publish release branch
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git checkout --orphan release-orphan
+
+          git rm -rf . >/dev/null 2>&1 || true
+          git clean -fdx
+
+          cp -a /tmp/release-artifacts/. .
+
+          git add \
+            Country.mmdb \
+            ChinaIP.txt \
+            ChinaIPv4.txt \
+            ChinaIPv6.txt \
+            GFW.txt \
+            AutoGFW.txt \
+            GFW.conf \
+            Proxy.yaml \
+            BlacklistIP.conf \
+            WhitelistIP.conf \
+            ChinaDomain.conf \
+            ChinaDomain2.conf \
+            ChinaDomain3.conf \
+            Domestic.yaml \
+            BogusNxdomain.conf \
+            "Ad·IP.yaml"
+
+          git commit --allow-empty \
+            -m "update: $(TZ=UTC-8 date '+%Y-%m-%d %H:%M:%S') [skip ci]"
+
+          git push --force origin HEAD:refs/heads/release
+
+          echo "Release branch published successfully."
+
+      # 19. Save automatic update timestamp on main
+      - name: Save automatic update timestamp
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git fetch origin main
+          git checkout -B main origin/main
+
+          mkdir -p .github
+
+          python3 - <<'PY'
+          import json
+          import time
+          from pathlib import Path
+
+          state = {
+              "last_update_epoch": int(time.time())
+          }
+
+          Path(".github/maintenance-state.json").write_text(
+              json.dumps(state, indent=2) + "\n"
+          )
+          PY
+
+          git add .github/maintenance-state.json
+
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: record automatic update timestamp [skip ci]"
+            git push origin HEAD:main
+          fi
+
+          echo "Automatic update timestamp saved."
+
+      # 20. Find old main commits
+      - name: Prepare main history cleanup
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        id: history
+        env:
+          KEEP_DAYS: ${{ steps.settings.outputs.commits_days }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Main history retention: $KEEP_DAYS days"
+
+          git fetch origin main
+          git checkout --detach refs/remotes/origin/main
+
+          OLD_HEAD=$(git rev-parse HEAD)
+          CUTOFF=$(date -u -d "$KEEP_DAYS days ago" +%s)
+
+          FIRST_COMMIT=""
+          FIRST_KEEP=""
+
+          while IFS= read -r COMMIT; do
+            [ -z "$COMMIT" ] && continue
+
+            if [ -z "$FIRST_COMMIT" ]; then
+              FIRST_COMMIT="$COMMIT"
+            fi
+
+            TIME=$(git show -s --format=%ct "$COMMIT")
+
+            if [ "$TIME" -ge "$CUTOFF" ]; then
+              FIRST_KEEP="$COMMIT"
+              break
+            fi
+          done < <(git rev-list --reverse --first-parent "$OLD_HEAD")
+
+          if [ -z "$FIRST_COMMIT" ]; then
+            echo "No commits found."
+            exit 0
+          fi
+
+          if [ "$FIRST_KEEP" = "$FIRST_COMMIT" ]; then
+            echo "No old main history to clean."
+
+            echo "cleanup_required=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -n "$FIRST_KEEP" ]; then
+            echo "First retained commit:"
+            git show -s --format="%h %ad %s" --date=short "$FIRST_KEEP"
+          else
+            echo "All commits are older than retention."
+            echo "Keeping current file snapshot only."
+          fi
+
+          # 保存当前分支作为重建来源
+          git branch -f cleanup-rewrite "$OLD_HEAD"
+
+          # 新根提交使用第一个保留提交的父提交文件树，
+          # 然后重新应用保留时间范围内的提交。
+          if [ -n "$FIRST_KEEP" ]; then
+            ROOT_TREE=$(git rev-parse "$FIRST_KEEP^{}^{tree}")
+          else
+            ROOT_TREE=$(git rev-parse "$OLD_HEAD^{tree}")
+          fi
+
+          NEW_ROOT=$(
+            printf '%s\n' "Initial history snapshot" |
+              git commit-tree "$ROOT_TREE"
+          )
+
+          echo "New root: $NEW_ROOT"
+
+          if [ -n "$FIRST_KEEP" ]; then
+            git rebase \
+              --rebase-merges \
+              --onto "$NEW_ROOT" \
+              "$FIRST_KEEP^" \
+              cleanup-rewrite
+          else
+            git branch -f cleanup-rewrite "$NEW_ROOT"
+          fi
+
+          NEW_HEAD=$(git rev-parse cleanup-rewrite)
+
+          # 验证重写前后的文件树完全一致
+          if ! git diff --quiet "$OLD_HEAD^{tree}" "$NEW_HEAD^{tree}"; then
+            echo "::error::Final file snapshot differs from original main."
+            exit 1
+          fi
+
+          echo "Old commits: $(git rev-list --count "$OLD_HEAD")"
+          echo "New commits: $(git rev-list --count "$NEW_HEAD")"
+
+          echo "old_head=$OLD_HEAD" >> "$GITHUB_OUTPUT"
+          echo "new_head=$NEW_HEAD" >> "$GITHUB_OUTPUT"
+          echo "cleanup_required=true" >> "$GITHUB_OUTPUT"
+
+      # 21. Push cleaned main history
+      - name: Push cleaned main history
+        if: ${{ steps.history.outputs.cleanup_required == 'true' }}
+        env:
+          OLD_HEAD: ${{ steps.history.outputs.old_head }}
+          NEW_HEAD: ${{ steps.history.outputs.new_head }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git push \
+            --force-with-lease="refs/heads/main:$OLD_HEAD" \
+            origin \
+            "$NEW_HEAD:refs/heads/main"
+
+          echo "Main history updated successfully."
+
+          {
+            echo "## Main Commit Cleanup"
+            echo ""
+            echo "- Retention: ${{ steps.settings.outputs.commits_days }} days"
+            echo "- Old HEAD: \`$OLD_HEAD\`"
+            echo "- New HEAD: \`$NEW_HEAD\`"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 22. Final summary
+      - name: Maintenance summary
+        if: always()
+        run: |
+          echo "================================"
+          echo "ChinaIP-and-GFW Maintenance"
+          echo "================================"
+
+          {
+            echo "## Maintenance Result"
+            echo ""
+            echo "- Workflow Runs retention: ${{ steps.settings.outputs.runs_days }} days"
+            echo "- Main commits retention: ${{ steps.settings.outputs.commits_days }} days"
+            echo "- Automatic update interval: ${{ steps.settings.outputs.update_interval }} hours"
+            echo "- Maintenance executed: ${{ steps.gate.outputs.run_maintenance }}"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
