@@ -21,7 +21,7 @@ on:
         type: number
 
   schedule:
-    - cron: 30 */8 * * *
+    - cron: "30 18,0,2,6,12 * * *"
 
   push:
     branches:
