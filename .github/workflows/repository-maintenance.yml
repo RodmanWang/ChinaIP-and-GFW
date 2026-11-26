@@ -1,0 +1,918 @@
+
+name: ChinaIP-and-GFW 维护
+
+permissions:
+  contents: write
+  actions: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      保留天数:
+        description: "保留最近多少天的 Actions 运行记录和 main 分支提交？"
+        required: true
+        default: 7
+        type: number
+
+      保留数量:
+        description: "在保留天数范围内，最多保留多少条 Actions 运行记录和 main 主线提交？"
+        required: true
+        default: 30
+        type: number
+
+  schedule:
+    - cron: 30 */8 * * *
+
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/README.md"
+      - ".github/workflows/repository-maintenance.yml"
+
+concurrency:
+  group: chinaip-and-gfw-maintenance
+  cancel-in-progress: false
+
+jobs:
+  maintenance:
+    name: 数据更新与历史清理
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      GH_TOKEN: ${{ secrets.PERSON_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      DEFAULT_BRANCH: main
+
+      DEFAULT_RETENTION_DAYS: "7"
+      DEFAULT_RETENTION_COUNT: "30"
+
+    steps:
+      # 0. 检查 PERSON_TOKEN
+      - name: 检查访问令牌
+        shell: bash
+        env:
+          PERSON_TOKEN: ${{ secrets.PERSON_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$PERSON_TOKEN" ]; then
+            echo "::error::仓库 Secret PERSON_TOKEN 尚未配置。"
+            exit 1
+          fi
+
+          echo "访问令牌配置正常。"
+
+      # 1. Checkout main
+      - name: 检出 main 分支
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.PERSON_TOKEN }}
+          persist-credentials: true
+
+      # 2. Configure Git
+      - name: 配置 Git
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "GitHub Actions Bot"
+
+      # 3. Resolve settings
+      - name: 设置清理参数
+        id: settings
+        env:
+          INPUT_DAYS: ${{ github.event.inputs['保留天数'] }}
+          INPUT_COUNT: ${{ github.event.inputs['保留数量'] }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            KEEP_DAYS="${INPUT_DAYS:-$DEFAULT_RETENTION_DAYS}"
+            KEEP_COUNT="${INPUT_COUNT:-$DEFAULT_RETENTION_COUNT}"
+          else
+            KEEP_DAYS="$DEFAULT_RETENTION_DAYS"
+            KEEP_COUNT="$DEFAULT_RETENTION_COUNT"
+          fi
+
+          if ! [[ "$KEEP_DAYS" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::保留天数必须是正整数。"
+            exit 1
+          fi
+
+          if ! [[ "$KEEP_COUNT" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::保留数量必须是正整数。"
+            exit 1
+          fi
+
+          echo "days=$KEEP_DAYS" >> "$GITHUB_OUTPUT"
+          echo "count=$KEEP_COUNT" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## 清理设置"
+            echo ""
+            echo "- 保留天数：**$KEEP_DAYS 天**"
+            echo "- 保留数量：**$KEEP_COUNT 条**"
+            echo ""
+            echo "清理顺序：先按天数筛选，再按数量限制。"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "================================"
+          echo "保留天数：$KEEP_DAYS 天"
+          echo "保留数量：$KEEP_COUNT 条"
+          echo "================================"
+
+      # 4. Remember manual settings
+      - name: 保存手动运行设置
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        env:
+          NEW_DAYS: ${{ steps.settings.outputs.days }}
+          NEW_COUNT: ${{ steps.settings.outputs.count }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          WORKFLOW_FILE=".github/workflows/repository-maintenance.yml"
+
+          if [ ! -f "$WORKFLOW_FILE" ]; then
+            echo "::error::找不到工作流文件：$WORKFLOW_FILE"
+            exit 1
+          fi
+
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          path = Path(".github/workflows/repository-maintenance.yml")
+          lines = path.read_text().splitlines(keepends=True)
+
+          days = os.environ["NEW_DAYS"]
+          count = os.environ["NEW_COUNT"]
+
+          if not days.isdigit() or int(days) <= 0:
+              raise SystemExit("保留天数必须是正整数。")
+
+          if not count.isdigit() or int(count) <= 0:
+              raise SystemExit("保留数量必须是正整数。")
+
+          def update_input_default(name, value):
+              key = "      " + name + ":"
+
+              matches = [
+                  i for i, line in enumerate(lines)
+                  if line.rstrip("\r\n") == key
+              ]
+
+              if len(matches) != 1:
+                  raise SystemExit(
+                      f"输入项 {name} 应出现一次，"
+                      f"实际出现 {len(matches)} 次。"
+                  )
+
+              start = matches[0] + 1
+              end = len(lines)
+
+              for i in range(start, len(lines)):
+                  if re.match(r"^      [^\s#]", lines[i]):
+                      end = i
+                      break
+
+              defaults = [
+                  i for i in range(start, end)
+                  if re.match(r"^        default:\s*", lines[i])
+              ]
+
+              if len(defaults) != 1:
+                  raise SystemExit(
+                      f"输入项 {name} 的 default 应出现一次，"
+                      f"实际出现 {len(defaults)} 次。"
+                  )
+
+              i = defaults[0]
+              newline = "\n" if lines[i].endswith("\n") else ""
+              lines[i] = f"        default: {value}{newline}"
+
+          def update_env_default(name, value):
+              prefix = "      " + name + ":"
+
+              matches = [
+                  i for i, line in enumerate(lines)
+                  if line.startswith(prefix)
+              ]
+
+              if len(matches) != 1:
+                  raise SystemExit(
+                      f"环境变量 {name} 应出现一次，"
+                      f"实际出现 {len(matches)} 次。"
+                  )
+
+              i = matches[0]
+              newline = "\n" if lines[i].endswith("\n") else ""
+
+              lines[i] = (
+                  f'      {name}: "{value}"{newline}'
+              )
+
+          update_input_default("保留天数", days)
+          update_input_default("保留数量", count)
+
+          update_env_default("DEFAULT_RETENTION_DAYS", days)
+          update_env_default("DEFAULT_RETENTION_COUNT", count)
+
+          path.write_text("".join(lines))
+
+          print("手动运行设置已更新：")
+          print(f"保留天数：{days}")
+          print(f"保留数量：{count}")
+          PY
+
+          git add "$WORKFLOW_FILE"
+
+          if git diff --cached --quiet; then
+            echo "设置没有变化，无需提交。"
+          else
+            git commit -m "chore: 更新维护清理默认设置 [skip ci]"
+            git push origin HEAD:main
+            echo "新的默认设置已保存到 main。"
+          fi
+
+      # 5. 确认执行维护任务
+      - name: 确认执行维护任务
+        id: gate
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "run_maintenance=true" >> "$GITHUB_OUTPUT"
+
+          echo "开始执行维护任务。"
+
+      # 6. 清理旧的 Workflow Runs
+      - name: 清理 Actions 运行记录
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        env:
+          KEEP_DAYS: ${{ steps.settings.outputs.days }}
+          KEEP_COUNT: ${{ steps.settings.outputs.count }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Actions 运行记录清理开始。"
+          echo "保留天数：$KEEP_DAYS"
+          echo "保留数量：$KEEP_COUNT"
+
+          CUTOFF=$(date -u -d "$KEEP_DAYS days ago" +%s)
+          CURRENT_RUN_ID="$GITHUB_RUN_ID"
+
+          TEMP_FILE="$RUNNER_TEMP/workflow-runs.tsv"
+
+          gh api --paginate \
+            "repos/$GH_REPO/actions/runs?per_page=100" \
+            --jq '.workflow_runs[] | [.created_at, .id] | @tsv' \
+            > "$TEMP_FILE"
+
+          if [ ! -s "$TEMP_FILE" ]; then
+            echo "没有找到 Actions 运行记录。"
+            exit 0
+          fi
+
+          SORTED_FILE="$RUNNER_TEMP/workflow-runs-sorted.tsv"
+
+          LC_ALL=C sort -r -k1,1 "$TEMP_FILE" > "$SORTED_FILE"
+
+          RETAINED=0
+          DELETED=0
+          FAILED=0
+
+          while IFS=$'\t' read -r CREATED_AT RUN_ID; do
+            [ -z "${RUN_ID:-}" ] && continue
+
+            CREATED_EPOCH=$(date -u -d "$CREATED_AT" +%s)
+
+            SHOULD_DELETE=false
+
+            # 当前正在运行的工作流不能删除
+            if [ "$RUN_ID" = "$CURRENT_RUN_ID" ]; then
+              RETAINED=$((RETAINED + 1))
+              echo "保留当前运行记录：$RUN_ID"
+              continue
+            fi
+
+            # 第一优先级：按保留天数筛选
+            if [ "$CREATED_EPOCH" -lt "$CUTOFF" ]; then
+              SHOULD_DELETE=true
+              REASON="超过保留天数"
+            else
+              # 第二优先级：按时间从新到旧限制数量
+              RETAINED=$((RETAINED + 1))
+
+              if [ "$RETAINED" -gt "$KEEP_COUNT" ]; then
+                SHOULD_DELETE=true
+                REASON="超过保留数量"
+              fi
+            fi
+
+            if [ "$SHOULD_DELETE" = "true" ]; then
+              echo "删除运行记录：$RUN_ID，原因：$REASON"
+
+              if gh api \
+                --method DELETE \
+                "repos/$GH_REPO/actions/runs/$RUN_ID" \
+                >/dev/null 2>&1; then
+                DELETED=$((DELETED + 1))
+              else
+                echo "::warning::运行记录 $RUN_ID 删除失败或已不存在。"
+                FAILED=$((FAILED + 1))
+              fi
+            fi
+
+          done < "$SORTED_FILE"
+
+          {
+            echo "## Actions 运行记录清理"
+            echo ""
+            echo "- 保留天数：$KEEP_DAYS 天"
+            echo "- 保留数量：$KEEP_COUNT 条"
+            echo "- 已删除：$DELETED 条"
+            echo "- 删除失败或已不存在：$FAILED 条"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Actions 运行记录清理完成。"
+          echo "删除：$DELETED"
+          echo "失败：$FAILED"
+
+      # 7. Set up Go
+      - name: 安装 Go 环境
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.4'
+
+      # 8. Get dependencies
+      - name: 获取项目依赖
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          go get -v -t -d ./...
+
+          if [ -f Gopkg.toml ]; then
+            curl -LR -o /tmp/dep-install.sh \
+              https://raw.githubusercontent.com/golang/dep/master/install.sh
+            sh /tmp/dep-install.sh
+            dep ensure
+          fi
+
+      # 9. Create dist folders
+      - name: 创建数据目录
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p dist
+          mkdir -p dist2
+          mkdir -p dist3
+          mkdir -p dist4
+
+      # 10. Compile GeoIP conversion binary
+      - name: 编译 GeoIP 转换程序
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+          /bin/bash ./build.sh
+
+      # 11. Obtain source lists
+      - name: 获取数据源
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          # 中国 IP
+          curl -fLR -o dist/ChinaIPv4-1.txt \
+            "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
+
+          curl -fLR -o dist/ChinaIPv4-2.txt \
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
+
+          curl -fLR -o dist/ChinaIPv6.txt \
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+
+          curl -fLR -o dist/exclude-domestic-ip.conf \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-domestic-ip.txt"
+
+          # Bogus-Nxdomain
+          curl -fLR -o dist2/bogus-nxdomain1.txt \
+            "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/bogus-nxdomain.china.conf"
+
+          curl -fLR -o dist2/bogus-nxdomain2.conf \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/bogus-nxdomain-added.txt"
+
+          curl -fLR -o dist2/bogus-nxdomain3.txt \
+            "https://urlhaus-filter.pages.dev/urlhaus-filter-ag-online.txt"
+
+          # 国内域名
+          curl -fLR -o dist3/domains.china.txt \
+            "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
+
+          curl -fLR -o dist3/domestic-added.conf \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/domestic-added.txt"
+
+          curl -fLR -o dist3/exclude-domestic.txt \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-domestic.txt"
+
+          # GFW
+          curl -fLR -o dist4/gfw2.txt \
+            "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/gfw.txt"
+
+          curl -fLR -o dist4/gfw3.txt \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/gfw-added.txt"
+
+          curl -fLR -o dist4/exclude-gfw.conf \
+            "https://raw.githubusercontent.com/RodmanWang/ChinaIP-and-GFW/main/patch/exclude-gfw.txt"
+
+      # 12. Merge China IP lists
+      - name: 合并中国 IP 列表
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          awk '!/^( *#.*| *$)/' dist/*.txt > dist/China-IP.txt
+
+          awk '!seen[$0]++' dist/China-IP.txt |
+            grep -Ev "^$|^\s*#" |
+            awk -F. '$1~/^[0-9]+$/{print "ipv4",$0;next} {print "ipv6",$0}' |
+            sort -t' ' -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n |
+            awk '{print $2}' |
+            sort -t. -k1,1n -k2,2n -k3,3n -k4,4n -k5,5n -k6,6n -k7,7n -k8,8n \
+            > dist/ChinaIPv4v6.txt
+
+          awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' \
+            dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt |
+            grep -Ev "^$|^\s*#" > dist/ChinaIP.txt
+
+          awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' \
+            dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt |
+            grep -Ev "^$|^\s*#|.*\:.*" > dist/ChinaIPv4.txt
+
+          awk 'NR==FNR{a[$0];next} {for (i in a) if (i ~ $0) next} 1' \
+            dist/exclude-domestic-ip.conf dist/ChinaIPv4v6.txt |
+            grep -Ev "^$|^\s*#|.*\..*" > dist/ChinaIPv6.txt
+
+          awk '{print "blacklist-ip " $0}' \
+            dist/ChinaIP.txt > dist/BlacklistIP.conf
+
+          awk '{print "whitelist-ip " $0}' \
+            dist/ChinaIP.txt > dist/WhitelistIP.conf
+
+      # 13. Merge Bogus-Nxdomain lists
+      - name: 合并 Bogus-Nxdomain 列表
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          awk '!/^[[:space:]]*(#|$)/' \
+            dist2/bogus-nxdomain1.txt > dist2/bogus-nxdomain1-1.txt
+
+          awk '{sub(/bogus-nxdomain=/,""); print}' \
+            dist2/bogus-nxdomain1-1.txt > dist2/bogus-nxdomain1.conf
+
+          awk '{sub(/\|\|/,""); sub(/\$all/,""); print}' \
+            dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3-1.txt
+
+          awk '!/^[[:space:]]*(#|$)/ && /([0-9]{1,3}\.){3}[0-9]{1,3}/ && !/[^0-9.]/' \
+            dist2/bogus-nxdomain3-1.txt > dist2/bogus-nxdomain3.txt
+
+          awk '{
+            split($0,a,".");
+            if(a[1]<=255&&a[2]<=255&&a[3]<=255&&a[4]<=255) print
+          }' dist2/bogus-nxdomain3.txt > dist2/bogus-nxdomain3.conf
+
+          awk '!seen[$0]++' dist2/*.conf |
+            sort -t'.' -k1,1n -k2,2n -k3,3n -k4,4n |
+            grep -Ev "^$|^\s*#" > dist2/nxdomain2.conf
+
+          awk '{print "bogus-nxdomain " $0 (index($0,":")?"/128":"/32")}' \
+            dist2/nxdomain2.conf > dist2/BogusNxdomain.conf
+
+          awk '{print "  - \x27" $0 (index($0,":")?"/128":"/32") "\x27"}' \
+            dist2/nxdomain2.conf > dist2/nxdomain3.conf
+
+          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" '
+            BEGIN { lines=0 }
+            { content[lines++] = $0 }
+            END {
+              print "payload:"
+              print "# > AD & BanIP"
+              print "# > lines: " lines
+              print "# > Times: " datetime
+              for(i=0; i<lines; i++) print content[i]
+            }' dist2/nxdomain3.conf > dist2/Ad·IP.yaml
+
+      # 14. Merge China domain lists
+      - name: 合并国内域名列表
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          awk '{gsub(/server=\/|\/114\.114\.114\.114|[[:space:]]*/, "")} 1' \
+            dist3/domains.china.txt > dist3/domains.china.conf
+
+          awk '!/^( *#.*| *$)/' dist3/*.conf |
+            awk '!seen[$0]++' |
+            sort -t. -k1 |
+            grep -Ev "^$|^\s*#" > dist3/China2.conf
+
+          sed 's/\r$//' dist3/exclude-domestic.txt |
+            awk '!/^( *#.*| *$)/' > dist3/exclude-domestic.tmp
+
+          grep -Fvxf dist3/exclude-domestic.tmp dist3/China2.conf |
+            awk '!/^( *#.*| *$)/' > dist3/China3.conf
+
+          grep -v '\.' dist3/China3.conf |
+            sed 's/^/./' > dist3/China4.conf
+
+          grep -Fvf dist3/China4.conf dist3/China3.conf \
+            > dist3/ChinaDomain3.conf
+
+          sort -u dist3/ChinaDomain3.conf |
+            awk '{print "server=/"$0"/114.114.114.114"}' \
+            > dist3/ChinaDomain2.conf
+
+          sort -u dist3/ChinaDomain3.conf |
+            awk '{print "nameserver /"$0"/domestic"}' \
+            > dist3/ChinaDomain.conf
+
+          sort -u dist3/ChinaDomain3.conf |
+            awk '{print "  - DOMAIN-SUFFIX,"$0}' \
+            > dist3/ChinaDomain4.conf
+
+          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" '
+            BEGIN { lines=0 }
+            { content[lines++] = $0 }
+            END {
+              print "payload:"
+              print "# > lines: " lines
+              print "# > Times: " datetime
+              for(i=0; i<lines; i++) print content[i]
+            }' dist3/ChinaDomain4.conf > dist3/Domestic.yaml
+
+      # 15. Merge GFW domain lists
+      - name: 合并 GFW 域名列表
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          awk '!/^( *#.*| *$)/' dist4/*.txt > dist4/gfw1.txt
+
+          sed 's/\r$//' dist4/exclude-gfw.conf |
+            awk '!/^( *#.*| *$)/' > dist4/exclude.tmp
+
+          grep -Fvxf dist4/exclude.tmp dist4/gfw1.txt |
+            awk '!/^( *#.*| *$)/' > dist4/gfw0.txt
+
+          grep -v '\.' dist4/gfw0.txt |
+            sed 's/^/./' > dist4/gfw11.txt
+
+          grep -Fvf dist4/gfw11.txt dist4/gfw0.txt \
+            > dist4/gfw22.txt
+
+          awk '!seen[$0]++' dist4/gfw22.txt |
+            sort -t. -k1 |
+            grep -Ev "^$|^\s*#" > dist4/GFW.txt
+
+          sort -u dist4/GFW.txt |
+            sed 's/^/||/' > dist4/AutoGFW111.txt
+
+          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" '
+            BEGIN { lines=0 }
+            { content[lines++] = $0 }
+            END {
+              print "# > lines: " lines
+              print "# > Times: " datetime
+              for(i=0; i<lines; i++) print content[i]
+            }' dist4/AutoGFW111.txt > dist4/AutoGFW.txt
+
+          sort -u dist4/GFW.txt |
+            awk '{print "  - DOMAIN-SUFFIX,"$0}' \
+            > dist4/GFW00000.txt
+
+          awk -v datetime="$(TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S')" '
+            BEGIN { lines=0 }
+            { content[lines++] = $0 }
+            END {
+              print "payload:"
+              print "# > lines: " lines
+              print "# > Times: " datetime
+              for(i=0; i<lines; i++) print content[i]
+            }' dist4/GFW00000.txt > dist4/Proxy.yaml
+
+          sort -u dist4/GFW.txt |
+            awk '{print "nameserver /"$0"/abroad"}' \
+            > dist4/GFW.conf
+
+      # 16. Generate GeoIP2 database
+      - name: 生成 GeoIP2 数据库
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        run: |
+          set -euo pipefail
+
+          CURRENT_DIR=$(pwd)
+          cd dist
+          ./ipip2mmdb -s ./ChinaIP.txt -d Country.mmdb
+          cd "$CURRENT_DIR"
+
+      # 17. Prepare release artifacts
+      - name: 准备发布文件
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ARTIFACT_DIR="/tmp/release-artifacts"
+          mkdir -p "$ARTIFACT_DIR"
+
+          cp dist/Country.mmdb "$ARTIFACT_DIR/"
+          cp dist/ChinaIPv4.txt "$ARTIFACT_DIR/"
+          cp dist/ChinaIPv6.txt "$ARTIFACT_DIR/"
+          cp dist/ChinaIP.txt "$ARTIFACT_DIR/"
+          cp dist/BlacklistIP.conf "$ARTIFACT_DIR/"
+          cp dist/WhitelistIP.conf "$ARTIFACT_DIR/"
+
+          cp dist2/BogusNxdomain.conf "$ARTIFACT_DIR/"
+          cp "dist2/Ad·IP.yaml" "$ARTIFACT_DIR/"
+
+          cp dist3/ChinaDomain.conf "$ARTIFACT_DIR/"
+          cp dist3/ChinaDomain2.conf "$ARTIFACT_DIR/"
+          cp dist3/ChinaDomain3.conf "$ARTIFACT_DIR/"
+          cp dist3/Domestic.yaml "$ARTIFACT_DIR/"
+
+          cp dist4/GFW.txt "$ARTIFACT_DIR/"
+          cp dist4/AutoGFW.txt "$ARTIFACT_DIR/"
+          cp dist4/GFW.conf "$ARTIFACT_DIR/"
+          cp dist4/Proxy.yaml "$ARTIFACT_DIR/"
+
+      # 18. Publish release branch
+      - name: 发布 release 分支
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git checkout --orphan release-orphan
+
+          git rm -rf . >/dev/null 2>&1 || true
+          git clean -fdx
+
+          cp -a /tmp/release-artifacts/. .
+
+          git add \
+            Country.mmdb \
+            ChinaIP.txt \
+            ChinaIPv4.txt \
+            ChinaIPv6.txt \
+            GFW.txt \
+            AutoGFW.txt \
+            GFW.conf \
+            Proxy.yaml \
+            BlacklistIP.conf \
+            WhitelistIP.conf \
+            ChinaDomain.conf \
+            ChinaDomain2.conf \
+            ChinaDomain3.conf \
+            Domestic.yaml \
+            BogusNxdomain.conf \
+            "Ad·IP.yaml"
+
+          git commit --allow-empty \
+            -m "更新：$(TZ=UTC-8 date '+%Y-%m-%d %H:%M:%S') [skip ci]"
+
+          # 只更新 release 的最新发布文件
+          # 不清理、不统计、不重写 release 历史
+          git push --force origin HEAD:refs/heads/release
+
+          echo "release 分支发布完成。"
+
+      # 19. Prepare main history cleanup
+      - name: 按天数和数量清理 main 历史
+        if: ${{ steps.gate.outputs.run_maintenance == 'true' }}
+        id: history
+        env:
+          KEEP_DAYS: ${{ steps.settings.outputs.days }}
+          KEEP_COUNT: ${{ steps.settings.outputs.count }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "开始清理 main 分支历史。"
+          echo "保留天数：$KEEP_DAYS"
+          echo "保留数量：$KEEP_COUNT"
+
+          # 明确只获取和处理 main
+          # release 不参与任何历史统计或重写
+          git fetch origin main
+          git checkout --detach refs/remotes/origin/main
+
+          OLD_HEAD=$(git rev-parse HEAD)
+          CUTOFF=$(date -u -d "$KEEP_DAYS days ago" +%s)
+
+          FIRST_COMMIT=""
+          FIRST_KEEP=""
+          ELIGIBLE_COUNT=0
+
+          # 第一阶段：按时间筛选 main 第一父提交链
+          # 第二阶段：只保留日期范围内最新的 KEEP_COUNT 个主线提交
+          #
+          # 使用 Python 计算保留边界，避免 head 提前关闭管道
+          RESULT_FILE="$RUNNER_TEMP/history-boundary.txt"
+
+          python3 - "$OLD_HEAD" "$CUTOFF" "$KEEP_COUNT" "$RESULT_FILE" <<'PY'
+          import subprocess
+          import sys
+
+          old_head = sys.argv[1]
+          cutoff = int(sys.argv[2])
+          keep_count = int(sys.argv[3])
+          output = sys.argv[4]
+
+          result = subprocess.run(
+              [
+                  "git", "rev-list",
+                  "--first-parent",
+                  "--reverse",
+                  old_head
+              ],
+              check=True,
+              capture_output=True,
+              text=True
+          )
+
+          commits = result.stdout.splitlines()
+
+          eligible = []
+
+          for commit in commits:
+              timestamp = int(
+                  subprocess.check_output(
+                      ["git", "show", "-s", "--format=%ct", commit],
+                      text=True
+                  ).strip()
+              )
+
+              if timestamp >= cutoff:
+                  eligible.append(commit)
+
+          retained = eligible[-keep_count:] if keep_count else []
+
+          with open(output, "w", encoding="utf-8") as f:
+              f.write(f"{commits[0] if commits else ''}\n")
+              f.write(f"{retained[0] if retained else ''}\n")
+              f.write(f"{len(eligible)}\n")
+              f.write(f"{len(retained)}\n")
+          PY
+
+          mapfile -t BOUNDARIES < "$RESULT_FILE"
+
+          FIRST_COMMIT="${BOUNDARIES[0]:-}"
+          FIRST_KEEP="${BOUNDARIES[1]:-}"
+          ELIGIBLE_COUNT="${BOUNDARIES[2]:-0}"
+          RETAINED_COUNT="${BOUNDARIES[3]:-0}"
+
+          if [ -z "$FIRST_COMMIT" ]; then
+            echo "main 分支没有提交。"
+            echo "cleanup_required=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "日期范围内的主线提交：$ELIGIBLE_COUNT"
+          echo "计划保留的主线提交：$RETAINED_COUNT"
+
+          if [ "$RETAINED_COUNT" -eq "$ELIGIBLE_COUNT" ] &&
+             [ "$FIRST_KEEP" = "$FIRST_COMMIT" ]; then
+            echo "main 历史已经符合保留要求。"
+            echo "cleanup_required=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # 创建重写备份引用
+          git branch -f cleanup-rewrite "$OLD_HEAD"
+
+          if [ -n "$FIRST_KEEP" ]; then
+            echo "第一个保留的主线提交："
+            git show -s --format="%h %ad %s" --date=short "$FIRST_KEEP"
+
+            # 以第一个保留提交之前的文件树创建新根提交
+            ROOT_TREE=$(git rev-parse "$FIRST_KEEP^{}^{tree}")
+          else
+            echo "日期范围内没有符合条件的提交。"
+            echo "将仅保留当前 main 文件快照。"
+
+            ROOT_TREE=$(git rev-parse "$OLD_HEAD^{tree}")
+          fi
+
+          NEW_ROOT=$(
+            printf '%s\n' "Initial history snapshot" |
+              git commit-tree "$ROOT_TREE"
+          )
+
+          echo "新根提交：$NEW_ROOT"
+
+          if [ -n "$FIRST_KEEP" ]; then
+            # 保留第一父链中从 FIRST_KEEP 开始的历史
+            git rebase \
+              --rebase-merges \
+              --onto "$NEW_ROOT" \
+              "$FIRST_KEEP^" \
+              cleanup-rewrite
+          else
+            git branch -f cleanup-rewrite "$NEW_ROOT"
+          fi
+
+          NEW_HEAD=$(git rev-parse cleanup-rewrite)
+
+          # 验证重写前后的文件树完全一致
+          if ! git diff --quiet "$OLD_HEAD^{tree}" "$NEW_HEAD^{tree}"; then
+            echo "::error::历史重写后的文件快照与原 main 不一致，停止推送。"
+            exit 1
+          fi
+
+          echo "文件快照验证通过。"
+
+          echo "原 main 主线提交数：$(git rev-list --first-parent --count "$OLD_HEAD")"
+          echo "新 main 主线提交数：$(git rev-list --first-parent --count "$NEW_HEAD")"
+
+          echo "old_head=$OLD_HEAD" >> "$GITHUB_OUTPUT"
+          echo "new_head=$NEW_HEAD" >> "$GITHUB_OUTPUT"
+          echo "cleanup_required=true" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## main 历史清理"
+            echo ""
+            echo "- 清理范围：仅 main 分支"
+            echo "- release 分支：完全排除"
+            echo "- 保留天数：$KEEP_DAYS 天"
+            echo "- 保留数量：$KEEP_COUNT 条主线提交"
+            echo "- 日期范围内提交：$ELIGIBLE_COUNT 条"
+            echo "- 计划保留提交：$RETAINED_COUNT 条"
+            echo "- 原文件快照与新文件快照：一致"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 20. Push cleaned main history
+      - name: 推送清理后的 main 历史
+        if: ${{ steps.history.outputs.cleanup_required == 'true' }}
+        env:
+          OLD_HEAD: ${{ steps.history.outputs.old_head }}
+          NEW_HEAD: ${{ steps.history.outputs.new_head }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # 使用 force-with-lease 防止覆盖清理期间产生的新提交
+          git push \
+            --force-with-lease="refs/heads/main:$OLD_HEAD" \
+            origin \
+            "$NEW_HEAD:refs/heads/main"
+
+          echo "main 分支历史更新成功。"
+
+          {
+            echo "## main 历史推送结果"
+            echo ""
+            echo "- 保留天数：${{ steps.settings.outputs.days }} 天"
+            echo "- 保留数量：${{ steps.settings.outputs.count }} 条主线提交"
+            echo "- 旧 HEAD：\`$OLD_HEAD\`"
+            echo "- 新 HEAD：\`$NEW_HEAD\`"
+            echo "- release 分支：未修改"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 21. Final summary
+      - name: 维护结果汇总
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "================================"
+          echo "ChinaIP-and-GFW 维护任务"
+          echo "================================"
+
+          {
+            echo "## 维护结果"
+            echo ""
+            echo "- 保留天数：${{ steps.settings.outputs.days }} 天"
+            echo "- 保留数量：${{ steps.settings.outputs.count }} 条"
+            echo "- Actions 清理：${{ steps.gate.outputs.run_maintenance == 'true' && '已执行' || '未执行' }}"
+            echo "- Git 清理范围：main 分支"
+            echo "- release 分支：排除，不参与历史清理"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "维护任务结束。"
