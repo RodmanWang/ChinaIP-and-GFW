@@ -21,8 +21,9 @@ on:
         type: number
 
   schedule:
-    - cron: "30 3,11,19 * * *"
-
+    - cron: '30 3,12,20 * * *'
+    timezone: 'Asia/Shanghai'
+    
   push:
     branches:
       - main
